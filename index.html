@@ -200,5 +200,27 @@
       label.style.color = isLight ? '#000000' : '#ffffff';
     }
   </script>
+  
+  <!-- Socket.IO Client -->
+<script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
+<script>
+  const socket = io("http://192.168.1.109:3000");
+
+  socket.on("connect", () => {
+    console.log("Connected to server:", socket.id);
+  });
+
+  // Simulate reserving a song when joining a room
+  function reserveSong(title = "Sample Song") {
+    socket.emit("reserve-song", { title });
+    console.log("Reserved song:", title);
+  }
+
+  // Receive confirmation
+  socket.on("song-reserved", (data) => {
+    alert("Song Reserved: " + data.title);
+  });
+</script>
+
 </body>
 </html>
