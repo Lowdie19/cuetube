@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KaraOwkie!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .screen { display: none; width: 100%; height: 100vh; justify-content: center; align-items: center; flex-direction: column; }
+    .active { display: flex !important; }
+    .title {
+      color: white;
+      font-size: 2.5em;
+      margin-bottom: 40px;
+      text-shadow: 0 0 5px cyan, 0 0 10px cyan;
+      animation: blink 1.5s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; text-shadow: 0 0 5px cyan, 0 0 10px cyan; }
+      50% { opacity: 0.7; text-shadow: 0 0 2px cyan, 0 0 5px cyan; }
+    }
+    .neon-button {
+      background-color: #121212;
+      color: white;
+      border: 2px solid cyan;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+    .neon-button:hover { background-color: cyan; color: black; }
+    .input-box {
+      background-color: white;
+      color: black;
+      font-size: 1em;
+      padding: 12px 16px;
+      border-radius: 10px;
+      width: 240px;
+      text-align: center;
+      margin-bottom: 10px;
+      border: none;
+    }
+    .label-text {
+      font-family: Arial, sans-serif;
+      color: white;
+      font-size: 1em;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+    }
+    .hint {
+      color: #ccc;
+      font-size: 0.9em;
+      margin-top: 5px;
+      max-width: 80%;
+      text-align: center;
+    }
+    .room-drawer {
+      position: absolute;
+      left: -220px;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+      transition: left 0.3s ease;
+    }
+    .room-drawer.open { left: 0; }
+    .room-drawer .subtitle {
+      color: #7f7f7f;
+      font-size: 0.6em;
+      text-align: left;
+    }
+    .room-drawer .value {
+      font-size: 2.0em;
+      font-weight: bold;
+      text-align: left;
+    }
+    .divider {
+      height: 1px;
+      width: 100%;
+      background-color: #7f7f7f;
+      margin: 10px 0;
+    }
+    .switch { display: flex; align-items: center; justify-content: space-between; }
+    .switch input[type="checkbox"] {
+      appearance: none;
+      width: 40px;
+      height: 20px;
+      background-color: #ccc;
+      border-radius: 20px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+    }
+    .switch input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: #fff;
+      top: 1px;
+      left: 1px;
+      transition: transform 0.2s;
+    }
+    .switch input[type="checkbox"]:checked {
+      background-color: #6200ee;
+    }
+    .switch input[type="checkbox"]:checked::before {
+      transform: translateX(20px);
+    }
+    .leave-text {
+      color: red;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
+
+  <!-- Home Screen -->
+  <div class="screen active" id="homeScreen">
+    <h1 class="title">KaraOwkie!</h1>
+    <button class="neon-button" onclick="switchScreen('createScreen')">Create</button>
+    <button class="neon-button" onclick="switchScreen('joinScreen')">Join</button>
+  </div>
+
+  <!-- Create Room Screen -->
+  <div class="screen" id="createScreen">
+    <p class="label-text">CREATE ROOM:</p>
+    <input type="text" class="input-box" placeholder="PASSCODE" maxlength="5" id="createCode" />
+    <p class="hint">💡 Turn on your mobile hotspot now. This will let others connect to your room.</p>
+    <button class="neon-button" onclick="switchScreen('roomScreen')">Create</button>
+    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
+  </div>
+
+  <!-- Join Room Screen -->
+  <div class="screen" id="joinScreen">
+    <p class="label-text">JOIN ROOM:</p>
+    <input type="text" class="input-box" placeholder="ENTER CODE" maxlength="5" id="joinCode" />
+    <p class="hint">💡 Connect to the host’s Wi-Fi hotspot first. Then return to the app to join.</p>
+    <button class="neon-button" onclick="switchScreen('roomScreen')">Join</button>
+    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
+  </div>
+
+  <!-- Room Screen -->
+  <div class="screen" id="roomScreen">
+    <div class="room-drawer" id="roomDrawer">
+      <div class="subtitle">ROOM PASSCODE:</div>
+      <div class="value" id="roomCodeDisplay">ABCDE</div>
+      <div class="divider"></div>
+      <div class="subtitle">THEME:</div>
+      <div class="switch">
+        <label for="switch1" id="themeLabel">LIGHT MODE</label>
+        <input type="checkbox" id="switch1" onclick="toggleTheme()" />
+      </div>
+      <div class="divider"></div>
+      <div class="leave-text" onclick="switchScreen('homeScreen')">LEAVE ROOM</div>
+    </div>
+    <iframe src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
+  </div>
+
+  <script>
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    let touchStartX = 0;
+    function handleTouchStart(evt) { touchStartX = evt.touches[0].clientX; }
+    function handleTouchMove(evt) {
+      const deltaX = evt.touches[0].clientX - touchStartX;
+      if (deltaX > 50) document.getElementById('roomDrawer').classList.add('open');
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const drawer = document.getElementById('roomDrawer');
+      const label = document.getElementById('themeLabel');
+      const isLight = body.classList.toggle("light-mode");
+      drawer.style.backgroundColor = isLight ? '#ffffff' : 'rgba(0,0,0,0.9)';
+      label.style.color = isLight ? '#000000' : '#ffffff';
+    }
+  </script>
+</body>
+</html>
