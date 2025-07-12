@@ -7,7 +7,6 @@
   <title>KaraOwkie!</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Orbitron', Arial, sans-serif;
@@ -41,31 +40,6 @@
       margin: 10px;
     }
     .neon-button:hover { background-color: cyan; color: black; }
-    .input-box {
-      background-color: white;
-      color: black;
-      font-size: 1em;
-      padding: 12px 16px;
-      border-radius: 10px;
-      width: 240px;
-      text-align: center;
-      margin-bottom: 10px;
-      border: none;
-    }
-    .label-text {
-      font-family: Arial, sans-serif;
-      color: white;
-      font-size: 1em;
-      letter-spacing: 2px;
-      margin-bottom: 15px;
-    }
-    .hint {
-      color: #ccc;
-      font-size: 0.9em;
-      margin-top: 5px;
-      max-width: 80%;
-      text-align: center;
-    }
     .room-drawer {
       position: absolute;
       left: -220px;
@@ -83,27 +57,14 @@
       transition: left 0.3s ease;
     }
     .room-drawer.open { left: 0; }
-    .room-drawer .subtitle {
-      color: #7f7f7f;
-      font-size: 0.6em;
-      text-align: left;
+    .subtitle { color: #7f7f7f; font-size: 0.6em; }
+    .value { font-size: 2em; font-weight: bold; }
+    .switch {
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .room-drawer .value {
-      font-size: 2.0em;
-      font-weight: bold;
-      text-align: left;
-    }
-    .divider {
-      height: 1px;
-      width: 100%;
-      background-color: #7f7f7f;
-      margin: 10px 0;
-    }
-    .switch { display: flex; align-items: center; justify-content: space-between; }
     .switch input[type="checkbox"] {
       appearance: none;
-      width: 40px;
-      height: 20px;
+      width: 40px; height: 20px;
       background-color: #ccc;
       border-radius: 20px;
       position: relative;
@@ -127,99 +88,128 @@
     .switch input[type="checkbox"]:checked::before {
       transform: translateX(20px);
     }
-    .leave-text {
-      color: red;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .leave-text { color: red; font-weight: bold; cursor: pointer; }
     iframe { width: 100%; height: 100%; border: none; }
+    #playerContainer { flex-grow: 1; width: 100%; height: 40vh; background: #000; }
+    #queueList { height: 120px; overflow-y: auto; padding: 10px; background: #222; }
+    .queue-item { padding: 6px; border-bottom: 1px solid #444; }
+    #reserveBtn {
+      margin: 15px auto;
+      background: cyan; color: black;
+      font-size: 1em; padding: 10px 20px;
+      border: none; border-radius: 10px; cursor: pointer;
+      display: block;
+    }
+    #scoreOverlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none; align-items: center; justify-content: center; flex-direction: column;
+      z-index: 999;
+    }
+    .score-number { font-size: 4em; color: #00ffc3; }
+    .score-message { font-size: 2em; color: gold; margin-top: 10px; }
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
-
-  <!-- Home Screen -->
   <div class="screen active" id="homeScreen">
     <h1 class="title">KaraOwkie!</h1>
-    <button class="neon-button" onclick="switchScreen('createScreen')">Create</button>
-    <button class="neon-button" onclick="switchScreen('joinScreen')">Join</button>
+    <button class="neon-button" onclick="switchScreen('roomScreen')">Enter Room</button>
   </div>
 
-  <!-- Create Room Screen -->
-  <div class="screen" id="createScreen">
-    <p class="label-text">CREATE ROOM:</p>
-    <input type="text" class="input-box" placeholder="PASSCODE" maxlength="5" id="createCode" />
-    <p class="hint">💡 Turn on your mobile hotspot now. This will let others connect to your room.</p>
-    <button class="neon-button" onclick="switchScreen('roomScreen')">Create</button>
-    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
-  </div>
-
-  <!-- Join Room Screen -->
-  <div class="screen" id="joinScreen">
-    <p class="label-text">JOIN ROOM:</p>
-    <input type="text" class="input-box" placeholder="ENTER CODE" maxlength="5" id="joinCode" />
-    <p class="hint">💡 Connect to the host’s Wi-Fi hotspot first. Then return to the app to join.</p>
-    <button class="neon-button" onclick="switchScreen('roomScreen')">Join</button>
-    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
-  </div>
-
-  <!-- Room Screen -->
   <div class="screen" id="roomScreen">
     <div class="room-drawer" id="roomDrawer">
-      <div class="subtitle">ROOM PASSCODE:</div>
-      <div class="value" id="roomCodeDisplay">ABCDE</div>
-      <div class="divider"></div>
-      <div class="subtitle">THEME:</div>
+      <div class="subtitle">ROOM:</div>
+      <div class="value">Local Mode</div>
       <div class="switch">
-        <label for="switch1" id="themeLabel">LIGHT MODE</label>
-        <input type="checkbox" id="switch1" onclick="toggleTheme()" />
+        <label id="themeLabel">LIGHT MODE</label>
+        <input type="checkbox" id="themeToggle" onclick="toggleTheme()" />
       </div>
-      <div class="divider"></div>
-      <div class="leave-text" onclick="switchScreen('homeScreen')">LEAVE ROOM</div>
+      <div class="leave-text" onclick="switchScreen('homeScreen')">LEAVE</div>
     </div>
-    <iframe src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
+
+    <div id="playerContainer"></div>
+    <div id="queueList"></div>
+    <button id="reserveBtn">Reserve Video</button>
+
+    <div id="scoreOverlay">
+      <div class="score-number" id="scoreText">88</div>
+      <div class="score-message" id="scoreMessage">Superstar!</div>
+    </div>
   </div>
 
-  <script>
-    function switchScreen(id) {
-      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    let touchStartX = 0;
-    function handleTouchStart(evt) { touchStartX = evt.touches[0].clientX; }
-    function handleTouchMove(evt) {
-      const deltaX = evt.touches[0].clientX - touchStartX;
-      if (deltaX > 50) document.getElementById('roomDrawer').classList.add('open');
-    }
-
-    function toggleTheme() {
-      const body = document.body;
-      const drawer = document.getElementById('roomDrawer');
-      const label = document.getElementById('themeLabel');
-      const isLight = body.classList.toggle("light-mode");
-      drawer.style.backgroundColor = isLight ? '#ffffff' : 'rgba(0,0,0,0.9)';
-      label.style.color = isLight ? '#000000' : '#ffffff';
-    }
-  </script>
-
-  <!-- Socket.IO Client -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
   <script>
     const socket = io("http://192.168.1.109:3000");
+    let player, currentVideo = null, queue = [], isHost = true;
 
-    socket.on("connect", () => {
-      console.log("Connected to server:", socket.id);
-    });
-
-    // Simulate reserving a song when joining a room
-    function reserveSong(title = "Sample Song") {
-      socket.emit("reserve-song", { title });
-      console.log("Reserved song:", title);
+    function switchScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
     }
 
-    socket.on("song-reserved", (data) => {
-      alert("Song Reserved: " + data.title);
+    function handleTouchStart(evt) { touchStartX = evt.touches[0].clientX; }
+    function handleTouchMove(evt) {
+      const deltaX = evt.touches[0].clientX - touchStartX;
+      if (deltaX > 50) document.getElementById("roomDrawer").classList.add("open");
+    }
+
+    function toggleTheme() {
+      const label = document.getElementById("themeLabel");
+      const isLight = document.body.classList.toggle("light-mode");
+      document.getElementById("roomDrawer").style.background = isLight ? "#fff" : "rgba(0,0,0,0.9)";
+      label.style.color = isLight ? "#000" : "#fff";
+    }
+
+    socket.emit("join-room", "karaowkie-room");
+
+    document.getElementById("reserveBtn").onclick = () => {
+      if (!currentVideo) return alert("Wait for video to load.");
+      const title = player.getVideoData().title || "Untitled";
+      socket.emit("reserve-video", { videoId: currentVideo, title });
+    };
+
+    socket.on("queue-update", updatedQueue => {
+      queue = updatedQueue;
+      document.getElementById("queueList").innerHTML =
+        queue.map(item => `<div class="queue-item">${item.title}</div>`).join("");
     });
+
+    socket.on("play-next", videoObj => playVideo(videoObj));
+
+    function playVideo(videoObj) {
+      currentVideo = videoObj.videoId;
+      player.loadVideoById(videoObj.videoId);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player("playerContainer", {
+        height: "100%", width: "100%", videoId: "M7lc1UVf-VE",
+        playerVars: { autoplay: 1, controls: 1 },
+        events: {
+          onReady: () => { currentVideo = "M7lc1UVf-VE"; },
+          onStateChange: e => {
+            if (e.data === YT.PlayerState.ENDED && isHost) {
+              const score = Math.floor(Math.random() * 101);
+              showScore(score);
+              setTimeout(() => socket.emit("video-ended"), 3500);
+            }
+          }
+        }
+      });
+    }
+
+    function showScore(score) {
+      const msg = score < 50 ? "Keep Trying!" :
+                  score < 70 ? "Nice!" :
+                  score < 90 ? "Superstar!" : "Legendary!";
+      document.getElementById("scoreText").innerText = score;
+      document.getElementById("scoreMessage").innerText = msg;
+      document.getElementById("scoreOverlay").style.display = "flex";
+      setTimeout(() => {
+        document.getElementById("scoreOverlay").style.display = "none";
+      }, 3000);
+    }
   </script>
 </body>
 </html>
