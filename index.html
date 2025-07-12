@@ -5,23 +5,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KaraOwkie!</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
+      margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background-color: #000;
+      background: #000;
       color: white;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
-    .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; justify-content: center; }
+    .screen {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
     .active { display: flex !important; }
     .title {
       font-size: 2.5em;
-      margin: 30px 0;
-      color: cyan;
+      margin-bottom: 30px;
       text-shadow: 0 0 5px cyan, 0 0 10px cyan;
       animation: blink 1.5s infinite;
     }
@@ -30,104 +39,156 @@
       50% { opacity: 0.7; }
     }
     .neon-button {
-      background-color: black;
-      color: white;
+      background: transparent;
       border: 2px solid cyan;
       padding: 15px 30px;
-      font-size: 1em;
-      border-radius: 10px;
+      font-size: 1.1em;
+      border-radius: 8px;
       margin: 10px;
+      color: white;
       cursor: pointer;
     }
     .neon-button:hover {
-      background-color: cyan;
+      background: cyan;
       color: black;
     }
-    .input-box {
-      background-color: white;
-      color: black;
-      padding: 10px;
-      border-radius: 10px;
-      width: 80%;
-      margin: 10px 0;
-      font-size: 1em;
-    }
-    iframe { width: 100%; height: 40vh; border: none; }
-    #queueList {
-      flex-grow: 1;
+    #playerContainer {
+      flex: 1;
       width: 100%;
+    }
+    #nowPlaying {
       background: #111;
+      padding: 10px;
+      text-align: center;
+    }
+    #queueList {
+      background: #222;
+      height: 120px;
       overflow-y: auto;
       padding: 10px;
     }
     .queue-item {
-      padding: 8px;
-      border-bottom: 1px solid #333;
+      padding: 5px 0;
+      border-bottom: 1px solid #444;
+    }
+    #reserveBtn {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 1.1em;
+      background: cyan;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #scoreOverlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 3em;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
-
   <div class="screen active" id="homeScreen">
     <h1 class="title">KaraOwkie!</h1>
-    <p style="text-align:center;">Turn on your Hotspot now if you're the host.<br>Join via Wi-Fi if you're a guest.</p>
-    <button class="neon-button" onclick="switchScreen('roomScreen')">Enter Room</button>
+    <p>💡 Turn on your mobile hotspot now.</p>
+    <button class="neon-button" onclick="startRoom()">Create</button>
   </div>
 
   <div class="screen" id="roomScreen">
-    <iframe id="ytPlayer" src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
-
-    <input id="youtubeLink" class="input-box" type="text" placeholder="Paste YouTube link here">
-    <button class="neon-button" onclick="reserveLink()">Reserve</button>
-
+    <div id="nowPlaying">NOW PLAYING: <span id="currentTitle">None</span></div>
+    <div id="playerContainer"></div>
     <div id="queueList"></div>
+    <button id="reserveBtn">Reserve Current Video</button>
+    <div id="scoreOverlay">
+      <div id="scoreNumber">88</div>
+      <div id="scoreMessage">Superstar!</div>
+    </div>
   </div>
 
-  <script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
   <script>
     const socket = io("http://192.168.1.109:3000");
-    const queueList = document.getElementById("queueList");
+    let isHost = false;
+    let player;
+    let currentVideo = 'M7lc1UVf-VE';
+    let queue = [];
 
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-      socket.emit("join-room", "karaowkie-room");
+    function startRoom() {
+      document.getElementById('homeScreen').classList.remove('active');
+      document.getElementById('roomScreen').classList.add('active');
+      socket.emit("join-room", "karaokie-room");
+    }
+
+    socket.on("you-are-host", () => { isHost = true; });
+    socket.on("you-are-joiner", () => { isHost = false; });
+
+    socket.on("queue-update", (q) => {
+      queue = q;
+      renderQueue();
     });
 
-    socket.on("queue-update", (queue) => {
-      queueList.innerHTML = "";
-      queue.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "queue-item";
-        div.textContent = item.title || item.videoId;
-        queueList.appendChild(div);
+    socket.on("play-next", (videoObj) => {
+      playVideo(videoObj);
+    });
+
+    function renderQueue() {
+      const container = document.getElementById("queueList");
+      container.innerHTML = queue.map(q => `<div class="queue-item">${q.title}</div>`).join("");
+    }
+
+    function playVideo(videoObj) {
+      currentVideo = videoObj.videoId;
+      player.loadVideoById(videoObj.videoId);
+      document.getElementById("currentTitle").innerText = videoObj.title;
+    }
+
+    document.getElementById("reserveBtn").onclick = () => {
+      if (!player) return;
+      const title = player.getVideoData().title || "Unknown Title";
+      socket.emit("reserve-video", { videoId: currentVideo, title });
+    };
+
+    function showScore(score) {
+      const msg = score < 50 ? "Keep Trying!" : score < 70 ? "Nice!" : score < 90 ? "Superstar!" : "Legendary!";
+      document.getElementById("scoreNumber").innerText = score;
+      document.getElementById("scoreMessage").innerText = msg;
+      document.getElementById("scoreOverlay").style.display = "flex";
+      setTimeout(() => {
+        document.getElementById("scoreOverlay").style.display = "none";
+      }, 3000);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('playerContainer', {
+        height: '100%', width: '100%',
+        videoId: currentVideo,
+        playerVars: { autoplay: 1, controls: 1 },
+        events: {
+          onReady: () => { },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.ENDED && isHost) {
+              const score = Math.floor(Math.random() * 101);
+              showScore(score);
+              setTimeout(() => {
+                socket.emit("video-ended");
+              }, 3000);
+            }
+          }
+        }
       });
-    });
-
-    socket.on("play-next", (video) => {
-      if (video.videoId) {
-        document.getElementById("ytPlayer").src =
-          "https://www.youtube.com/embed/" + video.videoId + "?autoplay=1&controls=1";
-      }
-    });
-
-    function switchScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    function reserveLink() {
-      const url = document.getElementById("youtubeLink").value;
-      const videoId = extractYouTubeID(url);
-      if (!videoId) return alert("Invalid YouTube link!");
-      socket.emit("reserve-video", { videoId, title: "Reserved Video" });
-      document.getElementById("youtubeLink").value = "";
-    }
-
-    function extractYouTubeID(url) {
-      const regExp = /(?:v=|\/embed\/|\.be\/)([a-zA-Z0-9_-]{11})/;
-      const match = url.match(regExp);
-      return match ? match[1] : null;
     }
   </script>
 </body>
 </html>
+
+
+
