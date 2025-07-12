@@ -9,154 +9,125 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Orbitron', Arial, sans-serif;
-      background-color: #0a0a0a;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #000;
       color: white;
       height: 100vh;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .screen { display: none; width: 100%; height: 100vh; justify-content: center; align-items: center; flex-direction: column; }
+    .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; justify-content: center; }
     .active { display: flex !important; }
     .title {
-      color: white;
       font-size: 2.5em;
-      margin-bottom: 40px;
+      margin: 30px 0;
+      color: cyan;
       text-shadow: 0 0 5px cyan, 0 0 10px cyan;
       animation: blink 1.5s infinite;
     }
     @keyframes blink {
-      0%, 100% { opacity: 1; text-shadow: 0 0 5px cyan, 0 0 10px cyan; }
-      50% { opacity: 0.7; text-shadow: 0 0 2px cyan, 0 0 5px cyan; }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
     .neon-button {
-      background-color: #121212;
+      background-color: black;
       color: white;
       border: 2px solid cyan;
       padding: 15px 30px;
-      font-size: 1.1em;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin: 10px;
-    }
-    .neon-button:hover { background-color: cyan; color: black; }
-    .label-text {
-      font-family: Arial, sans-serif;
-      color: white;
       font-size: 1em;
-      letter-spacing: 2px;
-      margin-bottom: 15px;
+      border-radius: 10px;
+      margin: 10px;
+      cursor: pointer;
     }
-    .hint {
-      color: #ccc;
-      font-size: 0.9em;
-      margin-top: 5px;
-      max-width: 80%;
-      text-align: center;
+    .neon-button:hover {
+      background-color: cyan;
+      color: black;
     }
-    iframe { width: 100%; height: 50%; border: none; }
-    .bottom-section {
-      height: 50%;
-      overflow-y: auto;
+    .input-box {
+      background-color: white;
+      color: black;
+      padding: 10px;
+      border-radius: 10px;
+      width: 80%;
+      margin: 10px 0;
+      font-size: 1em;
+    }
+    iframe { width: 100%; height: 40vh; border: none; }
+    #queueList {
+      flex-grow: 1;
+      width: 100%;
       background: #111;
+      overflow-y: auto;
       padding: 10px;
     }
-    .queue-item { padding: 5px; border-bottom: 1px solid #444; color: #fff; }
-    .drawer {
-      position: absolute;
-      left: -220px;
-      top: 0;
-      width: 200px;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      color: white;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 10;
-      transition: left 0.3s ease;
-    }
-    .drawer.open { left: 0; }
-    .divider {
-      height: 1px;
-      width: 100%;
-      background-color: #7f7f7f;
-      margin: 10px 0;
+    .queue-item {
+      padding: 8px;
+      border-bottom: 1px solid #333;
     }
   </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
+<body>
 
-<!-- Home -->
-<div class="screen active" id="homeScreen">
-  <h1 class="title">KaraOwkie!</h1>
-  <button class="neon-button" onclick="switchScreen('createScreen')">Create</button>
-  <button class="neon-button" onclick="switchScreen('joinScreen')">Join</button>
-</div>
-
-<!-- Create -->
-<div class="screen" id="createScreen">
-  <p class="hint">💡 Turn on your mobile hotspot now. This will let others connect to your room.</p>
-  <button class="neon-button" onclick="switchScreen('roomScreen')">Create</button>
-  <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
-</div>
-
-<!-- Join -->
-<div class="screen" id="joinScreen">
-  <p class="hint">💡 Connect to the host’s Wi-Fi hotspot first. Then return to the app to join.</p>
-  <button class="neon-button" onclick="switchScreen('roomScreen')">Join</button>
-  <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
-</div>
-
-<!-- Room -->
-<div class="screen" id="roomScreen">
-  <div class="drawer" id="drawer">
-    <div class="subtitle">ROOM</div>
-    <div class="divider"></div>
-    <div class="switch">
-      <label for="themeToggle">Light Mode</label>
-      <input type="checkbox" id="themeToggle" onclick="toggleTheme()"/>
-    </div>
-    <div class="divider"></div>
-    <div class="neon-button" onclick="switchScreen('homeScreen')">Leave</div>
+  <div class="screen active" id="homeScreen">
+    <h1 class="title">KaraOwkie!</h1>
+    <p style="text-align:center;">Turn on your Hotspot now if you're the host.<br>Join via Wi-Fi if you're a guest.</p>
+    <button class="neon-button" onclick="switchScreen('roomScreen')">Enter Room</button>
   </div>
-  <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
-  <div class="bottom-section" id="queueList"></div>
-</div>
 
-<script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
-<script>
-  const socket = io("http://192.168.1.109:3000");
+  <div class="screen" id="roomScreen">
+    <iframe id="ytPlayer" src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
 
-  function switchScreen(id) {
-    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
+    <input id="youtubeLink" class="input-box" type="text" placeholder="Paste YouTube link here">
+    <button class="neon-button" onclick="reserveLink()">Reserve</button>
 
-  let touchStartX = 0;
-  function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
-  function handleTouchMove(e) {
-    const dx = e.touches[0].clientX - touchStartX;
-    if (dx > 50) document.getElementById('drawer').classList.add('open');
-  }
+    <div id="queueList"></div>
+  </div>
 
-  function toggleTheme() {
-    document.body.classList.toggle("light-mode");
-    const drawer = document.getElementById('drawer');
-    drawer.style.background = document.body.classList.contains("light-mode") ? '#fff' : 'rgba(0,0,0,0.9)';
-  }
+  <script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io("http://192.168.1.109:3000");
+    const queueList = document.getElementById("queueList");
 
-  // Sample reserve logic
-  socket.emit("join-room", "karaokie-room");
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+      socket.emit("join-room", "karaowkie-room");
+    });
 
-  socket.on("room-joined", () => console.log("Joined Room"));
-  socket.on("queue-update", (queue) => {
-    const list = document.getElementById("queueList");
-    list.innerHTML = queue.map(item => `<div class="queue-item">${item.title}</div>`).join("");
-  });
+    socket.on("queue-update", (queue) => {
+      queueList.innerHTML = "";
+      queue.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "queue-item";
+        div.textContent = item.title || item.videoId;
+        queueList.appendChild(div);
+      });
+    });
 
-  socket.emit("reserve-video", { videoId: "M7lc1UVf-VE", title: "Sample Song" });
-</script>
+    socket.on("play-next", (video) => {
+      if (video.videoId) {
+        document.getElementById("ytPlayer").src =
+          "https://www.youtube.com/embed/" + video.videoId + "?autoplay=1&controls=1";
+      }
+    });
+
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function reserveLink() {
+      const url = document.getElementById("youtubeLink").value;
+      const videoId = extractYouTubeID(url);
+      if (!videoId) return alert("Invalid YouTube link!");
+      socket.emit("reserve-video", { videoId, title: "Reserved Video" });
+      document.getElementById("youtubeLink").value = "";
+    }
+
+    function extractYouTubeID(url) {
+      const regExp = /(?:v=|\/embed\/|\.be\/)([a-zA-Z0-9_-]{11})/;
+      const match = url.match(regExp);
+      return match ? match[1] : null;
+    }
+  </script>
 </body>
 </html>
