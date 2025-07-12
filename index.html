@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,165 +201,25 @@
       label.style.color = isLight ? '#000000' : '#ffffff';
     }
   </script>
-  
+
   <!-- Socket.IO Client -->
-<script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
-<script>
-  const socket = io("http://192.168.1.109:3000");
-
-  socket.on("connect", () => {
-    console.log("Connected to server:", socket.id);
-  });
-
-  // Simulate reserving a song when joining a room
-  function reserveSong(title = "Sample Song") {
-    socket.emit("reserve-song", { title });
-    console.log("Reserved song:", title);
-  }
-
-  // Receive confirmation
-  socket.on("song-reserved", (data) => {
-    alert("Song Reserved: " + data.title);
-  });
-</script>
-
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KaraOwkie!</title>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <style>
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #000; color: white;
-      display: flex; flex-direction: column;
-      height: 100vh; overflow: hidden;
-    }
-    #nowPlaying { padding: 10px; text-align: center; background: #111; font-size: 1.2em; }
-    #queueList { padding: 10px; background: #222; height: 100px; overflow-y: auto; }
-    #playerContainer { flex-grow: 1; }
-    #reserveBtn {
-      background: cyan; color: black; border: none;
-      padding: 12px 20px; font-size: 1.1em;
-      margin: 10px auto; display: block; cursor: pointer;
-      border-radius: 10px;
-    }
-    .queue-item { padding: 5px; border-bottom: 1px solid #444; }
-    #scoreOverlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      display: none; align-items: center; justify-content: center; flex-direction: column;
-      z-index: 999;
-    }
-    .score-number {
-      font-size: 4em; color: #00ffc3;
-    }
-    .score-message {
-      color: gold; font-size: 2em; margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div id="nowPlaying">NOW PLAYING: <span id="currentTitle">None</span></div>
-  <div id="queueList"></div>
-  <div id="playerContainer"></div>
-  <button id="reserveBtn">Reserve Current Video</button>
-
-  <div id="scoreOverlay">
-    <div class="score-number" id="scoreText">88</div>
-    <div class="score-message" id="scoreMessage">Superstar!</div>
-  </div>
-
+  <script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
   <script>
     const socket = io("http://192.168.1.109:3000");
 
-    let player;
-    let isHost = false;
-    let roomId = "karaokie-room";
-    let queue = [];
-    let currentVideo = null;
-
-    // Join room
-    socket.emit("join-room", roomId);
-
-    // Reserve button click
-    document.getElementById("reserveBtn").onclick = () => {
-      if (!currentVideo) return alert("Wait for player to load.");
-      const videoId = currentVideo;
-      const title = player.getVideoData().title || "Unknown Title";
-      socket.emit("reserve-video", { videoId, title });
-    };
-
-    socket.on("room-joined", () => console.log("Joined room"));
-    socket.on("room-created", () => console.log("Room created"));
-
-    // Receive updated queue
-    socket.on("queue-update", (updatedQueue) => {
-      queue = updatedQueue;
-      renderQueue();
+    socket.on("connect", () => {
+      console.log("Connected to server:", socket.id);
     });
 
-    // If host, receive play-next signal
-    socket.on("play-next", (videoObj) => {
-      playVideo(videoObj);
+    // Simulate reserving a song when joining a room
+    function reserveSong(title = "Sample Song") {
+      socket.emit("reserve-song", { title });
+      console.log("Reserved song:", title);
+    }
+
+    socket.on("song-reserved", (data) => {
+      alert("Song Reserved: " + data.title);
     });
-
-    function renderQueue() {
-      const container = document.getElementById("queueList");
-      container.innerHTML = queue.map(q => `<div class="queue-item">${q.title}</div>`).join("");
-    }
-
-    function playVideo(videoObj) {
-      currentVideo = videoObj.videoId;
-      player.loadVideoById(videoObj.videoId);
-      document.getElementById("currentTitle").innerText = videoObj.title;
-    }
-
-    function showScore(score) {
-      const msg = getScoreMessage(score);
-      document.getElementById("scoreText").innerText = score;
-      document.getElementById("scoreMessage").innerText = msg;
-      document.getElementById("scoreOverlay").style.display = "flex";
-      setTimeout(() => {
-        document.getElementById("scoreOverlay").style.display = "none";
-      }, 3000);
-    }
-
-    function getScoreMessage(score) {
-      if (score < 50) return "Keep Trying!";
-      if (score < 70) return "Nice!";
-      if (score < 90) return "Superstar!";
-      return "Legendary!";
-    }
-
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('playerContainer', {
-        height: '100%', width: '100%',
-        videoId: 'M7lc1UVf-VE',
-        playerVars: { autoplay: 1, controls: 1 },
-        events: {
-          onReady: () => {
-            currentVideo = 'M7lc1UVf-VE';
-          },
-          onStateChange: (event) => {
-            if (event.data === YT.PlayerState.ENDED && isHost) {
-              const score = Math.floor(Math.random() * 101);
-              showScore(score);
-              setTimeout(() => {
-                socket.emit("video-ended");
-              }, 3500);
-            }
-          }
-        }
-      });
-    }
   </script>
 </body>
 </html>
