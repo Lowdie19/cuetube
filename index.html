@@ -1,32 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KaraOwkie!</title>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: #000;
+      font-family: 'Orbitron', Arial, sans-serif;
+      background-color: #0a0a0a;
       color: white;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
     }
-    .screen {
-      flex: 1;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+    .screen { display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; justify-content: center; }
     .active { display: flex !important; }
     .title {
       font-size: 2.5em;
@@ -35,160 +23,184 @@
       animation: blink 1.5s infinite;
     }
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      0%, 100% { opacity: 1; text-shadow: 0 0 5px cyan; }
+      50% { opacity: 0.7; text-shadow: 0 0 2px cyan; }
     }
     .neon-button {
-      background: transparent;
-      border: 2px solid cyan;
-      padding: 15px 30px;
-      font-size: 1.1em;
-      border-radius: 8px;
-      margin: 10px;
+      background-color: #121212;
       color: white;
+      border: 2px solid cyan;
+      padding: 12px 24px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+    }
+    .neon-button:hover { background-color: cyan; color: black; }
+    .hint {
+      font-size: 0.9em;
+      color: #ccc;
+      text-align: center;
+      margin: 20px 0 10px;
+      padding: 0 20px;
+    }
+    .drawer {
+      position: absolute;
+      left: -220px;
+      top: 0;
+      height: 100vh;
+      width: 200px;
+      background: rgba(0,0,0,0.9);
+      transition: left 0.3s ease;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+    .drawer.open { left: 0; }
+    .drawer .section-title {
+      font-size: 0.7em;
+      color: #aaa;
+    }
+    .drawer .value {
+      font-size: 1.6em;
+      font-weight: bold;
+    }
+    .divider {
+      height: 1px;
+      background-color: #555;
+      margin: 10px 0;
+    }
+    .leave-text {
+      color: red;
+      font-weight: bold;
       cursor: pointer;
     }
-    .neon-button:hover {
-      background: cyan;
-      color: black;
-    }
-    #playerContainer {
-      flex: 1;
+    #playerArea {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
       width: 100%;
     }
-    #nowPlaying {
+    iframe {
+      width: 100%;
+      height: 50%;
+      border: none;
+    }
+    #searchSection {
+      height: 50%;
+      overflow-y: auto;
       background: #111;
       padding: 10px;
-      text-align: center;
     }
     #queueList {
-      background: #222;
-      height: 120px;
-      overflow-y: auto;
-      padding: 10px;
+      font-size: 0.9em;
+      color: white;
     }
     .queue-item {
+      border-bottom: 1px solid #333;
       padding: 5px 0;
-      border-bottom: 1px solid #444;
     }
     #reserveBtn {
-      margin: 10px;
+      margin: 10px auto;
+      display: block;
       padding: 12px 20px;
-      font-size: 1.1em;
       background: cyan;
       color: black;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      font-size: 1em;
       cursor: pointer;
-    }
-    #scoreOverlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      color: white;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-size: 3em;
-      z-index: 999;
     }
   </style>
 </head>
-<body>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
+
+  <!-- Home -->
   <div class="screen active" id="homeScreen">
     <h1 class="title">KaraOwkie!</h1>
-    <p>💡 Turn on your mobile hotspot now.</p>
-    <button class="neon-button" onclick="startRoom()">Create</button>
+    <button class="neon-button" onclick="switchScreen('createScreen')">Create</button>
+    <button class="neon-button" onclick="switchScreen('joinScreen')">Join</button>
   </div>
 
+  <!-- Create -->
+  <div class="screen" id="createScreen">
+    <div class="hint">💡 Turn ON your Mobile Hotspot to let others connect.</div>
+    <button class="neon-button" onclick="goToRoom(true)">Create Room</button>
+    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
+  </div>
+
+  <!-- Join -->
+  <div class="screen" id="joinScreen">
+    <div class="hint">💡 Connect to the Host's Wi-Fi first. Then return to the app.</div>
+    <button class="neon-button" onclick="goToRoom(false)">Join Room</button>
+    <button class="neon-button" onclick="switchScreen('homeScreen')">Back</button>
+  </div>
+
+  <!-- Room -->
   <div class="screen" id="roomScreen">
-    <div id="nowPlaying">NOW PLAYING: <span id="currentTitle">None</span></div>
-    <div id="playerContainer"></div>
-    <div id="queueList"></div>
-    <button id="reserveBtn">Reserve Current Video</button>
-    <div id="scoreOverlay">
-      <div id="scoreNumber">88</div>
-      <div id="scoreMessage">Superstar!</div>
+    <div class="drawer" id="roomDrawer">
+      <div class="section-title">ROOM</div>
+      <div class="value">Local</div>
+      <div class="divider"></div>
+      <div class="leave-text" onclick="switchScreen('homeScreen')">LEAVE ROOM</div>
+    </div>
+
+    <div id="playerArea">
+      <iframe id="youtubePlayer" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1"></iframe>
+      <div id="searchSection">
+        <div id="queueList">Queue is empty.</div>
+        <button id="reserveBtn">Reserve Sample</button>
+      </div>
     </div>
   </div>
 
+  <!-- Socket.IO -->
+  <script src="http://192.168.1.109:3000/socket.io/socket.io.js"></script>
   <script>
     const socket = io("http://192.168.1.109:3000");
-    let isHost = false;
-    let player;
-    let currentVideo = 'M7lc1UVf-VE';
-    let queue = [];
+    const queueList = document.getElementById("queueList");
+    const reserveBtn = document.getElementById("reserveBtn");
 
-    function startRoom() {
-      document.getElementById('homeScreen').classList.remove('active');
-      document.getElementById('roomScreen').classList.add('active');
-      socket.emit("join-room", "karaokie-room");
-    }
-
-    socket.on("you-are-host", () => { isHost = true; });
-    socket.on("you-are-joiner", () => { isHost = false; });
-
-    socket.on("queue-update", (q) => {
-      queue = q;
-      renderQueue();
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+      socket.emit("join-room", "karaokie");
     });
 
-    socket.on("play-next", (videoObj) => {
-      playVideo(videoObj);
-    });
-
-    function renderQueue() {
-      const container = document.getElementById("queueList");
-      container.innerHTML = queue.map(q => `<div class="queue-item">${q.title}</div>`).join("");
-    }
-
-    function playVideo(videoObj) {
-      currentVideo = videoObj.videoId;
-      player.loadVideoById(videoObj.videoId);
-      document.getElementById("currentTitle").innerText = videoObj.title;
-    }
-
-    document.getElementById("reserveBtn").onclick = () => {
-      if (!player) return;
-      const title = player.getVideoData().title || "Unknown Title";
-      socket.emit("reserve-video", { videoId: currentVideo, title });
+    reserveBtn.onclick = () => {
+      socket.emit("reserve-video", {
+        title: "Sample Song",
+        videoId: "M7lc1UVf-VE"
+      });
     };
 
-    function showScore(score) {
-      const msg = score < 50 ? "Keep Trying!" : score < 70 ? "Nice!" : score < 90 ? "Superstar!" : "Legendary!";
-      document.getElementById("scoreNumber").innerText = score;
-      document.getElementById("scoreMessage").innerText = msg;
-      document.getElementById("scoreOverlay").style.display = "flex";
-      setTimeout(() => {
-        document.getElementById("scoreOverlay").style.display = "none";
-      }, 3000);
+    socket.on("queue-update", (queue) => {
+      queueList.innerHTML = queue.map(item => `<div class="queue-item">${item.title}</div>`).join("");
+    });
+
+    socket.on("play-next", (video) => {
+      const player = document.getElementById("youtubePlayer");
+      player.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&enablejsapi=1`;
+    });
+
+    function switchScreen(id) {
+      document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
     }
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('playerContainer', {
-        height: '100%', width: '100%',
-        videoId: currentVideo,
-        playerVars: { autoplay: 1, controls: 1 },
-        events: {
-          onReady: () => { },
-          onStateChange: (event) => {
-            if (event.data === YT.PlayerState.ENDED && isHost) {
-              const score = Math.floor(Math.random() * 101);
-              showScore(score);
-              setTimeout(() => {
-                socket.emit("video-ended");
-              }, 3000);
-            }
-          }
-        }
-      });
+    let touchStartX = 0;
+    function handleTouchStart(evt) { touchStartX = evt.touches[0].clientX; }
+    function handleTouchMove(evt) {
+      if (evt.touches[0].clientX - touchStartX > 50) {
+        document.getElementById("roomDrawer").classList.add("open");
+      }
+    }
+
+    function goToRoom(isHost) {
+      switchScreen("roomScreen");
     }
   </script>
 </body>
 </html>
-
-
-
