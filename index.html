@@ -79,3 +79,145 @@
       background: rgba(0,0,0,0.5);
       z-index: 90;
       display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+
+    .drawer-hint {
+      position: absolute;
+      top: 10px;
+      left: 5px;
+      z-index: 5;
+      font-size: 1.8em;
+      color: cyan;
+      opacity: 0.5;
+    }
+
+    .youtube-wrapper {
+      width: 100%;
+      height: 60vh;
+      border: 2px solid cyan;
+      box-sizing: border-box;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .bottom-buttons {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .neon-btn {
+      flex: 1;
+      padding: 14px;
+      background: #121212;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .neon-btn:hover {
+      background: cyan;
+      color: black;
+    }
+
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+    }
+  </style>
+</head>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+
+  <!-- Hint for drawer -->
+  <div class="drawer-hint">≡</div>
+
+  <!-- Side Drawer -->
+  <div class="drawer" id="drawer">
+    <div>
+      <div class="chamfered-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">Sample Song Title</div>
+        <div class="subtitle" id="nextTitle">Next: Another Track</div>
+      </div>
+    </div>
+    <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
+  </div>
+
+  <!-- Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+  <!-- YouTube Player Area -->
+  <div class="youtube-wrapper">
+    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
+  </div>
+
+  <!-- Bottom Buttons -->
+  <div class="bottom-buttons">
+    <button class="neon-btn" onclick="reserve()">Reserve</button>
+    <button class="neon-btn" id="nextBtn" onclick="playNext()">Next</button>
+  </div>
+
+  <!-- JS -->
+  <script>
+    let touchStartX = 0;
+
+    function handleTouchStart(evt) {
+      touchStartX = evt.touches[0].clientX;
+    }
+
+    function handleTouchMove(evt) {
+      const deltaX = evt.touches[0].clientX - touchStartX;
+      if (deltaX > 50) openDrawer();
+      else if (deltaX < -50) closeDrawer();
+    }
+
+    function handleTap(evt) {
+      const drawer = document.getElementById('drawer');
+      if (!drawer.contains(evt.target)) closeDrawer();
+    }
+
+    function openDrawer() {
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('drawerOverlay').classList.add('visible');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('drawerOverlay').classList.remove('visible');
+    }
+
+    function leaveRoom() {
+      alert("👋 You left the room!");
+      // Optional: redirect to home screen
+    }
+
+    function reserve() {
+      alert("🎤 Reserved!");
+    }
+
+    function playNext() {
+      alert("⏭ Next song!");
+    }
+
+    // Simulate joiner/host
+    const isHost = true; // set to false if joiner
+    if (!isHost) {
+      document.getElementById("nextBtn").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
