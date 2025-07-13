@@ -25,6 +25,17 @@
       color: cyan;
       text-shadow: 0 0 5px cyan, 0 0 15px cyan;
       background-color: #000;
+      position: relative;
+    }
+
+    .drawer-icon {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      font-size: 1.8em;
+      color: cyan;
+      opacity: 0.7;
+      cursor: pointer;
     }
 
     .drawer {
@@ -91,28 +102,29 @@
     }
     .drawer-overlay.visible { display: block; }
 
-    .drawer-hint {
-      position: absolute;
-      top: 10px;
-      left: 5px;
-      z-index: 5;
-      font-size: 1.8em;
-      color: cyan;
-      opacity: 0.5;
-    }
-
     .youtube-wrapper {
       width: 100%;
-      height: 60vh;
+      height: 58vh;
       border: 2px solid cyan;
-      box-sizing: border-box;
-      margin-top: 10vh; /* Move down 10% */
+      margin-top: 10vh;
+      margin-bottom: 4vh;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    .url-input {
+      width: calc(100% - 20px);
+      margin: 0 10px 8px 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+      background-color: white;
+      color: black;
     }
 
     .bottom-buttons {
@@ -151,13 +163,13 @@
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
-  <!-- App Title -->
-  <div class="title-bar">KaraOwkie!</div>
+  <!-- Title -->
+  <div class="title-bar">
+    <div class="drawer-icon" onclick="openDrawer()">☰</div>
+    KaraOwkie!
+  </div>
 
-  <!-- Hint for drawer -->
-  <div class="drawer-hint">≡</div>
-
-  <!-- Side Drawer -->
+  <!-- Drawer -->
   <div class="drawer" id="drawer">
     <div>
       <div class="chamfered-box">
@@ -169,13 +181,15 @@
     <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
 
-  <!-- Overlay -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
-  <!-- YouTube Player Area -->
+  <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
+
+  <!-- URL Typing Field -->
+  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInput" />
 
   <!-- Bottom Buttons -->
   <div class="bottom-buttons">
@@ -217,7 +231,9 @@
     }
 
     function reserve() {
-      alert("🎤 Reserved!");
+      const url = document.getElementById("youtubeInput").value;
+      if (!url) return alert("Please paste a YouTube URL.");
+      alert("🎤 Reserved: " + url);
     }
 
     function playNext() {
@@ -225,7 +241,7 @@
     }
 
     // Simulate host/joiner
-    const isHost = true; // Set to false for joiner view
+    const isHost = true;
     if (!isHost) {
       document.getElementById("nextBtn").style.display = "none";
     }
