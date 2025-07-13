@@ -18,6 +18,15 @@
       width: 100vw;
     }
 
+    .title-bar {
+      text-align: center;
+      font-size: 1.8em;
+      padding: 10px 0;
+      color: cyan;
+      text-shadow: 0 0 5px cyan, 0 0 15px cyan;
+      background-color: #000;
+    }
+
     .drawer {
       position: fixed;
       top: 0;
@@ -97,6 +106,7 @@
       height: 60vh;
       border: 2px solid cyan;
       box-sizing: border-box;
+      margin-top: 10vh; /* Move down 10% */
     }
 
     iframe {
@@ -140,6 +150,9 @@
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+
+  <!-- App Title -->
+  <div class="title-bar">KaraOwkie!</div>
 
   <!-- Hint for drawer -->
   <div class="drawer-hint">≡</div>
@@ -201,7 +214,6 @@
 
     function leaveRoom() {
       alert("👋 You left the room!");
-      // Optional: redirect to home screen
     }
 
     function reserve() {
@@ -212,8 +224,8 @@
       alert("⏭ Next song!");
     }
 
-    // Simulate joiner/host
-    const isHost = true; // set to false if joiner
+    // Simulate host/joiner
+    const isHost = true; // Set to false for joiner view
     if (!isHost) {
       document.getElementById("nextBtn").style.display = "none";
     }
