@@ -18,13 +18,33 @@
       width: 100vw;
     }
 
+    .title-bar {
+      text-align: center;
+      font-size: 1.6em;
+      padding: 12px 0;
+      color: magenta;
+      text-shadow: 0 0 5px magenta, 0 0 15px magenta;
+      background-color: #000;
+      position: relative;
+    }
+
+    .drawer-icon {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      font-size: 1.6em;
+      color: magenta;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
     .drawer {
       position: fixed;
       top: 0;
       left: -240px;
       width: 220px;
       height: 100%;
-      background: rgba(0, 0, 0, 0.95);
+      background: rgba(0, 0, 0, 0.97);
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
@@ -32,11 +52,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      border-right: 3px solid magenta;
     }
     .drawer.open { left: 0; }
 
     .chamfered-box {
-      border: 2px solid cyan;
+      border: 2px solid magenta;
       border-radius: 10px;
       padding: 10px;
       background: #121212;
@@ -60,7 +81,7 @@
     }
 
     .leave-btn {
-      background-color: red;
+      background-color: magenta;
       border: none;
       padding: 12px;
       border-radius: 10px;
@@ -76,27 +97,18 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.4);
       z-index: 90;
       display: none;
     }
     .drawer-overlay.visible { display: block; }
 
-    .drawer-hint {
-      position: absolute;
-      top: 10px;
-      left: 5px;
-      z-index: 5;
-      font-size: 1.8em;
-      color: cyan;
-      opacity: 0.5;
-    }
-
     .youtube-wrapper {
       width: 100%;
-      height: 60vh;
-      border: 2px solid cyan;
-      box-sizing: border-box;
+      height: 58vh;
+      border: 2px solid magenta;
+      margin-top: 10vh;
+      margin-bottom: 4vh;
     }
 
     iframe {
@@ -105,21 +117,34 @@
       border: none;
     }
 
+    .url-input {
+      width: calc(100% - 20px);
+      margin: 0 10px 8px 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid magenta;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      text-align: center;
+    }
+
     .bottom-buttons {
-      position: absolute;
+      position: fixed;
       bottom: 15px;
       width: 100%;
       padding: 0 10px;
       display: flex;
       justify-content: space-between;
       gap: 10px;
+      z-index: 5;
     }
 
     .neon-btn {
       flex: 1;
       padding: 14px;
       background: #121212;
-      border: 2px solid cyan;
+      border: 2px solid magenta;
       border-radius: 10px;
       color: white;
       font-size: 1em;
@@ -128,7 +153,7 @@
     }
 
     .neon-btn:hover {
-      background: cyan;
+      background: magenta;
       color: black;
     }
 
@@ -137,14 +162,21 @@
         height: 75vh;
       }
     }
+
+    @media (max-height: 500px) {
+      .bottom-buttons { position: static; margin-top: 20px; }
+    }
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
-  <!-- Hint for drawer -->
-  <div class="drawer-hint">≡</div>
+  <!-- Title -->
+  <div class="title-bar">
+    <div class="drawer-icon" onclick="toggleDrawer()">☰</div>
+    KaraOwkie!
+  </div>
 
-  <!-- Side Drawer -->
+  <!-- Drawer -->
   <div class="drawer" id="drawer">
     <div>
       <div class="chamfered-box">
@@ -156,13 +188,15 @@
     <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
 
-  <!-- Overlay -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
-  <!-- YouTube Player Area -->
+  <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
+
+  <!-- URL Typing Field -->
+  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInput" />
 
   <!-- Bottom Buttons -->
   <div class="bottom-buttons">
@@ -173,6 +207,8 @@
   <!-- JS -->
   <script>
     let touchStartX = 0;
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
 
     function handleTouchStart(evt) {
       touchStartX = evt.touches[0].clientX;
@@ -185,35 +221,42 @@
     }
 
     function handleTap(evt) {
-      const drawer = document.getElementById('drawer');
-      if (!drawer.contains(evt.target)) closeDrawer();
+      if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+        closeDrawer();
+      }
+    }
+
+    function toggleDrawer() {
+      if (drawer.classList.contains("open")) closeDrawer();
+      else openDrawer();
     }
 
     function openDrawer() {
-      document.getElementById('drawer').classList.add('open');
-      document.getElementById('drawerOverlay').classList.add('visible');
+      drawer.classList.add('open');
+      overlay.classList.add('visible');
     }
 
     function closeDrawer() {
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('drawerOverlay').classList.remove('visible');
+      drawer.classList.remove('open');
+      overlay.classList.remove('visible');
     }
 
     function leaveRoom() {
       alert("👋 You left the room!");
-      // Optional: redirect to home screen
     }
 
     function reserve() {
-      alert("🎤 Reserved!");
+      const url = document.getElementById("youtubeInput").value;
+      if (!url) return alert("Please paste a YouTube URL.");
+      alert("🎤 Reserved: " + url);
     }
 
     function playNext() {
       alert("⏭ Next song!");
     }
 
-    // Simulate joiner/host
-    const isHost = true; // set to false if joiner
+    // Simulate host/joiner
+    const isHost = true;
     if (!isHost) {
       document.getElementById("nextBtn").style.display = "none";
     }
