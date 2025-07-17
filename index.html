@@ -29,6 +29,23 @@
       position: relative;
     }
     
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -240px;
+      width: 220px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.97);
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .drawer.open { left: 0; }
+    
     .drawer-handle {
       position: absolute;
       top: 40%;
@@ -47,23 +64,6 @@
       z-index: 0.8;
       box-shadow: 0 0 10px magenta;
     }
-
-    .drawer {
-      position: fixed;
-      top: 0;
-      left: -240px;
-      width: 220px;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.97);
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-      z-index: 99;
-      transition: left 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .drawer.open { left: 0; }
 
     .chamfered-box {
       border: 2px solid cyan;
@@ -181,8 +181,10 @@
 
   <!-- Title -->
   <div class="title-bar">
-      <div class="drawer" id="drawer">
-  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    KaraOwkie!
+  </div>
+    
   
   <!-- Drawer -->
   <div class="drawer" id="drawer">
