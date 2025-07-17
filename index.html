@@ -38,6 +38,24 @@
       opacity: 0.8;
       cursor: pointer;
     }
+    
+    .drawer-handle {
+      position: absolute;
+      top: 10%;
+      right: -20px;
+      width: 30px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.97);
+      color: magenta;
+      font-size: 1.0em;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 900;
+}
 
     .drawer {
       position: fixed;
@@ -152,24 +170,6 @@
       transition: 0.3s;
     }
 
-    .drawer-handle {
-      position: absolute;
-       top: 40%;
-      right: -40px;
-      width: 40px;
-      height: 80px;
-      background: magenta;
-      color: white;
-      font-size: 1.5em;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 100;
-}
-
     .neon-btn:hover {
       background: cyan;
       color: black;
@@ -189,12 +189,11 @@
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
-  <div class="title-bar">
-    <div class="drawer" id="drawer">
-  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    KaraOwkie!
-  </div>
+  <div class="title-bar">KaraOwkie!</div>
 
+    <!-- Drawer-handle -->
+  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    
   <!-- Drawer -->
   <div class="drawer" id="drawer">
     <div>
