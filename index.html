@@ -35,26 +35,26 @@
       left: -240px;
       width: 220px;
       height: 100%;
-      background: rgba(0, 0, 0, 0.70);
+      background: rgba(20, 20, 20, 0.90);
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
       transition: left 0.3s ease;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: start;
     }
     .drawer.open { left: 0; }
     
     .drawer-handle {
       position: absolute;
       top: 0%;
-      right: -60px;
-      width: 60px;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.70);
+      right: -70px;
+      width: 70px;
+      height: 70px;
+      background: rgba(20, 20, 20, 0.90);
       color: magenta;
-      font-size: 1.0em;
+      font-size: 1.5em;
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
       display: flex;
@@ -97,6 +97,7 @@
       font-size: 1em;
       cursor: pointer;
       width: 100%;
+      z-index: 5; 
     }
 
     .drawer-overlay {
