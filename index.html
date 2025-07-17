@@ -28,34 +28,25 @@
       background-color: #000;
       position: relative;
     }
-
-    .drawer-icon {
-      position: absolute;
-      left: 15px;
-      top: 15px;
-      font-size: 1em;
-      color: magenta;
-      opacity: 0.8;
-      cursor: pointer;
-    }
     
     .drawer-handle {
       position: absolute;
-      top: 10%;
-      right: -20px;
-      width: 30px;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.97);
+      top: 40%;
+      right: -30px;
+      width: 40px;
+      height: 80px;
+      background: #0a0a0a;
       color: magenta;
       font-size: 1.0em;
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      z-index: 900;
-}
+      z-index: 0.8;
+      box-shadow: 0 0 10px magenta;
+    }
 
     .drawer {
       position: fixed;
@@ -189,7 +180,9 @@
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
-  <div class="title-bar">KaraOwkie!</div>
+  <div class="title-bar">
+      <div class="drawer" id="drawer">
+  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
   
   <!-- Drawer -->
   <div class="drawer" id="drawer">
@@ -204,9 +197,6 @@
   </div>
 
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-
-  <div class="drawer" id="drawer">
-  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
