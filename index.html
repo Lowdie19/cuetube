@@ -43,18 +43,19 @@
       display: flex;
       flex-direction: column;
       justify-content: start;
+      gap: 10px;
     }
     .drawer.open { left: 0; }
     
     .drawer-handle {
       position: absolute;
       top: 0%;
-      right: -30px;
+      right: -100px;
       width: 50px;
       height: 50px;
       background: rgba(0, 0, 0, 0.0);
       color: magenta;
-      font-size: 1.5em;
+      font-size: 1.6em;
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
       display: flex;
@@ -97,6 +98,9 @@
       font-size: 1em;
       cursor: pointer;
       width: 90%;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 5;
     }
 
     .drawer-overlay {
