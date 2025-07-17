@@ -31,9 +31,9 @@
 
     .drawer-icon {
       position: absolute;
-      left: 12px;
-      top: 12px;
-      font-size: 0.8em;
+      left: 15px;
+      top: 15px;
+      font-size: 1em;
       color: magenta;
       opacity: 0.8;
       cursor: pointer;
@@ -152,6 +152,24 @@
       transition: 0.3s;
     }
 
+    .drawer-handle {
+      position: absolute;
+       top: 40%;
+      right: -40px;
+      width: 40px;
+      height: 80px;
+      background: magenta;
+      color: white;
+      font-size: 1.5em;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+}
+
     .neon-btn:hover {
       background: cyan;
       color: black;
@@ -171,8 +189,11 @@
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
-  <div class="title-bar">KaraOwkie!</div>
-  <div class="drawer-icon" onclick="toggleDrawer()">☰</div>
+  <div class="title-bar">
+    <div class="drawer" id="drawer">
+  <div class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    KaraOwkie!
+  </div>
 
   <!-- Drawer -->
   <div class="drawer" id="drawer">
