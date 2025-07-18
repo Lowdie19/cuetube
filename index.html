@@ -60,7 +60,7 @@
       border-bottom-right-radius: 10px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: right;
       cursor: pointer;
       z-index: 80;
     }
@@ -88,8 +88,9 @@
       color: #aaa;
       word-wrap: break-word;
     }
-
+    
     .leave-btn {
+      margin-top: auto;
       background-color: magenta;
       border: none;
       padding: 12px;
@@ -98,14 +99,23 @@
       font-size: 1em;
       cursor: pointer;
       width: 90%;
-      touch-action: manipulation;
-      transition: background 0.2s ease;
     }
     
+    .leave-btn {
+      flex: 1;
+      padding: 14px;
+      background: #121212;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
     }
     
     .leave-btn:hover {
-      background-color: deeppink;
+      background: deeppink;
+      color: black;
     }
 
     .drawer-overlay {
@@ -157,7 +167,7 @@
       z-index: 5;
     }
 
-    .neon-btn {
+    .cyan-btn {
       flex: 1;
       padding: 14px;
       background: #121212;
@@ -169,7 +179,7 @@
       transition: 0.3s;
     }
 
-    .neon-btn:hover {
+    .cyan-btn:hover {
       background: cyan;
       color: black;
     }
@@ -217,8 +227,8 @@
 
   <!-- Bottom Buttons -->
   <div class="bottom-buttons">
-    <button class="neon-btn" onclick="reserve()">Reserve</button>
-    <button class="neon-btn" id="nextBtn" onclick="playNext()">Next</button>
+    <button class="cyan-btn" onclick="reserve()">Reserve</button>
+    <button class="cyan-btn" id="nextBtn" onclick="playNext()">Next</button>
   </div>
 
   <!-- JS -->
