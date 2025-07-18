@@ -84,38 +84,36 @@
     }
 
     .chamfered-box .subtitle {
-      font-size: 0.7em;
-      color: #aaa;
+      font-size: 0.5em;
+      color: #aaaaaa;
       word-wrap: break-word;
     }
-    
     .leave-btn {
-      margin-top: auto;
-      background-color: magenta;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      width: 90%;
-    }
-    
-    .leave-btn {
-      flex: 1;
+      osition: fixed;
+      bottom: 15px;
+      left: 10px;
+      right: 10px;
+
+      width: auto; /* You can use 100% if you want full width */
       padding: 14px;
-      background: #121212;
-      border: 2px solid cyan;
+
+      background: magenta;
+      border: none;
       border-radius: 10px;
       color: white;
       font-size: 1em;
       cursor: pointer;
-      transition: 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      transition: background 0.3s, color 0.3s;
+      z-index: 100;
     }
     
     .leave-btn:hover {
       background: deeppink;
-      color: black;
+      color: magenta;
     }
 
     .drawer-overlay {
