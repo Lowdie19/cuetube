@@ -199,9 +199,16 @@
       flex-direction: column;
       align-items: center;
     }
-    .bottom-drawer.open {
-      bottom: 0;
+    .bottom-drawer.open .drawer-handle {
+      opacity: 0;
+      pointer-events: none;
     }
+    
+    .bottom-drawer.closed .drawer-handle {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
     .bottom-drawer-handle {
       position: absolute;
       top: -50px;
@@ -211,14 +218,15 @@
       height: 30px;
       background: none;
       color: Magenta;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      text-align: start;
-      line-height: 30px;
-      cursor: pointer;
       font-size: 1.6em;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
     }
-    
+      
     .bottom-buttons.inside {
       position: relative;
       bottom: 0;
@@ -326,7 +334,7 @@
       if (drawer.classList.contains("open")) closeDrawer();
       else openDrawer();
     }
-
+    
     function openDrawer() {
       drawer.classList.add('open');
       overlay.classList.add('visible');
@@ -337,6 +345,17 @@
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
+    }
+    
+    function toggleDrawer() {
+      const drawer = document.querySelector('.bottom-drawer');
+      if (drawer.classList.contains('open')) {
+        drawer.classList.remove('open');
+        drawer.classList.add('closed');
+      } else {
+        drawer.classList.add('open');
+        drawer.classList.remove('closed');
+      }
     }
     
     let startY = 0;
