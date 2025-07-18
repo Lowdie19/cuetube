@@ -189,6 +189,21 @@
       .youtube-wrapper {
         height: 75vh;
       }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+      
+      .bottom-buttons, .leave-btn {
+        position: relative;
+        bottom: 0;
+        margin-top: auto; /* Push to bottom inside flex column */
+      }
     }
 
     @media (max-height: 500px) {
