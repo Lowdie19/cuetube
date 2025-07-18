@@ -133,10 +133,10 @@
 
     .youtube-wrapper {
       width: 100%;
-      height: 60vh;
+      height: 72vh;
       border: 5px solid cyan;
       margin-top: 5vh;
-      margin-bottom: 10vh;
+      margin-bottom: 5vh;
     }
 
     iframe {
@@ -204,7 +204,7 @@
     }
     .bottom-drawer-handle {
       position: absolute;
-      top: -30px;
+      top: -50px;
       left: 50%;
       transform: translateX(-50%);
       width: 60px;
@@ -216,7 +216,7 @@
       text-align: center;
       line-height: 30px;
       cursor: pointer;
-      font-size: 1.2em;
+      font-size: 1.6em;
     }
     
     .bottom-buttons.inside {
@@ -290,15 +290,7 @@
     <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
 
-  <!-- URL Typing Field -->
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInput" />
-
-  <!-- Bottom Buttons -->
-  <div class="bottom-buttons">
-    <button class="cyan-btn" onclick="reserve()">Reserve</button>
-    <button class="cyan-btn" id="nextBtn" onclick="playNext()">Next</button>
-  </div>
-
+  <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
   <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
