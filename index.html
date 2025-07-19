@@ -312,7 +312,7 @@
   </div>
 
   <!-- Bottom Drawer -->
-  <div class="bottom-drawer" id="bottomDrawer">
+  <div class="bottom-drawer closed" id="bottomDrawer">
   <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
   <div class="bottom-buttons inside">
@@ -369,22 +369,35 @@
     const bottomDrawer = document.getElementById("bottomDrawer");
     const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
     
-    function toggleBottomDrawer() {
-    bottomDrawer.classList.toggle("open");
-    bottomDrawerHandle.innerText = bottomDrawer.classList.contains("open") ? "▼" : "▲";
-    }
+   function toggleBottomDrawer() {
+     const isOpen = bottomDrawer.classList.contains("open");
+     if (isOpen) {
+       bottomDrawer.classList.remove("open");
+       bottomDrawer.classList.add("closed");
+       bottomDrawerHandle.innerText = "▲";
+     } else {
+       bottomDrawer.classList.add("open");
+       bottomDrawer.classList.remove("closed");
+       bottomDrawerHandle.innerText = "▼";
+     }
+   }
     
     function handleDrawerTouchStart(evt) {
     startY = evt.touches[0].clientY;
     }
     
-    function handleDrawerTouchMove(evt) {
-      const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) bottomDrawer.classList.add("open");
-      else if (deltaY > 40) bottomDrawer.classList.remove("open");
+    function handleDrawerTouchMove() {
+      if (deltaY < -40) {
+        bottomDrawer.classList.add("open");
+        bottomDrawer.classList.remove("closed");
+        bottomDrawerHandle.innerText = "▼";
+      }
+      if (deltaY > 40) {
+        bottomDrawer.classList.remove("open");
+        bottomDrawer.classList.add("closed");
+        bottomDrawerHandle.innerText = "▲";
+      }
     }
-    document.body.addEventListener("touchstart", handleDrawerTouchStart);
-    document.body.addEventListener("touchmove", handleDrawerTouchMove);
     
     function reserveFromDrawer() {
     const url = document.getElementById("youtubeInputDrawer").value;
