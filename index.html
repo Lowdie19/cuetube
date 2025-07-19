@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0a0a0a" />
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -28,7 +28,7 @@
       background-color: #000;
       position: relative;
     }
-    
+
     .refresh-btn {
       position: absolute;
       top: 10px;
@@ -40,26 +40,25 @@
       cursor: pointer;
       z-index: 200;
     }
-    
+
     .drawer {
       position: fixed;
       top: 0;
       left: -240px;
       width: 220px;
-      height: 100%;
       background: rgba(20, 20, 20, 0.90);
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
       transition: left 0.3s ease;
-
       display: flex;
       flex-direction: column;
       justify-content: space-around;
       height: 50%;
     }
+
     .drawer.open { left: 0; }
-    
+
     .drawer-handle {
       position: absolute;
       top: 0%;
@@ -77,14 +76,14 @@
       cursor: pointer;
       z-index: 80;
     }
-    
+
     .nowplaying-box {
       border: 2px solid cyan;
       border-radius: 10px;
       padding: 10px;
       background: #121212;
     }
-    
+
     .nowplaying-box .label {
       font-size: 0.7em;
       color: #aaa;
@@ -95,25 +94,25 @@
       margin: 5px 0;
       word-wrap: break-word;
     }
-    
+
     .next-box {
       border: none;
       border-radius: 10px;
       padding: 10px;
       background: #121212;
     }
-    
+
     .next-box .label {
       font-size: 0.7em;
       color: #aaa;
     }
-    
+
     .next-box .title {
       font-size: 0.9em;
       margin: 10px 0;
       word-wrap: break-word;
     }
-    
+
     .leave-btn {
       width: 100%;
       padding: 12px;
@@ -125,7 +124,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    
+
     .leave-btn:hover {
       background: deeppink;
       color: white;
@@ -141,6 +140,7 @@
       z-index: 90;
       display: none;
     }
+
     .drawer-overlay.visible { display: block; }
 
     .youtube-wrapper {
@@ -196,7 +196,7 @@
       background: cyan;
       color: black;
     }
-    
+
     .bottom-drawer {
       position: fixed;
       bottom: -200px;
@@ -211,16 +211,10 @@
       flex-direction: column;
       align-items: center;
     }
-    .bottom-drawer.open .drawer-handle {
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    .bottom-drawer.closed .drawer-handle {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    
+
+    .bottom-drawer.open .drawer-handle { opacity: 0; pointer-events: none; }
+    .bottom-drawer.closed .drawer-handle { opacity: 1; pointer-events: auto; }
+
     .bottom-drawer-handle {
       position: absolute;
       top: -50px;
@@ -229,7 +223,7 @@
       width: 60px;
       height: 30px;
       background: none;
-      color: Magenta;
+      color: magenta;
       font-size: 1.6em;
       border-radius: 10px 10px 0 0;
       display: flex;
@@ -238,7 +232,7 @@
       cursor: pointer;
       transition: opacity 0.3s ease;
     }
-      
+
     .bottom-buttons.inside {
       position: relative;
       bottom: 0;
@@ -249,24 +243,10 @@
     }
 
     @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 75vh;
-      }
-      .drawer {
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      
-      .url-input, .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-      
-      .bottom-buttons, .leave-btn {
-        position: relative;
-        bottom: 0;
-        margin-top: auto; /* Push to bottom inside flex column */
-      }
+      .youtube-wrapper { height: 75vh; }
+      .drawer { height: 100vh; justify-content: space-between; padding-bottom: 20px; }
+      .url-input, .search-bar { display: block; }
+      .bottom-buttons, .leave-btn { position: relative; bottom: 0; margin-top: auto; }
     }
 
     @media (max-height: 500px) {
@@ -275,61 +255,54 @@
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-  
-  <!-- Title -->
+
   <div class="title-bar">KaraOwkie!</div>
-  <button class="refresh-btn" onclick="refreshApp()">⟳</button>
-    
+  <button type="button" class="refresh-btn" onclick="refreshApp()">⟳</button>
+
   <!-- Drawer -->
   <div class="drawer" id="drawer">
-     <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
-      <div class="nowplaying-box">
-        <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">Sample Song Title</div>
-      </div>
+    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div class="nowplaying-box">
+      <div class="label">NOW PLAYING</div>
+      <div class="title" id="nowTitle">Sample Song Title</div>
     </div>
-    <div>
-      <div class="next-box">
-        <div class="label">NEXT</div>
-        <div class="title" id="nowTitle">Sample Song 1</div>
-        <div class="title" id="nowTitle">Sample Song 2</div>
-        <div class="title" id="nowTitle">Sample Song 3</div>
-        <div class="title" id="nowTitle">Sample Song 4</div>
-      </div>
+    <div class="next-box">
+      <div class="label">NEXT</div>
+      <div class="title">Sample Song 1</div>
+      <div class="title">Sample Song 2</div>
+      <div class="title">Sample Song 3</div>
+      <div class="title">Sample Song 4</div>
     </div>
-    <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
+    <button type="button" class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
-</div>
-</div>
 
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()">
-  </div>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
+    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1&controls=1"></iframe>
   </div>
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer closed" id="bottomDrawer"
      ontouchstart="handleDrawerTouchStart(event)"
      ontouchmove="handleDrawerTouchMove(event)">
-  <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <div class="bottom-buttons inside">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
+    <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
+    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+    <div class="bottom-buttons inside">
+      <button type="button" class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+      <button type="button" class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
+    </div>
   </div>
-</div>
 
-  <!-- JS -->
+  <!-- JavaScript -->
   <script>
+    let isHost = true; // set this based on your app logic
 
     function refreshApp() {
-    location.reload(); // Full reload
+      location.reload();
     }
-    
+
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
@@ -351,47 +324,40 @@
     }
 
     function toggleDrawer() {
-      if (drawer.classList.contains("open")) closeDrawer();
-      else openDrawer();
+      drawer.classList.toggle('open');
+      overlay.classList.toggle('visible');
+      document.getElementById('drawerHandle').style.display = drawer.classList.contains('open') ? 'none' : 'flex';
     }
-    
+
     function openDrawer() {
       drawer.classList.add('open');
       overlay.classList.add('visible');
       document.getElementById('drawerHandle').style.display = 'none';
     }
-    
+
     function closeDrawer() {
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
     }
-    
+
     let startY = 0;
     const bottomDrawer = document.getElementById("bottomDrawer");
     const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
-    
-   function toggleBottomDrawer() {
-     const isOpen = bottomDrawer.classList.contains("open");
-     if (isOpen) {
-       bottomDrawer.classList.remove("open");
-       bottomDrawer.classList.add("closed");
-       bottomDrawerHandle.innerText = "▲";
-     } else {
-       bottomDrawer.classList.add("open");
-       bottomDrawer.classList.remove("closed");
-       bottomDrawerHandle.innerText = "▼";
-     }
-   }
-    
+
+    function toggleBottomDrawer() {
+      const isOpen = bottomDrawer.classList.contains("open");
+      bottomDrawer.classList.toggle("open", !isOpen);
+      bottomDrawer.classList.toggle("closed", isOpen);
+      bottomDrawerHandle.innerText = isOpen ? "▲" : "▼";
+    }
+
     function handleDrawerTouchStart(evt) {
       startY = evt.touches[0].clientY;
     }
 
     function handleDrawerTouchMove(evt) {
-      const currentY = evt.touches[0].clientY;
-      const deltaY = currentY - startY;
-      
+      const deltaY = evt.touches[0].clientY - startY;
       if (deltaY < -40) {
         bottomDrawer.classList.add("open");
         bottomDrawer.classList.remove("closed");
@@ -402,21 +368,20 @@
         bottomDrawerHandle.innerText = "▲";
       }
     }
-    
+
     function reserveFromDrawer() {
-    const url = document.getElementById("youtubeInputDrawer").value;
-    if (!url) return alert("Please paste a YouTube URL.");
-    alert("🎤 Reserved: " + url);
+      const url = document.getElementById("youtubeInputDrawer").value;
+      if (!url) return alert("Please paste a YouTube URL.");
+      alert("🎤 Reserved: " + url);
     }
+
     function playNextFromDrawer() {
-    alert("⏭ Next song!");
+      alert("⏭ Next song!");
     }
-    
-    // Host check logic for drawer button
+
     if (!isHost) {
       document.getElementById("nextBtnDrawer").style.display = "none";
     }
   </script>
-
 </body>
 </html>
