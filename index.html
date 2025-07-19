@@ -7,10 +7,6 @@
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      overscroll-behavior: none;
-    }
-    
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
@@ -367,17 +363,6 @@
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
-    }
-    
-    function toggleDrawer() {
-      const drawer = document.querySelector('.bottom-drawer');
-      if (drawer.classList.contains('open')) {
-        drawer.classList.remove('open');
-        drawer.classList.add('closed');
-      } else {
-        drawer.classList.add('open');
-        drawer.classList.remove('closed');
-      }
     }
     
     let startY = 0;
