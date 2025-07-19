@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#0a0a0a" />
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -29,36 +29,25 @@
       position: relative;
     }
 
-    .refresh-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.5em;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      z-index: 200;
-    }
-
     .drawer {
       position: fixed;
       top: 0;
       left: -240px;
       width: 220px;
+      height: 100%;
       background: rgba(20, 20, 20, 0.90);
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
       transition: left 0.3s ease;
+
       display: flex;
       flex-direction: column;
       justify-content: space-around;
       height: 50%;
     }
-
     .drawer.open { left: 0; }
-
+    
     .drawer-handle {
       position: absolute;
       top: 0%;
@@ -76,14 +65,14 @@
       cursor: pointer;
       z-index: 80;
     }
-
+    
     .nowplaying-box {
       border: 2px solid cyan;
       border-radius: 10px;
       padding: 10px;
       background: #121212;
     }
-
+    
     .nowplaying-box .label {
       font-size: 0.7em;
       color: #aaa;
@@ -94,25 +83,25 @@
       margin: 5px 0;
       word-wrap: break-word;
     }
-
+    
     .next-box {
       border: none;
       border-radius: 10px;
       padding: 10px;
       background: #121212;
     }
-
+    
     .next-box .label {
       font-size: 0.7em;
       color: #aaa;
     }
-
+    
     .next-box .title {
       font-size: 0.9em;
       margin: 10px 0;
       word-wrap: break-word;
     }
-
+    
     .leave-btn {
       width: 100%;
       padding: 12px;
@@ -124,7 +113,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
+    
     .leave-btn:hover {
       background: deeppink;
       color: white;
@@ -140,7 +129,6 @@
       z-index: 90;
       display: none;
     }
-
     .drawer-overlay.visible { display: block; }
 
     .youtube-wrapper {
@@ -196,7 +184,7 @@
       background: cyan;
       color: black;
     }
-
+    
     .bottom-drawer {
       position: fixed;
       bottom: -200px;
@@ -211,31 +199,26 @@
       flex-direction: column;
       align-items: center;
     }
-
-    .bottom-drawer.open .drawer-handle { opacity: 0; pointer-events: none; }
-    .bottom-drawer.closed .drawer-handle { opacity: 1; pointer-events: auto; }
-
-    .bottom-drawer.open .bottom-drawer-handle { opacity: 0; pointer-events: none;}
-    .bottom-drawer.closed .bottom-drawer-handle { opacity: 1; pointer-events: auto;}
-
+    .bottom-drawer.open {
+      bottom: 0;
+    }
     .bottom-drawer-handle {
       position: absolute;
-      top: -100px;
+      top: -50px;
       left: 50%;
       transform: translateX(-50%);
       width: 60px;
       height: 30px;
       background: none;
-      color: magenta;
-      font-size: 1.6em;
-      border-radius: 10px 10px 0 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: Magenta;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      text-align: start;
+      line-height: 30px;
       cursor: pointer;
-      transition: opacity 0.3s ease;
+      font-size: 1.6em;
     }
-
+    
     .bottom-buttons.inside {
       position: relative;
       bottom: 0;
@@ -246,10 +229,24 @@
     }
 
     @media (orientation: landscape) {
-      .youtube-wrapper { height: 75vh; }
-      .drawer { height: 100vh; justify-content: space-between; padding-bottom: 20px; }
-      .url-input, .search-bar { display: block; }
-      .bottom-buttons, .leave-btn { position: relative; bottom: 0; margin-top: auto; }
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+      
+      .bottom-buttons, .leave-btn {
+        position: relative;
+        bottom: 0;
+        margin-top: auto; /* Push to bottom inside flex column */
+      }
     }
 
     @media (max-height: 500px) {
@@ -257,40 +254,44 @@
     }
   </style>
 </head>
-  <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-    <div id="bottomDrawerOverlay" class="drawer-overlay" onclick="closeBottomDrawer()"></div>
-    
-  <div class="title-bar">KaraOwkie!</div>
-  <button type="button" class="refresh-btn" onclick="refreshApp()">⟳</button>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
+  <!-- Title -->
+  <div class="title-bar">KaraOwkie!</div>
+    
   <!-- Drawer -->
   <div class="drawer" id="drawer">
-    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div class="nowplaying-box">
-      <div class="label">NOW PLAYING</div>
-      <div class="title" id="nowTitle">Sample Song Title</div>
+     <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">Sample Song Title</div>
+      </div>
     </div>
-    <div class="next-box">
-      <div class="label">NEXT</div>
-      <div class="title">Sample Song 1</div>
-      <div class="title">Sample Song 2</div>
-      <div class="title">Sample Song 3</div>
-      <div class="title">Sample Song 4</div>
+    <div>
+      <div class="next-box">
+        <div class="label">NEXT</div>
+        <div class="title" id="nowTitle">Sample Song 1</div>
+        <div class="title" id="nowTitle">Sample Song 2</div>
+        <div class="title" id="nowTitle">Sample Song 3</div>
+        <div class="title" id="nowTitle">Sample Song 4</div>
+      </div>
     </div>
-    <button type="button" class="leave-btn" onclick="leaveRoom()">Leave Room</button>
+    <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
+</div>
+</div>
 
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()">
+  </div>
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&controls=1"></iframe>
+    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
 
   <!-- Bottom Drawer -->
-    
-  <div class="bottom-drawer" id="bottomDrawer" ontouchstart="handleDrawerTouchStart(event)"
-      ontouchmove="handleDrawerTouchMove(event)">
+  <div class="bottom-drawer" id="bottomDrawer">
   <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
   <div class="bottom-buttons inside">
@@ -299,14 +300,8 @@
   </div>
 </div>
 
-  <!-- JavaScript -->
+  <!-- JS -->
   <script>
-    let isHost = true; // set this based on your app logic
-
-    function refreshApp() {
-      location.reload();
-    }
-
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
@@ -320,21 +315,16 @@
       if (deltaX > 50) openDrawer();
       else if (deltaX < -50) closeDrawer();
     }
-    
+
     function handleTap(evt) {
       if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
         closeDrawer();
       }
-      
-      if (!bottomDrawer.contains(evt.target) && bottomDrawer.classList.contains("open")) {
-        closeBottomDrawer();
-      }
     }
-    
+
     function toggleDrawer() {
-      drawer.classList.toggle('open');
-      overlay.classList.toggle('visible');
-      document.getElementById('drawerHandle').style.display = drawer.classList.contains('open') ? 'none' : 'flex';
+      if (drawer.classList.contains("open")) closeDrawer();
+      else openDrawer();
     }
 
     function openDrawer() {
@@ -342,64 +332,48 @@
       overlay.classList.add('visible');
       document.getElementById('drawerHandle').style.display = 'none';
     }
-
+    
     function closeDrawer() {
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
     }
-
+    
     let startY = 0;
     const bottomDrawer = document.getElementById("bottomDrawer");
     const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
     
-    function handleDrawerTouchStart(evt) {
-      startY = evt.touches[0].clientY;
+    function toggleBottomDrawer() {
+    bottomDrawer.classList.toggle("open");
+    bottomDrawerHandle.innerText = bottomDrawer.classList.contains("open") ? "▼" : "▲";
     }
-
+    
+    function handleDrawerTouchStart(evt) {
+    startY = evt.touches[0].clientY;
+    }
+    
     function handleDrawerTouchMove(evt) {
       const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) openBottomDrawer();
-      else if (deltaY > 40) closeBottomDrawer();
+      if (deltaY < -40) bottomDrawer.classList.add("open");
+      else if (deltaY > 40) bottomDrawer.classList.remove("open");
     }
+    document.body.addEventListener("touchstart", handleDrawerTouchStart);
+    document.body.addEventListener("touchmove", handleDrawerTouchMove);
     
-    const bottomDrawerOverlay = document.getElementById("bottomDrawerOverlay");
-    function closeBottomDrawer() {
-      bottomDrawer.classList.remove("open");
-      bottomDrawer.classList.add("closed");
-      bottomDrawerHandle.innerText = "▲";
-      bottomDrawerOverlay.classList.remove("visible");
-    }
-
-    function openBottomDrawer() {
-      bottomDrawer.classList.add("open");
-      bottomDrawer.classList.remove("closed");
-      bottomDrawerHandle.innerText = "▼";
-      bottomDrawerOverlay.classList.add("visible");
-    }
-    
-    function toggleBottomDrawer() {
-      const isOpen = bottomDrawer.classList.contains("open");
-      if (isOpen) {
-        closeBottomDrawer();
-      } else {
-        openBottomDrawer();
-      }
-    }
-
     function reserveFromDrawer() {
-      const url = document.getElementById("youtubeInputDrawer").value;
-      if (!url) return alert("Please paste a YouTube URL.");
-      alert("🎤 Reserved: " + url);
+    const url = document.getElementById("youtubeInputDrawer").value;
+    if (!url) return alert("Please paste a YouTube URL.");
+    alert("🎤 Reserved: " + url);
     }
-
     function playNextFromDrawer() {
-      alert("⏭ Next song!");
+    alert("⏭ Next song!");
     }
-
+    
+    // Host check logic for drawer button
     if (!isHost) {
       document.getElementById("nextBtnDrawer").style.display = "none";
     }
   </script>
+
 </body>
 </html>
