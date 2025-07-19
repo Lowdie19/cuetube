@@ -7,10 +7,6 @@
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      overscroll-behavior: none;
-    }
-    
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
@@ -32,19 +28,7 @@
       background-color: #000;
       position: relative;
     }
-    
-    .refresh-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.5em;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      z-index: 200;
-    }
-    
+
     .drawer {
       position: fixed;
       top: 0;
@@ -282,7 +266,6 @@
 
   <!-- Title -->
   <div class="title-bar">KaraOwkie!</div>
-  <button class="refresh-btn" onclick="refreshApp()">⟳</button>
     
   <!-- Drawer -->
   <div class="drawer" id="drawer">
@@ -327,11 +310,6 @@
 
   <!-- JS -->
   <script>
-
-    function refreshApp() {
-    location.reload(); // Full reload
-    }
-    
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
