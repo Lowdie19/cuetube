@@ -215,6 +215,9 @@
     .bottom-drawer.open .drawer-handle { opacity: 0; pointer-events: none; }
     .bottom-drawer.closed .drawer-handle { opacity: 1; pointer-events: auto; }
 
+    .bottom-drawer.open .bottom-drawer-handle { opacity: 0; pointer-events: none;}
+    .bottom-drawer.closed .bottom-drawer-handle { opacity: 1; pointer-events: auto;}
+
     .bottom-drawer-handle {
       position: absolute;
       top: -100px;
@@ -254,7 +257,8 @@
     }
   </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+  <div id="bottomDrawerOverlay" class="drawer-overlay" onclick="closeBottomDrawer()"></div>
+  <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <div class="title-bar">KaraOwkie!</div>
   <button type="button" class="refresh-btn" onclick="refreshApp()">⟳</button>
@@ -358,14 +362,31 @@
 
     function handleDrawerTouchMove(evt) {
       const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) {
-        bottomDrawer.classList.add("open");
-        bottomDrawer.classList.remove("closed");
-        bottomDrawerHandle.innerText = "▼";
-      } else if (deltaY > 40) {
-        bottomDrawer.classList.remove("open");
-        bottomDrawer.classList.add("closed");
-        bottomDrawerHandle.innerText = "▲";
+      if (deltaY < -40) openBottomDrawer();
+      else if (deltaY > 40) closeBottomDrawer();
+    }
+    
+    const bottomDrawerOverlay = document.getElementById("bottomDrawerOverlay");
+    function closeBottomDrawer() {
+      bottomDrawer.classList.remove("open");
+      bottomDrawer.classList.add("closed");
+      bottomDrawerHandle.innerText = "▲";
+      bottomDrawerOverlay.classList.remove("visible");
+    }
+
+    function openBottomDrawer() {
+      bottomDrawer.classList.add("open");
+      bottomDrawer.classList.remove("closed");
+      bottomDrawerHandle.innerText = "▼";
+      bottomDrawerOverlay.classList.add("visible");
+    }
+    
+    function toggleBottomDrawer() {
+      const isOpen = bottomDrawer.classList.contains("open");
+      if (isOpen) {
+        closeBottomDrawer();
+      } else {
+        openBottomDrawer();
       }
     }
 
