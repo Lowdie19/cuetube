@@ -275,7 +275,7 @@
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-
+  
   <!-- Title -->
   <div class="title-bar">KaraOwkie!</div>
   <button class="refresh-btn" onclick="refreshApp()">⟳</button>
@@ -312,7 +312,9 @@
   </div>
 
   <!-- Bottom Drawer -->
-  <div class="bottom-drawer closed" id="bottomDrawer">
+  <div class="bottom-drawer closed" id="bottomDrawer"
+     ontouchstart="handleDrawerTouchStart(event)"
+     ontouchmove="handleDrawerTouchMove(event)">
   <div id="bottomDrawerHandle" class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
   <div class="bottom-buttons inside">
@@ -383,16 +385,18 @@
    }
     
     function handleDrawerTouchStart(evt) {
-    startY = evt.touches[0].clientY;
+      startY = evt.touches[0].clientY;
     }
-    
-    function handleDrawerTouchMove() {
+
+    function handleDrawerTouchMove(evt) {
+      const currentY = evt.touches[0].clientY;
+      const deltaY = currentY - startY;
+      
       if (deltaY < -40) {
         bottomDrawer.classList.add("open");
         bottomDrawer.classList.remove("closed");
         bottomDrawerHandle.innerText = "▼";
-      }
-      if (deltaY > 40) {
+      } else if (deltaY > 40) {
         bottomDrawer.classList.remove("open");
         bottomDrawer.classList.add("closed");
         bottomDrawerHandle.innerText = "▲";
@@ -416,5 +420,3 @@
 
 </body>
 </html>
-
-Refresh
