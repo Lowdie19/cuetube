@@ -225,7 +225,6 @@
       color: Magenta;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
-      text-align: start;
       line-height: 50px;
       cursor: pointer;
       font-size: 1.6em;
@@ -284,16 +283,14 @@
     <div>
       <div class="next-box">
         <div class="label">NEXT</div>
-        <div class="title" id="nowTitle">Sample Song 1</div>
-        <div class="title" id="nowTitle">Sample Song 2</div>
-        <div class="title" id="nowTitle">Sample Song 3</div>
-        <div class="title" id="nowTitle">Sample Song 4</div>
+        <div class="title">Sample Song 1</div>
+        <div class="title">Sample Song 2</div>
+        <div class="title">Sample Song 3</div>
+        <div class="title">Sample Song 4</div>
       </div>
     </div>
     <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
-</div>
-</div>
 
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()">
   </div>
@@ -315,6 +312,8 @@
 
   <!-- JS -->
   <script>
+    let isHost = true; // Set based on actual user role later
+    
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
