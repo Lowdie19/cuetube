@@ -233,6 +233,13 @@
       z-index: 80;
     }
 
+    .bottom-drawer-handle {
+      transition: opacity 0.3s ease;
+    }
+    .bottom-drawer-handle[style*="display: none"] {
+      opacity: 0;
+    }
+    
     .bottom-buttons.inside {
       position: relative;
       bottom: 0;
@@ -304,14 +311,15 @@
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
-    <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</div>
-  <div id="bottomDrawerHandle inside">
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <div class="bottom-buttons inside">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
+    <div id="bottomDrawerHandle">
+      <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</button>
+    </div>
+    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+    <div class="bottom-buttons inside">
+      <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+      <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
+    </div>
   </div>
-</div>
 
   <!-- JS -->
   <script>
@@ -371,7 +379,7 @@
     function toggleBottomDrawer() {
       bottomDrawer.classList.toggle("open");
       const isOpen = bottomDrawer.classList.contains("open");
-      bottomDrawerHandle.innerText = isOpen ? "▼" : "▲";
+      document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
       document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
     }
     
@@ -381,9 +389,18 @@
     
     function handleDrawerTouchMove(evt) {
       const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) bottomDrawer.classList.add("open");
-      else if (deltaY > 40) bottomDrawer.classList.remove("open");
+      
+      if (deltaY < -40) {
+        bottomDrawer.classList.add("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "none";
+        document.getElementById("bottomDrawerOverlay").classList.add("visible");
+      } else if (deltaY > 40) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      }
     }
+    
     document.body.addEventListener("touchstart", handleDrawerTouchStart);
     document.body.addEventListener("touchmove", handleDrawerTouchMove);
     
