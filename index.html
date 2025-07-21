@@ -318,48 +318,48 @@
   <!-- JS -->
   <script>
     let isHost = true; // Set based on actual user role later
-    
+
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
-    
+  
     function refreshApp() {
       location.reload();
     }
-
+  
     function handleTouchStart(evt) {
       touchStartX = evt.touches[0].clientX;
     }
-
+  
     function handleTouchMove(evt) {
       const deltaX = evt.touches[0].clientX - touchStartX;
       if (deltaX > 50) openDrawer();
       else if (deltaX < -50) closeDrawer();
     }
-
+  
     function handleTap(evt) {
       if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
         closeDrawer();
       }
     }
-
+  
     function toggleDrawer() {
       if (drawer.classList.contains("open")) closeDrawer();
       else openDrawer();
     }
-
+  
     function openDrawer() {
       drawer.classList.add('open');
       overlay.classList.add('visible');
       document.getElementById('drawerHandle').style.display = 'none';
     }
-    
+  
     function closeDrawer() {
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
     }
-
+  
     function closeBottomDrawer() {
       if (bottomDrawer.classList.contains("open")) {
         bottomDrawer.classList.remove("open");
@@ -367,24 +367,23 @@
         document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
     }
-    
+  
     let startY = 0;
     const bottomDrawer = document.getElementById("bottomDrawer");
     const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
-    
+  
     function toggleBottomDrawer() {
       const isOpen = bottomDrawer.classList.toggle("open");
       document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
       document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
     }
-    
+  
     function handleDrawerTouchStart(evt) {
-    startY = evt.touches[0].clientY;
+      startY = evt.touches[0].clientY;
     }
-    
+  
     function handleDrawerTouchMove(evt) {
       const deltaY = evt.touches[0].clientY - startY;
-      
       if (deltaY < -40) {
         bottomDrawer.classList.add("open");
         document.querySelector(".bottom-drawer-handle").style.display = "none";
@@ -395,19 +394,44 @@
         document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
     }
-    
+  
     document.body.addEventListener("touchstart", handleDrawerTouchStart);
     document.body.addEventListener("touchmove", handleDrawerTouchMove);
-    
+  
     function reserveFromDrawer() {
-    const url = document.getElementById("youtubeInputDrawer").value;
-    if (!url) return alert("Please paste a YouTube URL.");
-    alert("🎤 Reserved: " + url);
+      const url = document.getElementById("youtubeInputDrawer").value.trim();
+      if (!url) return alert("Please paste a YouTube URL.");
+  
+      const videoId = extractYouTubeID(url);
+      if (!videoId) return alert("Invalid YouTube URL.");
+  
+      // Set video player iframe src
+      const player = document.getElementById("player");
+      player.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1`;
+  
+      // Fetch title using oEmbed (no API key)
+      fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("nowTitle").textContent = data.title || "Now Playing";
+          alert("🎤 Reserved: " + data.title);
+        })
+        .catch(err => {
+          document.getElementById("nowTitle").textContent = "Now Playing";
+          alert("🎤 Reserved! (Title not found)");
+          console.error("Failed to fetch video title:", err);
+        });
     }
+  
+    function extractYouTubeID(url) {
+      const match = url.match(/(?:youtu\.be\/|v=)([^&]+)/);
+      return match ? match[1] : null;
+    }
+  
     function playNextFromDrawer() {
-    alert("⏭ Next song!");
+      alert("⏭ Next song!");
     }
-    
+  
     // Host check logic for drawer button
     if (!isHost) {
       document.getElementById("nextBtnDrawer").style.display = "none";
