@@ -218,7 +218,7 @@
     }
     
     .bottom-drawer-handle {position: absolute;
-      top: -30px;
+      top: -50px;
       left: 50%;
       transform: translateX(-50%);
       background: none;
@@ -361,9 +361,11 @@
     }
 
     function closeBottomDrawer() {
-      bottomDrawer.classList.remove("open");
-      bottomDrawerHandle.innerText = "▲";
-      document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      if (bottomDrawer.classList.contains("open")) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      }
     }
     
     let startY = 0;
