@@ -212,25 +212,18 @@
       flex-direction: column;
       align-items: center;
     }
+    
     .bottom-drawer.open {
       bottom: 0;
     }
+    
     .bottom-drawer-handle {
-      position: absolute;
-      top: -50%;
-      right: -50px;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.0);
-      color: magenta;
-      font-size: 1.6em;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
+      position: relative;
+      bottom: 0;
+      background: rgba(20, 20, 20, 0.95);
       display: flex;
-      align-items: center;
-      justify-content: right;
-      cursor: pointer;
-      z-index: 80;
+      justify-content: center;
+      gap: 3px;
     }
 
     .bottom-drawer-handle {
