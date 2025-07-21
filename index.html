@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KaraOwkie! - Offline Mode</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
@@ -11,178 +12,436 @@
       margin: 0;
       padding: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #111;
+      background-color: #0a0a0a;
       color: white;
-      height: 100vh;
       overflow: hidden;
+      height: 100vh;
+      width: 100vw;
     }
-    header {
+
+    .title-bar {
       text-align: center;
-      font-size: 2rem;
-      padding: 10px;
+      font-size: 1.6em;
+      padding: 12px 0;
+      color: cyan;
+      text-shadow: 0 0 5px cyan, 0 0 15px cyan;
+      background-color: #000;
+      position: relative;
       animation: neon 1.5s ease-in-out infinite alternate;
     }
     @keyframes neon {
       from { text-shadow: 0 0 10px cyan, 0 0 20px cyan; }
       to { text-shadow: 0 0 20px magenta, 0 0 40px magenta; }
     }
-    #player {
-      width: 100%;
-      height: 40vh;
-      background: black;
-    }
-    #queueDrawer, #bottomDrawer {
+    
+    .refresh-btn {
       position: absolute;
-      background: #222;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      z-index: 200;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -240px;
+      width: 220px;
+      height: 100%;
+      background: rgba(20, 20, 20, 0.90);
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      height: 50%;
+    }
+    .drawer.open { left: 0; }
+    
+    .drawer-handle {
+      position: absolute;
+      top: 0%;
+      right: -50px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.0);
+      color: magenta;
+      font-size: 1.6em;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+      cursor: pointer;
+      z-index: 80;
+    }
+    
+    .nowplaying-box {
+      border: 2px solid cyan;
+      border-radius: 10px;
       padding: 10px;
-      z-index: 10;
-      transition: all 0.3s ease;
+      background: #121212;
     }
-    #queueDrawer {
-      top: 60px;
-      right: 0;
-      width: 250px;
-      height: calc(100% - 60px);
-      overflow-y: auto;
-      border-left: 2px solid #444;
+    
+    .nowplaying-box .label {
+      font-size: 0.7em;
+      color: #aaa;
     }
-    #bottomDrawer {
-      bottom: 0;
+
+    .nowplaying-box .title {
+      font-size: 1.1em;
+      margin: 5px 0;
+      word-wrap: break-word;
+    }
+    
+    .next-box {
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      background: #121212;
+    }
+    
+    .next-box .label {
+      font-size: 0.7em;
+      color: #aaa;
+    }
+    
+    .next-box .title {
+      font-size: 0.9em;
+      margin: 10px 0;
+      word-wrap: break-word;
+    }
+    
+    .leave-btn {
+      width: 100%;
+      padding: 12px;
+      background: magenta;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .leave-btn:hover {
+      background: deeppink;
+      color: white;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+      display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+    .bottomDrawerOverlay.visible { display: block; }
+
+    .youtube-wrapper {
+      width: 100%;
+      height: 70vh;
+      border: 5px solid cyan;
+      margin-top: 2vh;
+      margin-bottom: 5vh;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .url-input {
+      width: calc(100% - 20px);
+      margin: 0 10px 8px 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid cyan;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      text-align: center;
+    }
+
+    .bottom-buttons {
+      position: fixed;
+      bottom: 15px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .cyan-btn {
+      flex: 1;
+      padding: 14px;
+      background: #121212;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .cyan-btn:hover {
+      background: cyan;
+      color: black;
+    }
+    
+    .bottom-drawer {
+      position: fixed;
+      bottom: -160px;
       left: 0;
       width: 100%;
-      height: 30vh;
-      border-top: 2px solid #444;
+      background: rgba(20, 20, 20, 0.95);
+      padding: 20px 15px 25px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+      transition: bottom 0.3s ease;
+      z-index: 98;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    input {
-      width: 80%;
-      padding: 8px;
-      font-size: 1rem;
-      border-radius: 5px;
+    
+    .bottom-drawer.open {
+      bottom: 0;
     }
-    button {
-      background: #0ff;
-      border: none;
-      color: #111;
-      padding: 10px;
-      margin: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #0cf;
-    }
-    .queue-item {
-      padding: 5px;
-      border-bottom: 1px solid #555;
-      font-size: 0.9rem;
-    }
-    #toast {
-      position: fixed;
-      bottom: 50px;
+    
+    .bottom-drawer-handle {position: absolute;
+      top: -50px;
       left: 50%;
       transform: translateX(-50%);
-      background: #0f0;
-      padding: 10px 20px;
-      border-radius: 8px;
-      display: none;
-      font-weight: bold;
-      z-index: 999;
+      background: none;
+      border: none;
+      color: magenta;
+      font-size: 1.8em;
+      cursor: pointer;
+      text-shadow: 0 0 6px magenta, 0 0 12px magenta;
+      z-index: 99;
+      transition: opacity 0.3s ease;
+    }
+    .bottom-drawer-handle[style*="display: none"] {
+      opacity: 0;
+    }
+    
+    .bottom-buttons.inside {
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+      
+      .bottom-buttons, .leave-btn {
+        position: relative;
+        bottom: 0;
+        margin-top: auto; /* Push to bottom inside flex column */
+      }
+    }
+
+    @media (max-height: 500px) {
+      .bottom-buttons { position: static; margin-top: 20px; }
     }
   </style>
 </head>
-<body>
-  <header>Ytube Party!</header>
-  <div id="player"></div>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
-  <!-- Right drawer: Up Next Queue -->
-  <div id="queueDrawer">
-    <h3>Up Next</h3>
-    <div id="queueList"></div>
-    <button onclick="playNext()">Next ▶️</button>
+  <!-- Title -->
+  <div class="title-bar">KaraOwkie!</div>
+  <button type="button" class="refresh-btn" onclick="refreshApp()">⟳</button>
+    
+  <!-- Drawer -->
+  <div class="drawer" id="drawer">
+     <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">Sample Song Title</div>
+      </div>
+    </div>
+    <div>
+      <div class="next-box">
+        <div class="label">NEXT</div>
+        <div class="title">Sample Song 1</div>
+        <div class="title">Sample Song 2</div>
+        <div class="title">Sample Song 3</div>
+        <div class="title">Sample Song 4</div>
+      </div>
+    </div>
+    <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
+  </div>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+
+  <!-- YouTube Player -->
+  <div class="youtube-wrapper">
+    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
 
-  <!-- Bottom drawer: Paste URL + Reserve -->
-  <div id="bottomDrawer">
-    <h3>Paste YouTube URL</h3>
-    <input type="text" id="youtubeUrl" placeholder="Paste full YouTube URL here..." />
-    <button onclick="reserveVideo()">Reserve 🎤</button>
+  <!-- Bottom Drawer -->
+  <div class="bottom-drawer" id="bottomDrawer">
+  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">▲</button>
+  
+  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+  
+  <div class="bottom-buttons inside">
+    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
   </div>
+</div>
 
-  <div id="toast">Added to Queue!</div>
-
+  <!-- JS -->
   <script>
-    const queue = [];
-    let player;
+    let isHost = true; // Set based on actual user role later
 
-    function getVideoIdFromUrl(url) {
-      try {
-        const urlObj = new URL(url);
-        return urlObj.searchParams.get("v");
-      } catch (e) {
-        alert("Invalid YouTube URL");
-        return null;
+    let touchStartX = 0;
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+  
+    function refreshApp() {
+      location.reload();
+    }
+  
+    function handleTouchStart(evt) {
+      touchStartX = evt.touches[0].clientX;
+    }
+  
+    function handleTouchMove(evt) {
+      const deltaX = evt.touches[0].clientX - touchStartX;
+      if (deltaX > 50) openDrawer();
+      else if (deltaX < -50) closeDrawer();
+    }
+  
+    function handleTap(evt) {
+      if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+        closeDrawer();
       }
     }
-
-    function reserveVideo() {
-      const url = document.getElementById('youtubeUrl').value.trim();
-      const id = getVideoIdFromUrl(url);
-      if (!id) return;
-      queue.push(id);
-      document.getElementById('youtubeUrl').value = "";
-      updateQueueList();
-      showToast("Added to Queue!");
-      playClickSound();
+  
+    function toggleDrawer() {
+      if (drawer.classList.contains("open")) closeDrawer();
+      else openDrawer();
     }
-
-    function updateQueueList() {
-      const list = document.getElementById('queueList');
-      list.innerHTML = "";
-      queue.forEach((id, i) => {
-        const div = document.createElement('div');
-        div.className = 'queue-item';
-        div.innerText = `#${i + 1} https://youtu.be/${id}`;
-        list.appendChild(div);
-      });
+  
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('visible');
+      document.getElementById('drawerHandle').style.display = 'none';
     }
-
-    function playNext() {
-      if (queue.length === 0) {
-        alert("Queue is empty!");
-        return;
+  
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('visible');
+      document.getElementById('drawerHandle').style.display = 'flex';
+    }
+  
+    function closeBottomDrawer() {
+      if (bottomDrawer.classList.contains("open")) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
-      const nextId = queue.shift();
-      updateQueueList();
-      loadVideo(nextId);
-      playSuccessSound();
     }
-
-    function loadVideo(id) {
-      player.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  
+    let startY = 0;
+    const bottomDrawer = document.getElementById("bottomDrawer");
+    const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
+  
+    function toggleBottomDrawer() {
+      const isOpen = bottomDrawer.classList.toggle("open");
+      document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+      document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
     }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 2000);
+  
+    function handleDrawerTouchStart(evt) {
+      startY = evt.touches[0].clientY;
     }
-
-    function playClickSound() {
-      const click = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
-      click.play();
+  
+    function handleDrawerTouchMove(evt) {
+      const deltaY = evt.touches[0].clientY - startY;
+      if (deltaY < -40) {
+        bottomDrawer.classList.add("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "none";
+        document.getElementById("bottomDrawerOverlay").classList.add("visible");
+      } else if (deltaY > 40) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      }
     }
-
-    function playSuccessSound() {
-      const success = new Audio('https://www.soundjay.com/buttons/sounds/button-4.mp3');
-      success.play();
+  
+    document.body.addEventListener("touchstart", handleDrawerTouchStart);
+    document.body.addEventListener("touchmove", handleDrawerTouchMove);
+  
+    function reserveFromDrawer() {
+      const url = document.getElementById("youtubeInputDrawer").value.trim();
+      if (!url) return alert("Please paste a YouTube URL.");
+  
+      const videoId = extractYouTubeID(url);
+      if (!videoId) return alert("Invalid YouTube URL.");
+  
+      // Set video player iframe src
+      const player = document.getElementById("player");
+      player.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1`;
+  
+      // Fetch title using oEmbed (no API key)
+      fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("nowTitle").textContent = data.title || "Now Playing";
+          alert("🎤 Reserved: " + data.title);
+        })
+        .catch(err => {
+          document.getElementById("nowTitle").textContent = "Now Playing";
+          alert("🎤 Reserved! (Title not found)");
+          console.error("Failed to fetch video title:", err);
+        });
     }
-
-    // Init
-    window.onload = () => {
-      player = document.getElementById('player');
+  
+    function extractYouTubeID(url) {
+      const match = url.match(/(?:youtu\.be\/|v=)([^&]+)/);
+      return match ? match[1] : null;
+    }
+  
+    function playNextFromDrawer() {
+      alert("⏭ Next song!");
+    }
+  
+    // Host check logic for drawer button
+    if (!isHost) {
+      document.getElementById("nextBtnDrawer").style.display = "none";
     }
   </script>
+
 </body>
 </html>
