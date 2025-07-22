@@ -248,6 +248,50 @@
       gap: 10px;
     }
 
+    .cheers-message {
+      position: fixed;
+      font-size: 36px;
+      font-weight: bold;
+      color: #fff;
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 16px;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(1);
+      animation-fill-mode: forwards;
+    }
+    
+    @keyframes reservedAnimate {
+      0% {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      100% {
+        left: 10%;
+        top: 50%;
+        transform: translate(0, -50%) scale(0.5);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes skippedAnimate {
+      0% {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      100% {
+        top: 35%;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+    }
+    
     @media (orientation: landscape) {
       .youtube-wrapper {
         height: 75vh;
@@ -332,6 +376,12 @@
     <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
   </div>
 </div>
+
+  <!-- When Reserve is clicked -->
+<button onclick="reserveVideo(); showActionMessage('Reserved!', 'reserved');">Reserve</button>
+
+<!-- When Next is clicked -->
+<button onclick="playNext(); showActionMessage('Skipped!', 'skipped');">Next</button>
 
   <!-- JS -->
   <script>
@@ -424,18 +474,17 @@
       document.getElementById("leaveModal").style.display = "none";
     }
 
-function confirmLeaveApp() {
-  // Close the app (in WebView/Cordova environments)
-  if (navigator.app) {
-    navigator.app.exitApp(); // Cordova or WebIntoApp
-  } else if (window.close) {
-    window.close(); // Some browsers or standalone apps
-  } else {
-    alert("This can only close the app if it's installed.");
-  }
-}
+    function confirmLeaveApp() {
+      // Close the app (in WebView/Cordova environments)
+      if (navigator.app) {
+        navigator.app.exitApp(); // Cordova or WebIntoApp
+      } else if (window.close) {
+        window.close(); // Some browsers or standalone apps
+      } else {
+        alert("This can only close the app if it's installed.");
+      }
+    }
 
-    
     function reserveFromDrawer() {
     const url = document.getElementById("youtubeInputDrawer").value;
     if (!url) return alert("Please paste a YouTube URL.");
@@ -444,6 +493,24 @@ function confirmLeaveApp() {
     function playNextFromDrawer() {
     alert("⏭ Next song!");
     }
+
+    function showActionMessage(text, type = "reserved") {
+    const msg = document.createElement("div");
+    msg.className = "cheers-message";
+    msg.innerText = text;
+  
+    if (type === "reserved") {
+      msg.style.animation = "reservedAnimate 1.2s ease-out";
+    } else if (type === "skipped") {
+      msg.style.animation = "skippedAnimate 0.8s ease-out";
+    }
+  
+    document.body.appendChild(msg);
+  
+    setTimeout(() => {
+      msg.remove();
+    }, 1300);
+  }
   </script>
 
 </body>
