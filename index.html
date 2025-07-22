@@ -20,6 +20,13 @@
     }
 
     .title-bar {
+      text-align: center;
+      font-size: 1.6em;
+      padding: 12px 0;
+      color: white;
+      text-shadow: 0 0 5px cyan, 0 0 15px cyan;
+      background-color: #000;
+      position: relative;
       animation: neon 1.5s ease-in-out infinite alternate;
     }
     @keyframes neon {
@@ -216,7 +223,7 @@
     }
     
     .bottom-drawer-handle {position: absolute;
-      top: -60px;
+      top: -70px;
       left: 50%;
       transform: translateX(-50%);
       background: none;
@@ -339,7 +346,7 @@
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
-  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()"><b>_<b></button>
   
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
   
@@ -491,26 +498,6 @@
       popup.classList.remove("show");
       }, 1800);
     }
-
-    const titleEl = document.querySelector('.title-bar');
-    const glowColors = ['cyan', 'magenta']; /*['cyan', 'magenta', 'lime', 'deeppink', 'orange', 'aqua'];*/
-    let colorIndex = 0;
-  
-    function updateTitleColor() {
-      const color = glowColors[colorIndex];
-      titleEl.style.color = color;
-      titleEl.style.textShadow = `
-        0 0 5px ${color},
-        0 0 15px ${color},
-        0 0 30px ${color}
-      `;
-      colorIndex = (colorIndex + 1) % glowColors.length;
-    }
-  
-    // Initial run
-    updateTitleColor();
-    // Repeat every 1.5 seconds
-    setInterval(updateTitleColor, 1500);
     
   </script>
 
