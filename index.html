@@ -304,9 +304,8 @@
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
 
   <!-- Leave Confirmation Modal -->
-  <div id="leaveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 300; display: flex;
-    align-items: center; justify-content: center;">
+ <div id="leaveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 300; align-items: center; justify-content: center;">
     <div style="background: #121212; border: 2px solid magenta; border-radius: 12px; padding: 24px; text-align: center; max-width: 80vw;">
       <h2 style="color: magenta; margin-top: 0;">Leave KaraOwkie?</h2>
       <p style="color: white;">Are you sure you want to leave the room?</p>
@@ -336,8 +335,6 @@
 
   <!-- JS -->
   <script>
-    let isHost = true; // Set based on actual user role later
-    
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
@@ -419,7 +416,8 @@
     document.body.addEventListener("touchmove", handleDrawerTouchMove);
 
     function leaveRoom() {
-      document.getElementById("leaveModal").style.display = "flex";
+    const modal = document.getElementById("leaveModal");
+      modal.style.display = "flex"; // set it to flex here, not in the inline style
     }
     
     function closeLeaveModal() {
@@ -445,11 +443,6 @@ function confirmLeaveApp() {
     }
     function playNextFromDrawer() {
     alert("⏭ Next song!");
-    }
-    
-    // Host check logic for drawer button
-    if (!isHost) {
-      document.getElementById("nextBtnDrawer").style.display = "none";
     }
   </script>
 
