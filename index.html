@@ -303,6 +303,20 @@
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
 
+  <!-- Leave Confirmation Modal -->
+  <div id="leaveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 300; display: flex;
+    align-items: center; justify-content: center;">
+    <div style="background: #121212; border: 2px solid magenta; border-radius: 12px; padding: 24px; text-align: center; max-width: 80vw;">
+      <h2 style="color: magenta; margin-top: 0;">Leave KaraOwkie?</h2>
+      <p style="color: white;">Are you sure you want to leave the room?</p>
+      <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+        <button onclick="closeLeaveModal()" style="padding: 10px 20px; background: #333; color: white; border: 2px solid cyan; border-radius: 8px; cursor: pointer;">Cancel</button>
+        <button onclick="confirmLeaveApp()" style="padding: 10px 20px; background: magenta; color: white; border: none; border-radius: 8px; cursor: pointer;">Leave</button>
+      </div>
+    </div>
+  </div>
+
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
@@ -403,6 +417,26 @@
     
     document.body.addEventListener("touchstart", handleDrawerTouchStart);
     document.body.addEventListener("touchmove", handleDrawerTouchMove);
+
+    function leaveRoom() {
+      document.getElementById("leaveModal").style.display = "flex";
+    }
+    
+    function closeLeaveModal() {
+      document.getElementById("leaveModal").style.display = "none";
+    }
+
+function confirmLeaveApp() {
+  // Close the app (in WebView/Cordova environments)
+  if (navigator.app) {
+    navigator.app.exitApp(); // Cordova or WebIntoApp
+  } else if (window.close) {
+    window.close(); // Some browsers or standalone apps
+  } else {
+    alert("This can only close the app if it's installed.");
+  }
+}
+
     
     function reserveFromDrawer() {
     const url = document.getElementById("youtubeInputDrawer").value;
