@@ -269,13 +269,13 @@
       }
     }
     /* Glowing text-only popup */
-    #popupModal {
+    .popupModal {
       display: none;
       position: fixed;
       top: 35%;
       left: 50%;
       transform: translateX(-50%) scale(0.8);
-      font-size: 2em;
+      font-size: 1.5em;
       font-weight: bold;
       text-align: center;
       z-index: 300;
@@ -285,7 +285,7 @@
     }
     
     /* Show effect */
-    #popupModal.show {
+    .popupModal.show {
       display: block;
       opacity: 1;
       transform: translateX(-50%) scale(1);
@@ -439,7 +439,7 @@
     }
   
     function playNextFromDrawer() {
-      showPopup("Next song!", "deepskyblue");
+      showPopup("Next song!", "cyan");
     }
   
     function leaveRoom() {
