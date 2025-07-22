@@ -268,6 +268,28 @@
         margin-top: auto; /* Push to bottom inside flex column */
       }
     }
+    /* Glowing text-only popup */
+    #popupModal {
+      display: none;
+      position: fixed;
+      top: 35%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+      z-index: 300;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    
+    /* Show effect */
+    #popupModal.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
 
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
@@ -318,11 +340,9 @@
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
     <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
   </div>
-</div>
+  </div>
   
-  <div id="popupModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
-  padding:20px 30px; background:#000; border-radius:12px; font-size:1.2em; text-align:center; 
-  z-index:300; color:white; box-shadow:0 0 20px lime; border: 2px solid lime;">Reserved!</div>
+  <div id="popupModal">Reserved!</div>
   
   <div id="leaveModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
   padding:20px; background:#111; border:2px solid magenta; border-radius:12px; color:white; text-align:center;
@@ -431,16 +451,17 @@
     }
   
     function showPopup(text, glowColor) {
-      const popup = document.getElementById("popupModal");
-      popup.innerText = text;
-      popup.style.boxShadow = `0 0 20px ${glowColor}`;
-      popup.style.border = `2px solid ${glowColor}`;
-      popup.style.display = "block";
+    const popup = document.getElementById("popupModal");
+    popup.innerText = text;
+    popup.style.textShadow = `0 0 8px ${glowColor}, 0 0 18px ${glowColor}, 0 0 30px ${glowColor}`;
+    popup.style.color = glowColor;
   
-      setTimeout(() => {
-        popup.style.display = "none";
-      }, 1800);
-    }
+    popup.classList.add("show");
+  
+    setTimeout(() => {
+      popup.classList.remove("show");
+    }, 1800);
+  }
   </script>
 
 </body>
