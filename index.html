@@ -33,7 +33,6 @@
       from { text-shadow: 0 0 10px cyan, 0 0 20px cyan; }
       to { text-shadow: 0 0 20px magenta, 0 0 40px magenta; }
     }
-    }
     
     .refresh-btn {
       position: absolute;
@@ -323,92 +322,98 @@
 
   <!-- JS -->
   <script>
-    let isHost = true; // Later: this determines who controls playback
+    let isHost = true; // Set based on actual user role later
+    
+    let touchStartX = 0;
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    
+    function refreshApp() {
+      location.reload();
+    }
 
-    const queue = []; // Holds queued videos
-  
+    function handleTouchStart(evt) {
+      touchStartX = evt.touches[0].clientX;
+    }
+
+    function handleTouchMove(evt) {
+      const deltaX = evt.touches[0].clientX - touchStartX;
+      if (deltaX > 50) openDrawer();
+      else if (deltaX < -50) closeDrawer();
+    }
+
+    function handleTap(evt) {
+      if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+        closeDrawer();
+      }
+    }
+
+    function toggleDrawer() {
+      if (drawer.classList.contains("open")) closeDrawer();
+      else openDrawer();
+    }
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('visible');
+      document.getElementById('drawerHandle').style.display = 'none';
+    }
+    
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('visible');
+      document.getElementById('drawerHandle').style.display = 'flex';
+    }
+
+    function closeBottomDrawer() {
+      if (bottomDrawer.classList.contains("open")) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      }
+    }
+    
+    let startY = 0;
+    const bottomDrawer = document.getElementById("bottomDrawer");
+    const bottomDrawerHandle = document.getElementById("bottomDrawerHandle");
+    
+    function toggleBottomDrawer() {
+      const isOpen = bottomDrawer.classList.toggle("open");
+      document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+      document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
+    }
+    
+    function handleDrawerTouchStart(evt) {
+    startY = evt.touches[0].clientY;
+    }
+    
+    function handleDrawerTouchMove(evt) {
+      const deltaY = evt.touches[0].clientY - startY;
+      
+      if (deltaY < -40) {
+        bottomDrawer.classList.add("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "none";
+        document.getElementById("bottomDrawerOverlay").classList.add("visible");
+      } else if (deltaY > 40) {
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+      }
+    }
+    
+    document.body.addEventListener("touchstart", handleDrawerTouchStart);
+    document.body.addEventListener("touchmove", handleDrawerTouchMove);
+    
     function reserveFromDrawer() {
-      const url = document.getElementById("youtubeInputDrawer").value.trim();
-      if (!url) return alert("Please paste a YouTube URL.");
-  
-      const videoId = extractYouTubeID(url);
-      if (!videoId) return alert("Invalid YouTube URL.");
-  
-      // Try to get video title (optional)
-      fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
-        .then(res => res.json())
-        .then(data => {
-          const title = data.title || "Untitled Video";
-  
-          // Add to queue
-          queue.push({ videoId, title });
-          updateQueueUI();
-  
-          alert("🎤 Reserved: " + title);
-  
-          // Autoplay if first in queue
-          if (queue.length === 1) {
-            playNextFromDrawer();
-          }
-        })
-        .catch(err => {
-          queue.push({ videoId, title: "Unknown Title" });
-          updateQueueUI();
-          alert("🎤 Reserved! (Title not found)");
-  
-          if (queue.length === 1) {
-            playNextFromDrawer();
-          }
-          console.error("Title fetch failed:", err);
-        });
-  
-      // Clear input
-      document.getElementById("youtubeInputDrawer").value = "";
+    const url = document.getElementById("youtubeInputDrawer").value;
+    if (!url) return alert("Please paste a YouTube URL.");
+    alert("🎤 Reserved: " + url);
     }
-  
     function playNextFromDrawer() {
-      if (queue.length === 0) {
-        document.getElementById("nowTitle").textContent = "Nothing in queue.";
-        document.getElementById("player").src = "";
-        return;
-      }
-  
-      const next = queue.shift(); // Remove first
-      updateQueueUI();
-  
-      // Play video
-      const player = document.getElementById("player");
-      player.src = `https://www.youtube.com/embed/${next.videoId}?enablejsapi=1&autoplay=1`;
-  
-      document.getElementById("nowTitle").textContent = next.title;
+    alert("⏭ Next song!");
     }
-  
-    function updateQueueUI() {
-      const nextBox = document.querySelector(".next-box");
-      nextBox.innerHTML = `<div class="label">NEXT</div>`;
-  
-      if (queue.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "title";
-        empty.textContent = "No songs in queue.";
-        nextBox.appendChild(empty);
-        return;
-      }
-  
-      queue.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "title";
-        div.textContent = item.title;
-        nextBox.appendChild(div);
-      });
-    }
-  
-    function extractYouTubeID(url) {
-      const match = url.match(/(?:youtu\.be\/|v=)([^&]+)/);
-      return match ? match[1] : null;
-    }
-  
-    // Initial state check (e.g., if user is not host)
+    
+    // Host check logic for drawer button
     if (!isHost) {
       document.getElementById("nextBtnDrawer").style.display = "none";
     }
