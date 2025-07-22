@@ -1,4 +1,5 @@
-<!DOCTYPE html> 
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -19,17 +20,287 @@
     }
 
     .title-bar {
-      text-align: center;
-      font-size: 1.6em;
-      padding: 12px 0;
-      background-color: #000;
-      position: relative;
-      transition: color 0.4s ease, text-shadow 0.4s ease;
+      animation: neon 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes neon {
+      from { text-shadow: 0 0 10px cyan, 0 0 20px cyan; }
+      to { text-shadow: 0 0 20px magenta, 0 0 40px magenta; }
+    }
+    
+    .refresh-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      z-index: 200;
     }
 
-    /* Removed keyframes neon animation */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -240px;
+      width: 220px;
+      height: 100%;
+      background: rgba(20, 20, 20, 0.90);
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
 
-    /* ... rest of your styles remain unchanged ... */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      height: 50%;
+    }
+    .drawer.open { left: 0; }
+    
+    .drawer-handle {
+      position: absolute;
+      top: 0%;
+      right: -50px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.0);
+      color: magenta;
+      font-size: 1.6em;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+      cursor: pointer;
+      z-index: 80;
+    }
+    
+    .nowplaying-box {
+      border: 2px solid cyan;
+      border-radius: 10px;
+      padding: 10px;
+      background: #121212;
+    }
+    
+    .nowplaying-box .label {
+      font-size: 0.7em;
+      color: #aaa;
+    }
+
+    .nowplaying-box .title {
+      font-size: 1.1em;
+      margin: 5px 0;
+      word-wrap: break-word;
+    }
+    
+    .next-box {
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      background: #121212;
+    }
+    
+    .next-box .label {
+      font-size: 0.7em;
+      color: #aaa;
+    }
+    
+    .next-box .title {
+      font-size: 0.9em;
+      margin: 10px 0;
+      word-wrap: break-word;
+    }
+    
+    .leave-btn {
+      width: 100%;
+      padding: 12px;
+      background: magenta;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .leave-btn:hover {
+      background: deeppink;
+      color: white;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+      display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+    .bottomDrawerOverlay.visible { display: block; }
+
+    .youtube-wrapper {
+      width: 100%;
+      height: 70vh;
+      border: 5px solid cyan;
+      margin-top: 2vh;
+      margin-bottom: 5vh;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .url-input {
+      width: calc(100% - 20px);
+      margin: 0 10px 8px 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid cyan;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      text-align: center;
+    }
+
+    .bottom-buttons {
+      position: fixed;
+      bottom: 15px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .cyan-btn {
+      flex: 1;
+      padding: 14px;
+      background: #121212;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .cyan-btn:hover {
+      background: cyan;
+      color: black;
+    }
+    
+    .bottom-drawer {
+      position: fixed;
+      bottom: -160px;
+      left: 0;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.95);
+      padding: 20px 15px 25px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+      transition: bottom 0.3s ease;
+      z-index: 98;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .bottom-drawer.open {
+      bottom: 0;
+    }
+    
+    .bottom-drawer-handle {position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: none;
+      border: none;
+      color: magenta;
+      font-size: 2.5em;
+      cursor: pointer;
+      text-shadow: none; //* text-shadow: 0 0 6px magenta, 0 0 12px magenta; *//
+      z-index: 99;
+      transition: opacity 0.3s ease;
+    }
+    .bottom-drawer-handle[style*="display: none"] {
+      opacity: 0;
+    }
+    
+    .bottom-buttons.inside {
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+      
+      .bottom-buttons, .leave-btn {
+        position: relative;
+        bottom: 0;
+        margin-top: auto; /* Push to bottom inside flex column */
+      }
+    }
+
+    @media (max-height: 500px) {
+      .bottom-buttons { position: static; margin-top: 20px; }
+    }
+    #popupModal {
+    display: none;
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    color: white;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime; /* Default fallback */
+    }
+    
+    #popupModal.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    #leaveModalOverlay {
+    transition: opacity 0.3s ease;
+    }
+    
+    #leaveModalOverlay.fade-in {
+      display: block;
+      opacity: 1;
+    }
+    
+    #leaveModalOverlay.fade-out {
+      opacity: 0;
+    }
+    
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -37,52 +308,108 @@
   <!-- Title -->
   <div class="title-bar">KaraOwkie!</div>
   <button type="button" class="refresh-btn" onclick="refreshApp()">⟳</button>
+    
+  <!-- Drawer -->
+  <div class="drawer" id="drawer">
+     <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">Sample Song Title</div>
+      </div>
+    </div>
+    <div>
+      <div class="next-box">
+        <div class="label">NEXT</div>
+        <div class="title">Sample Song 1</div>
+        <div class="title">Sample Song 2</div>
+        <div class="title">Sample Song 3</div>
+        <div class="title">Sample Song 4</div>
+      </div>
+    </div>
+    <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
+  </div>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
 
-  <!-- Rest of your HTML stays the same... -->
+  <!-- YouTube Player -->
+  <div class="youtube-wrapper">
+    <iframe id="player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=1&autoplay=1"></iframe>
+  </div>
+
+  <!-- Bottom Drawer -->
+  <div class="bottom-drawer" id="bottomDrawer">
+  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+  
+  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+  
+  <div class="bottom-buttons inside">
+    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromDrawer()">Next</button>
+  </div>
+  </div>
+  
+  <div id="popupModal">Reserved!</div>
+
+  <div id="leaveModalOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 299;"></div>
+  
+  <div id="leaveModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
+  padding:10px; background:#111; border:2px solid magenta; border-radius:12px; color:white; text-align:center;
+  z-index:300;">
+    <p style="margin:0 0 15px;font-size:.7em;">Click back to close the App</p>
+    <button onclick="closeLeaveModal()" style="padding:8px 16px; border:none; background:magenta; color:white; border-radius:8px; cursor:pointer;">Close</button>
+  </div>
+
 
   <!-- JS -->
   <script>
     let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
-
+  
     function refreshApp() {
       location.reload();
     }
-
+  
     function handleTouchStart(evt) {
       touchStartX = evt.touches[0].clientX;
     }
-
+  
     function handleTouchMove(evt) {
       const deltaX = evt.touches[0].clientX - touchStartX;
       if (deltaX > 50) openDrawer();
       else if (deltaX < -50) closeDrawer();
     }
-
+  
     function handleTap(evt) {
       if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
         closeDrawer();
       }
     }
-
+  
     function toggleDrawer() {
       if (drawer.classList.contains("open")) closeDrawer();
       else openDrawer();
     }
-
+  
     function openDrawer() {
       drawer.classList.add('open');
       overlay.classList.add('visible');
       document.getElementById('drawerHandle').style.display = 'none';
     }
-
+  
     function closeDrawer() {
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
     }
-
+  
     function closeBottomDrawer() {
       if (bottomDrawer.classList.contains("open")) {
         bottomDrawer.classList.remove("open");
@@ -90,23 +417,23 @@
         document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
     }
-
+  
     let startY = 0;
     const bottomDrawer = document.getElementById("bottomDrawer");
-
+  
     function toggleBottomDrawer() {
       const isOpen = bottomDrawer.classList.toggle("open");
       document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
       document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
     }
-
+  
     function handleDrawerTouchStart(evt) {
       startY = evt.touches[0].clientY;
     }
-
+  
     function handleDrawerTouchMove(evt) {
       const deltaY = evt.touches[0].clientY - startY;
-
+  
       if (deltaY < -40) {
         bottomDrawer.classList.add("open");
         document.querySelector(".bottom-drawer-handle").style.display = "none";
@@ -117,59 +444,58 @@
         document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
     }
-
+  
     document.body.addEventListener("touchstart", handleDrawerTouchStart);
     document.body.addEventListener("touchmove", handleDrawerTouchMove);
-
+  
     function reserveFromDrawer() {
       const url = document.getElementById("youtubeInputDrawer").value;
       if (!url) return alert("Please paste a YouTube URL.");
       showPopup("Reserved!", "lime");
     }
-
+  
     function playNextFromDrawer() {
       showPopup("Next song!", "magenta");
     }
-
+  
     function leaveRoom() {
       const overlay = document.getElementById("leaveModalOverlay");
       overlay.classList.remove("fade-out");
       overlay.classList.add("fade-in");
       overlay.style.display = "block";
-
+    
       document.getElementById("leaveModal").style.display = "block";
     }
-
+  
     function closeLeaveModal() {
       const overlay = document.getElementById("leaveModalOverlay");
       overlay.classList.remove("fade-in");
       overlay.classList.add("fade-out");
-
+    
       setTimeout(() => {
         overlay.style.display = "none";
       }, 300);
-
+      
       document.getElementById("leaveModal").style.display = "none";
     }
-
+  
     function showPopup(text, glowColor) {
       const popup = document.getElementById("popupModal");
       popup.innerText = text;
       popup.style.color = "white";
       popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
-
+    
       popup.classList.add("show");
-
+      
       setTimeout(() => {
-        popup.classList.remove("show");
+      popup.classList.remove("show");
       }, 1800);
     }
 
-    // NEW: Neon color cycling for KaraOwkie! title
     const titleEl = document.querySelector('.title-bar');
-    const glowColors = ['cyan', 'magenta', 'lime', 'deeppink', 'orange', 'aqua'];
+    const glowColors = ['cyan', 'magenta']; /*['cyan', 'magenta', 'lime', 'deeppink', 'orange', 'aqua'];*/
     let colorIndex = 0;
-
+  
     function updateTitleColor() {
       const color = glowColors[colorIndex];
       titleEl.style.color = color;
@@ -180,9 +506,13 @@
       `;
       colorIndex = (colorIndex + 1) % glowColors.length;
     }
-
+  
+    // Initial run
     updateTitleColor();
+    // Repeat every 1.5 seconds
     setInterval(updateTitleColor, 1500);
+    
   </script>
+
 </body>
 </html>
