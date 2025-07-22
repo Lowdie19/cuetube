@@ -269,7 +269,7 @@
       }
     }
     /* Glowing text-only popup */
-    .popupModal {
+    #popupModal {
       display: none;
       position: fixed;
       top: 35%;
@@ -285,7 +285,7 @@
     }
     
     /* Show effect */
-    .popupModal.show {
+    #popupModal.show {
       display: block;
       opacity: 1;
       transform: translateX(-50%) scale(1);
@@ -345,9 +345,9 @@
   <div id="popupModal">Reserved!</div>
   
   <div id="leaveModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
-  padding:20px; background:#111; border:2px solid magenta; border-radius:12px; color:white; text-align:center;
+  padding:10px; background:#111; border:2px solid magenta; border-radius:12px; color:white; text-align:center;
   z-index:300;">
-    <p style="margin:0 0 15px;font-size:1em;">Click back to close the App</p>
+    <p style="margin:0 0 15px;font-size:.7em;">Click back to close the App</p>
     <button onclick="closeLeaveModal()" style="padding:8px 16px; border:none; background:magenta; color:white; border-radius:8px; cursor:pointer;">Close</button>
   </div>
 
@@ -439,7 +439,7 @@
     }
   
     function playNextFromDrawer() {
-      showPopup("Next song!", "cyan");
+      showPopup("Next song!", "magenta");
     }
   
     function leaveRoom() {
