@@ -272,26 +272,41 @@
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
     }
-      #popupModal {
-        display: none;
-        position: fixed;
-        top: 35%;
-        left: 50%;
-        transform: translateX(-50%) scale(0.8);
-        font-size: 1.5em;
-        font-weight: bold;
-        text-align: center;
-        z-index: 300;
-        pointer-events: none;
-        opacity: 0;
-        color: white;
-        transition: opacity 0.4s ease, transform 0.4s ease;
-      }
-      #popupModal.show {
-        display: block;
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-      }
+    #popupModal {
+    display: none;
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    color: white;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime; /* Default fallback */
+    }
+    
+    #popupModal.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    #leaveModalOverlay {
+    transition: opacity 0.3s ease;
+    }
+    
+    #leaveModalOverlay.fade-in {
+      display: block;
+      opacity: 1;
+    }
+    
+    #leaveModalOverlay.fade-out {
+      opacity: 0;
+    }
     
   </style>
 </head>
@@ -451,13 +466,24 @@
     }
   
     function leaveRoom() {
-    document.getElementById("leaveModal").style.display = "block";
-    document.getElementById("leaveModalOverlay").style.display = "block";
-    }
+      const overlay = document.getElementById("leaveModalOverlay");
+      overlay.classList.remove("fade-out");
+      overlay.classList.add("fade-in");
+      overlay.style.display = "block";
     
+      document.getElementById("leaveModal").style.display = "block";
+    }
+  
     function closeLeaveModal() {
-    document.getElementById("leaveModal").style.display = "none";
-    document.getElementById("leaveModalOverlay").style.display = "none";
+      const overlay = document.getElementById("leaveModalOverlay");
+      overlay.classList.remove("fade-in");
+      overlay.classList.add("fade-out");
+    
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 300);
+      
+      document.getElementById("leaveModal").style.display = "none";
     }
   
     function showPopup(text, glowColor) {
