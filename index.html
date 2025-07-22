@@ -272,29 +272,27 @@
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
     }
-
-      .popupModal {
-          display: none;
-          position: fixed;
-          top: 35%;
-          left: 50%;
-          transform: translateX(-50%) scale(0.8);
-          font-size: 1.5em;
-          font-weight: bold;
-          text-align: center;
-          z-index: 300;
-          pointer-events: none;
-          opacity: 0;
-          color: white;
-          transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        
-        .popupModal.show {
-          display: block;
-          opacity: 1;
-          transform: translateX(-50%) scale(1);
-        }
-
+      #popupModal {
+        display: none;
+        position: fixed;
+        top: 35%;
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        font-size: 1.5em;
+        font-weight: bold;
+        text-align: center;
+        z-index: 300;
+        pointer-events: none;
+        opacity: 0;
+        color: white;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      #popupModal.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+    
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -344,6 +342,14 @@
   </div>
   
   <div id="popupModal">Reserved!</div>
+
+  <div id="leaveModalOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 299;"></div>
   
   <div id="leaveModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%);
   padding:10px; background:#111; border:2px solid magenta; border-radius:12px; color:white; text-align:center;
@@ -445,25 +451,28 @@
     }
   
     function leaveRoom() {
-      document.getElementById("leaveModal").style.display = "block";
+    document.getElementById("leaveModal").style.display = "block";
+    document.getElementById("leaveModalOverlay").style.display = "block";
     }
-  
+    
     function closeLeaveModal() {
-      document.getElementById("leaveModal").style.display = "none";
+    document.getElementById("leaveModal").style.display = "none";
+    document.getElementById("leaveModalOverlay").style.display = "none";
     }
   
     function showPopup(text, glowColor) {
-    const popup = document.getElementById("popupModal");
-    popup.innerText = text;
-    popup.style.color = "white";
-    popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
-  
-    popup.classList.add("show");
-  
-    setTimeout(() => {
+      const popup = document.getElementById("popupModal");
+      popup.innerText = text;
+      popup.style.color = "white";
+      popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
+    
+      popup.classList.add("show");
+      
+      setTimeout(() => {
       popup.classList.remove("show");
-    }, 1800);
-  }
+      }, 1800);
+    }
+    
   </script>
 
 </body>
