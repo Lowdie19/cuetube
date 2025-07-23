@@ -151,6 +151,7 @@
       font-size: 0.9em;
       margin: 10px 0;
       word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     
     .leave-btn {
@@ -356,22 +357,22 @@
     <div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">Sample Song Title</div>
+        <div class="title" id="nowTitle"><div id="nextList">…</div></div>
       </div>
     </div>
     <div>
       <div class="next-box">
-        <div class="label">NEXT</div>
-        <div class="title">Sample Song 1</div>
-        <div class="title">Sample Song 2</div>
-        <div class="title">Sample Song 3</div>
-        <div class="title">Sample Song 4</div>
+      <div class="label">NEXT</div>
+      <div id="nextList"></div>
       </div>
     </div>
     <button class="leave-btn" onclick="leaveRoom()">Leave Room</button>
   </div>
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+
+  
+  
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
@@ -503,34 +504,57 @@
         origin: window.location.origin
       });
     }
-    
+
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.ENDED) {
         playNextFromQueue();
       }
     }
-    
+
     function extractVideoId(url) {
       const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
       return match ? match[1] : null;
     }
 
-    function reserveFromDrawer() {
+    async function reserveFromDrawer() {
       const url = document.getElementById("youtubeInputDrawer").value;
       const videoId = extractVideoId(url);
       if (!videoId) return alert("Invalid YouTube URL");
-      queue.push(videoId);
 
-      // Auto-play if nothing is playing
+      const title = await fetchTitle(videoId);
+      queue.push({ id: videoId, title });
+      updateQueueDisplay();
+
       if (currentIndex === -1 && player && player.loadVideoById) {
         currentIndex = 0;
-        player.loadVideoById(queue[currentIndex]);
+        player.loadVideoById(queue[currentIndex].id);
         updateNowPlaying();
       }
 
       showPopup("Reserved!", "lime");
     }
-    
+
+    async function fetchTitle(videoId) {
+      try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+        const data = await res.json();
+        return data.title || videoId;
+      } catch (err) {
+        return videoId;
+      }
+    }
+
+    function updateQueueDisplay() {
+      const list = document.getElementById("nextList");
+      list.innerHTML = "";
+      for (let i = currentIndex + 1; i < queue.length; i++) {
+        const div = document.createElement("div");
+        div.className = "title";
+        div.textContent = queue[i].title;
+        list.appendChild(div);
+      }
+    }
+
     function playNextFromQueue() {
       if (queue.length === 0 || currentIndex + 1 >= queue.length) {
         showPopup("No next song.", "red");
@@ -538,14 +562,15 @@
       }
 
       currentIndex++;
-      player.loadVideoById(queue[currentIndex]);
+      player.loadVideoById(queue[currentIndex].id);
       updateNowPlaying();
+      updateQueueDisplay();
       showPopup("Next song!", "magenta");
     }
 
     function updateNowPlaying() {
       const nowTitleEl = document.getElementById("nowTitle");
-      nowTitleEl.textContent = `https://youtu.be/${queue[currentIndex]}`;
+      nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
     }
     
    // <---- Modal ---->
