@@ -26,6 +26,9 @@
       color: white;
       background-color: #000;
       position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       animation: neon 3.0s ease-in-out infinite alternate;
     }
     @keyframes neon {
@@ -337,7 +340,7 @@
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
-  </div
+  </div>
     
   <div id="drawerOverlay" class="drawer-overlay"></div>
   <div id="bottomDrawerOverlay" class="drawer-overlay"></div>
@@ -524,11 +527,30 @@
     
     function onPlayerReady(event) {
       console.log('YouTube Player Ready');
+      if (queue.length > 0 && currentIndex === -1) {
+      currentIndex = 0;
+      player.loadVideoById(queue[currentIndex]);
+      updateNowPlaying();
     }
+  }
     
     function onPlayerStateChange(event) {
       // Optionally handle play/pause/end
     }
+
+    function playNextFromQueue() {
+      if (currentIndex + 1 < queue.length && player && player.loadVideoById) {
+        currentIndex++;
+        player.loadVideoById(queue[currentIndex]);
+        updateNowPlaying();
+      } else {
+        showPopup("Queue is empty", "orange");
+      }
+    }
+    
+    document.getElementById("youtubeInputDrawer").addEventListener("keydown", e => {
+  if (e.key === "Enter") reserveFromDrawer();
+});
 
   </script>
   
