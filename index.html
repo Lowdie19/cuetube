@@ -392,14 +392,19 @@
       const isOpen = bottomDrawer.classList.toggle("open");
       document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
       document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
-    }
     
-      document.body.addEventListener("touchstart", evt => startY = evt.touches[0].clientY);
-      document.body.addEventListener("touchmove", evt => {
-        const deltaY = evt.touches[0].clientY - startY;
-        if (deltaY < -40) toggleBottomDrawer();
-        else if (deltaY > 40) closeBottomDrawer();
-      });
+      if (isOpen) {
+        const input = document.getElementById("youtubeInputDrawer");
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    document.body.addEventListener("touchstart", evt => startY = evt.touches[0].clientY);
+    document.body.addEventListener("touchmove", evt => {
+      const deltaY = evt.touches[0].clientY - startY;
+      if (deltaY < -40) toggleBottomDrawer();
+      else if (deltaY > 40) closeBottomDrawer();
+    });
 
     let player;
     let queue = [];
@@ -422,6 +427,23 @@
     function extractVideoId(url) {
       const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
       return match ? match[1] : null;
+    }
+
+    async function autoPlayIfValidUrl(url) {
+      const trimmed = url.trim();
+      const id = extractVideoId(trimmed);
+      if (id && queue.every(q => q.id !== id)) {
+        document.getElementById("youtubeInputDrawer").value = "";
+        const title = await fetchTitle(id);
+        queue.push({ id, title });
+        if (currentIndex === -1 && player && player.loadVideoById) {
+          currentIndex = 0;
+          player.loadVideoById(id);
+          updateNowPlaying();
+        }
+        updateQueueDisplay();
+        showPopup("Reserved!", "lime");
+      }
     }
 
     async function reserveFromDrawer() {
