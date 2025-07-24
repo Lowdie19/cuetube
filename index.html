@@ -314,6 +314,10 @@
     #confirmDelete.show {
       opacity: 1;
     }
+    
+    .long-pressing {
+    box-shadow: 0 0 6px red;
+    }
       
   </style>
 </head>
@@ -362,10 +366,10 @@
 
   <!-- Delete Confirm Box -->
   <div id="confirmDelete" style="display:none; position:absolute; background:#333; padding:10px; border-radius:6px; z-index:999;">
-    <div style="font-family:Arial,sans-serif; color:white; font-size:1em; margin-bottom:8px;">Delete?</div>
+    <div style="font-family:Arial,sans-serif; color:white; font-size:1em; margin-bottom:8px; text-align:center;">Delete?</div>
     <div style="display:flex; gap:10px;">
-      <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">YES</button>
-      <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">NO</button>
+      <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✓</button>
+      <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
     </div>
   </div>
   
@@ -401,12 +405,14 @@
       drawer.classList.add('open');
       overlay.classList.add('visible');
       document.getElementById('drawerHandle').style.display = 'none';
+      document.getElementById("confirmDelete").style.display = "none";
     }
   
     function closeDrawer() {
       drawer.classList.remove('open');
       overlay.classList.remove('visible');
       document.getElementById('drawerHandle').style.display = 'flex';
+      document.getElementById("confirmDelete").style.display = "none";
     }
   
     function closeBottomDrawer() {
@@ -520,15 +526,20 @@
         div.style.cursor = "pointer";
 
         let longPressTimer;
-
+        
         const startHandler = (e) => {
-          e.preventDefault();
-          longPressTimer = setTimeout(() => {
-            showDeleteConfirm(e, i);
-          }, 500);
-        };
+        e.preventDefault();
+        div.classList.add("long-pressing");
+        longPressTimer = setTimeout(() => {
+          navigator.vibrate?.(50);
+          showDeleteConfirm(e, i);
+        }, 500);
+      };
 
-        const cancelHandler = () => clearTimeout(longPressTimer);
+        const cancelHandler = () => {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
+      };
 
         div.addEventListener("mousedown", startHandler);
         div.addEventListener("touchstart", startHandler);
@@ -554,11 +565,12 @@
       const no = document.getElementById("noBtn");
 
       yes.onclick = () => {
-        queue.splice(index, 1);
-        confirmBox.style.display = "none";
-        updateQueueDisplay();
+        queue.splice(index, 1);                     // remove item
+        confirmBox.style.display = "none";          // hide modal
+        updateQueueDisplay();                       // update list
+        // NOTE: we do NOT call closeDrawer() anymore
       };
-
+      
       no.onclick = () => {
         confirmBox.style.display = "none";
       };
