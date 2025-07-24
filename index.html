@@ -457,8 +457,21 @@
       player = new YT.Player('player', {
         height: '100%',
         width: '100%',
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
+        },
         events: {
-          onReady: () => console.log("Player Ready"),
+          onReady: (event) => {
+            console.log("Player Ready");
+            // Attempt autoplay if something is queued and currentIndex is 0
+            if (queue.length > 0 && currentIndex === 0) {
+              event.target.loadVideoById(queue[0].id);
+              updateNowPlaying();
+            }
+          },
           onStateChange: onPlayerStateChange
         }
       });
