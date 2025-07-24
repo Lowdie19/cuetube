@@ -307,6 +307,13 @@
     #popupOverlay.visible {
       display: block;
     }
+    #confirmDelete {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    }
+    #confirmDelete.show {
+      opacity: 1;
+    }
       
   </style>
 </head>
@@ -352,6 +359,15 @@
   <!-- Popup -->
   <div id="popupOverlay"></div>
   <div id="popupModal">Reserved!</div>
+
+  <!-- Delete Confirm Box -->
+  <div id="confirmDelete" style="display:none; position:absolute; background:#333; padding:10px; border-radius:6px; z-index:999;">
+    <div style="font-family:Arial,sans-serif; color:white; font-size:1em; margin-bottom:8px;">Delete?</div>
+    <div style="display:flex; gap:10px;">
+      <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">YES</button>
+      <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">NO</button>
+    </div>
+  </div>
   
   <!-- JS -->
   <script>
@@ -501,18 +517,33 @@
         div.className = "title";
         div.textContent = queue[i].title;
 
-        const btn = document.createElement("button");
-        btn.textContent = "❌";
-        btn.style.marginLeft = "8px";
-        btn.style.cursor = "pointer";
-        btn.onclick = () => {
-          queue.splice(i, 1);
-          updateQueueDisplay();
+        div.style.cursor = "pointer";
+        div.onclick = (e) => {
+          showDeleteConfirm(e, i);
         };
 
-        div.appendChild(btn);
         list.appendChild(div);
       }
+    }
+
+    function showDeleteConfirm(e, index) {
+      const confirmBox = document.getElementById("confirmDelete");
+      confirmBox.style.left = `${e.clientX + 10}px`;
+      confirmBox.style.top = `${e.clientY}px`;
+      confirmBox.style.display = "block";
+
+      const yes = document.getElementById("yesBtn");
+      const no = document.getElementById("noBtn");
+
+      yes.onclick = () => {
+        queue.splice(index, 1);
+        confirmBox.style.display = "none";
+        updateQueueDisplay();
+      };
+
+      no.onclick = () => {
+        confirmBox.style.display = "none";
+      };
     }
 
     function playNextFromQueue() {
