@@ -309,7 +309,7 @@
     }
     #confirmDelete {
     transition: opacity 0.3s ease;
-    opacity: 0;
+    opacity: 1;
     }
     #confirmDelete.show {
       opacity: 1;
@@ -518,9 +518,25 @@
         div.textContent = queue[i].title;
 
         div.style.cursor = "pointer";
-        div.onclick = (e) => {
-          showDeleteConfirm(e, i);
+
+        let longPressTimer;
+
+        const startHandler = (e) => {
+          e.preventDefault();
+          longPressTimer = setTimeout(() => {
+            showDeleteConfirm(e, i);
+          }, 500);
         };
+
+        const cancelHandler = () => clearTimeout(longPressTimer);
+
+        div.addEventListener("mousedown", startHandler);
+        div.addEventListener("touchstart", startHandler);
+
+        div.addEventListener("mouseup", cancelHandler);
+        div.addEventListener("mouseleave", cancelHandler);
+        div.addEventListener("touchend", cancelHandler);
+        div.addEventListener("touchcancel", cancelHandler);
 
         list.appendChild(div);
       }
@@ -528,8 +544,10 @@
 
     function showDeleteConfirm(e, index) {
       const confirmBox = document.getElementById("confirmDelete");
-      confirmBox.style.left = `${e.clientX + 10}px`;
-      confirmBox.style.top = `${e.clientY}px`;
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      confirmBox.style.left = `${x + 10}px`;
+      confirmBox.style.top = `${y}px`;
       confirmBox.style.display = "block";
 
       const yes = document.getElementById("yesBtn");
