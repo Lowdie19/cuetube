@@ -425,13 +425,16 @@
     }
 
     async function reserveFromDrawer() {
-      const url = document.getElementById("youtubeInputDrawer").value;
+      const input = document.getElementById("youtubeInputDrawer");
+      const url = input.value.trim();
       const videoId = extractVideoId(url);
       if (!videoId) return alert("Invalid YouTube URL");
 
       const title = await fetchTitle(videoId);
       queue.push({ id: videoId, title });
       updateQueueDisplay();
+
+      input.value = ""; // Clear the input box after reserving
 
       if (currentIndex === -1 && player && player.loadVideoById) {
         currentIndex = 0;
