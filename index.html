@@ -79,7 +79,6 @@
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
       transition: left 0.3s ease;
-
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -143,6 +142,7 @@
       margin: 10px 0;
       word-wrap: break-word;
       overflow-wrap: break-word;
+      font-weight: normal;
     }
     
     .drawer-overlay {
@@ -273,7 +273,7 @@
   
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
-    }
+      }
     }
     
     #popupModal {
@@ -290,7 +290,7 @@
     opacity: 0;
     color: white;
     transition: opacity 0.4s ease, transform 0.4s ease;
-    text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime; /* Default fallback */
+    text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime;
     }
       
     #popupModal.show {
