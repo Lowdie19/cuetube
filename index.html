@@ -13,16 +13,31 @@
       color: #0ff;
       text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
     }
-    
+    input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+    }
     button {
       padding: 10px 20px;
       margin-left: 10px;
       font-size: 1em;
       cursor: pointer;
     }
+    #queue {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      padding-top: 10px;
+    }
+    .queue-item {
+      padding: 8px;
+      background: #222;
+      border: 1px solid #333;
+      margin-bottom: 5px;
+    }
     
     * { box-sizing: border-box; }
-      html, body {
+    html, body {
       margin: 0;
       padding: 0;
       font-family: 'Orbitron', sans-serif;
@@ -108,6 +123,16 @@
       border-radius: 10px;
       padding: 10px;
       background: #121212;
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+
+    #overflowCounter {
+    text-align: center;
+    font-size: 0.7em;
+    color: #888;
+    margin-top: 5px;
+    display: none;
     }
     
     .next-box .label {
@@ -143,11 +168,6 @@
       border: 5px solid cyan;
       margin-top: 2vh;
       margin-bottom: 5vh;
-    }
-    
-    #player {
-      width: 100%;
-      height: 100%;
     }
 
     iframe {
@@ -308,20 +328,7 @@
     .long-pressing {
     box-shadow: 0 0 7px red;
     }
-
-    #nextList {
-      max-height: 40vh;
-      overflow-y: auto;
-    }
-
-    #overflowCounter {
-      text-align: center;
-      font-size: 0.7em;
-      color: #888;
-      margin-top: 5px;
-      display: none;
-    }
-        
+      
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -337,7 +344,6 @@
         <div class="label">NOW PLAYING</div>
         <div class="title" id="nowTitle">Please insert song..</div>
       </div>
-      <!-- Inside Drawer -->
       <div class="next-box">
         <div class="label">NEXT</div>
         <div id="nextList"></div>
@@ -352,7 +358,7 @@
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-  <div id="player"></div>
+    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
   </div>
 
   <!-- Bottom Drawer -->
@@ -455,25 +461,11 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        height: '100%',
-        width: '100%',
-        playerVars: {
-          autoplay: 1,
-          controls: 1,
-          enablejsapi: 1,
-          origin: window.location.origin
-        },
         events: {
-          onReady: (event) => {
-            console.log("Player Ready");
-            // Attempt autoplay if something is queued and currentIndex is 0
-            if (queue.length > 0 && currentIndex === 0) {
-              event.target.loadVideoById(queue[0].id);
-              updateNowPlaying();
-            }
-          },
+          onReady: () => console.log("Player Ready"),
           onStateChange: onPlayerStateChange
-        }
+        },
+        origin: window.location.origin
       });
     }
 
@@ -533,52 +525,12 @@
         return videoId;
       }
     }
-
-    function updateQueueDisplay() {
-    const list = document.getElementById("nextList");
-    const overflow = document.getElementById("overflowCounter");
-    list.innerHTML = "";
-
-    let visibleCount = 0;
-    let remainingCount = 0;
-      
-    if (currentIndex === -1 && queue.length > 0) currentIndex = 0;
-
-    for (let i = currentIndex + 1; i < queue.length; i++) {
-      const div = document.createElement("div");
-      div.className = "title";
-      div.textContent = queue[i].title;
-      div.style.cursor = "pointer";
-  
-      let longPressTimer;
-      const startHandler = (e) => {
-        e.preventDefault();
-        div.classList.add("long-pressing");
-        longPressTimer = setTimeout(() => {
-          navigator.vibrate?.(50);
-          showDeleteConfirm(e, i);
-        }, 500);
-      };
-      const cancelHandler = () => {
-        clearTimeout(longPressTimer);
-        div.classList.remove("long-pressing");
-      };
-  
-      div.addEventListener("mousedown", startHandler);
-      div.addEventListener("touchstart", startHandler);
-      div.addEventListener("mouseup", cancelHandler);
-      div.addEventListener("mouseleave", cancelHandler);
-      div.addEventListener("touchend", cancelHandler);
-      div.addEventListener("touchcancel", cancelHandler);
-  
-      list.appendChild(div);
-    }
-  }
-      setTimeout(() => {
+    
+    setTimeout(() => {
       const totalHeight = list.scrollHeight;
       const visibleHeight = list.clientHeight;
       const scrollable = totalHeight > visibleHeight;
-  
+    
       if (scrollable) {
         const items = list.children;
         let shown = 0;
@@ -587,12 +539,12 @@
           accHeight += items[i].offsetHeight;
           if (accHeight < visibleHeight) shown++;
         }
-        remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
-      }
+          const remainingCount = items.length - shown;
+          overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+          overflow.style.display = "block";
+        } else {
+          overflow.style.display = "none";
+        }
     }, 100);
 
     function showDeleteConfirm(e, index) {
@@ -629,6 +581,42 @@
       updateNowPlaying();
       updateQueueDisplay();
       showPopup("Next song!", "magenta");
+    }
+
+    function updateQueueDisplay() {
+      const list = document.getElementById("nextList");
+      const overflow = document.getElementById("overflowCounter");
+      list.innerHTML = "";
+    
+      for (let i = currentIndex + 1; i < queue.length; i++) {
+        const div = document.createElement("div");
+        div.className = "title";
+        div.textContent = queue[i].title;
+        div.style.cursor = "pointer";
+    
+        let longPressTimer;
+        const startHandler = (e) => {
+          e.preventDefault();
+          div.classList.add("long-pressing");
+          longPressTimer = setTimeout(() => {
+            navigator.vibrate?.(50);
+            showDeleteConfirm(e, i);
+          }, 500);
+        };
+        const cancelHandler = () => {
+          clearTimeout(longPressTimer);
+          div.classList.remove("long-pressing");
+        };
+    
+        div.addEventListener("mousedown", startHandler);
+        div.addEventListener("touchstart", startHandler);
+        div.addEventListener("mouseup", cancelHandler);
+        div.addEventListener("mouseleave", cancelHandler);
+        div.addEventListener("touchend", cancelHandler);
+        div.addEventListener("touchcancel", cancelHandler);
+    
+        list.appendChild(div);
+      }
     }
 
     function updateNowPlaying() {
