@@ -144,6 +144,11 @@
       margin-top: 2vh;
       margin-bottom: 5vh;
     }
+    
+    #player {
+      width: 100%;
+      height: 100%;
+    }
 
     iframe {
       width: 100%;
@@ -347,7 +352,7 @@
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
+  <div id="player"></div>
   </div>
 
   <!-- Bottom Drawer -->
@@ -450,11 +455,12 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
         events: {
           onReady: () => console.log("Player Ready"),
           onStateChange: onPlayerStateChange
-        },
-        origin: window.location.origin
+        }
       });
     }
 
