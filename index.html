@@ -316,7 +316,7 @@
     }
     
     .long-pressing {
-    box-shadow: 0 0 6px red;
+    box-shadow: 0 0 7px red;
     }
       
   </style>
@@ -516,18 +516,18 @@
     }
 
     function updateQueueDisplay() {
-      const list = document.getElementById("nextList");
-      list.innerHTML = "";
-      for (let i = currentIndex + 1; i < queue.length; i++) {
-        const div = document.createElement("div");
-        div.className = "title";
-        div.textContent = queue[i].title;
-
-        div.style.cursor = "pointer";
-
-        let longPressTimer;
-        
-        const startHandler = (e) => {
+    const list = document.getElementById("nextList");
+    list.innerHTML = "";
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+      const div = document.createElement("div");
+      div.className = "title";
+      div.textContent = queue[i].title;
+  
+      div.style.cursor = "pointer";
+  
+      let longPressTimer;
+  
+      const startHandler = (e) => {
         e.preventDefault();
         div.classList.add("long-pressing");
         longPressTimer = setTimeout(() => {
@@ -535,23 +535,23 @@
           showDeleteConfirm(e, i);
         }, 500);
       };
-
-        const cancelHandler = () => {
+  
+      const cancelHandler = () => {
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
       };
-
-        div.addEventListener("mousedown", startHandler);
-        div.addEventListener("touchstart", startHandler);
-
-        div.addEventListener("mouseup", cancelHandler);
-        div.addEventListener("mouseleave", cancelHandler);
-        div.addEventListener("touchend", cancelHandler);
-        div.addEventListener("touchcancel", cancelHandler);
-
-        list.appendChild(div);
-      }
+  
+      div.addEventListener("mousedown", startHandler);
+      div.addEventListener("touchstart", startHandler);
+  
+      div.addEventListener("mouseup", cancelHandler);
+      div.addEventListener("mouseleave", cancelHandler);
+      div.addEventListener("touchend", cancelHandler);
+      div.addEventListener("touchcancel", cancelHandler);
+  
+      list.appendChild(div);
     }
+  }
 
     function showDeleteConfirm(e, index) {
       const confirmBox = document.getElementById("confirmDelete");
