@@ -151,6 +151,9 @@
       pointer-events: none;
       z-index: 1;
     }
+    .next-box::-webkit-scrollbar-thumb {
+      background: cyan;
+    }
 
     #overflowCounter {
     text-align: center;
@@ -302,6 +305,14 @@
     
     @media (max-height: 500px) {
   .bottom-buttons { position: static; margin-top: 20px; }
+}
+    @media (hover: hover) {
+  .next-box::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  .next-box:hover::-webkit-scrollbar-thumb {
+    background: cyan;
+  }
 }
     
     #popupModal {
