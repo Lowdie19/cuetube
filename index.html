@@ -78,7 +78,10 @@
       justify-content: flex-start;
       gap: 25px;
     }
-    .drawer.open { left: 0; }
+    .drawer.open {
+      left: 0;
+      display: flex;
+    }
     
     .drawer-handle {
       position: absolute;
@@ -153,9 +156,7 @@
       flex-direction: column;
       overflow: hidden;
     }
-    .drawer.open {
-      display: flex;
-    }
+    
     .next-box::after {
       content: "";
       position: absolute;
@@ -166,9 +167,6 @@
       background: linear-gradient(to bottom, transparent, #121212);
       pointer-events: none;
       z-index: 1;
-    }
-    .next-box::-webkit-scrollbar-thumb {
-      background: cyan;
     }
 
     #overflowCounter {
@@ -348,7 +346,6 @@
     }
       
     #popupModal.show {
-      display: block;
       opacity: 1;
       transform: translateX(-50%) scale(1);
     }
