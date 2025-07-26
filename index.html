@@ -579,6 +579,7 @@
     let player;
     let queue = [];
     let currentIndex = -1;
+    let videoDurationCheckInterval;
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
@@ -591,21 +592,39 @@
     }
 
     function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) {
-        showScoreAnimation();
-        setTimeout(() => {
-          if (!isScoreBoardVisible) playNextFromQueue();
-          else {
-            const waitUntilClosed = setInterval(() => {
-              if (!isScoreBoardVisible) {
-                clearInterval(waitUntilClosed);
-                playNextFromQueue();
-              }
-            }, 500);
-          }
-        }, 5000);
-      }
+    if (event.data === YT.PlayerState.PLAYING) {
+      clearInterval(videoDurationCheckInterval);
+      videoDurationCheckInterval = setInterval(checkForScoreTrigger, 1000);
+    } else if (event.data === YT.PlayerState.ENDED) {
+      clearInterval(videoDurationCheckInterval);
+      showScoreAnimation();
+      waitForScoreToEndThenPlayNext();
     }
+  }
+    function checkForScoreTrigger() {
+    if (!player || !player.getDuration || !player.getCurrentTime) return;
+    const duration = player.getDuration();
+    const currentTime = player.getCurrentTime();
+  
+    if (duration - currentTime <= 7 && !isScoreBoardVisible) {
+      clearInterval(videoDurationCheckInterval);
+      showScoreAnimation(true);
+    }
+  }
+    function waitForScoreToEndThenPlayNext() {
+    setTimeout(() => {
+      if (!isScoreBoardVisible) playNextFromQueue();
+      else {
+        const waitUntilClosed = setInterval(() => {
+          if (!isScoreBoardVisible) {
+            clearInterval(waitUntilClosed);
+            playNextFromQueue();
+          }
+        }, 500);
+      }
+    }, 5000);
+  }
+    
     function extractVideoId(url) {
       const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
       return match ? match[1] : null;
@@ -858,92 +877,104 @@
     // 🎯 SCORE COMPONENTS
     let isScoreBoardVisible = false;
 
-    function showScoreAnimation() {
-      const score = Math.floor(Math.random() * 101);
-      const scoreEl = document.getElementById("score");
-      const messageEl = document.getElementById("message");
-      const scoreBoard = document.getElementById("scoreBoard");
-      const sound = document.getElementById("scoreSound");
-      const canvas = document.getElementById("confetti");
+    function showScoreAnimation(triggeredBeforeEnd = false) {
+    const score = Math.floor(Math.random() * 101);
+    const scoreEl = document.getElementById("score");
+    const messageEl = document.getElementById("message");
+    const scoreBoard = document.getElementById("scoreBoard");
+    const sound = document.getElementById("scoreSound");
+    const canvas = document.getElementById("confetti");
+  
+    scoreBoard.style.opacity = 1;
+    scoreBoard.style.pointerEvents = "auto";
+    canvas.style.display = "block";
+    isScoreBoardVisible = true;
+  
+    let current = 0;
+    const steps = score;
+    const duration = 3000;
+    const delay = Math.floor(duration / steps);
+    let skipped = false;
+    let closed = false;
 
-      scoreBoard.style.opacity = 1;
-      scoreBoard.style.pointerEvents = "auto";
-      canvas.style.display = "block";
-      isScoreBoardVisible = true;
-
-      let current = 0;
-      const steps = score;
-      const duration = 3000;
-      const delay = Math.floor(duration / steps);
-      let skipped = false;
-      let closed = false;
-
-      if (player && player.pauseVideo) {
-        player.pauseVideo();
-      }
-
-      const interval = setInterval(() => {
-        if (current >= score) {
-          clearInterval(interval);
-          showMessage(score);
-          if (!skipped) sound.play();
-          if (!skipped) launchConfetti();
-        } else {
-          scoreEl.textContent = current;
-          current++;
+      // Fade audio volume if video still playing
+    if (triggeredBeforeEnd && player && player.getVolume) {
+      const startVol = player.getVolume();
+      let fadeStep = 0;
+      const fadeOut = setInterval(() => {
+        if (fadeStep >= 20 || !isScoreBoardVisible) {
+          clearInterval(fadeOut);
+          return;
         }
-      }, delay);
+        player.setVolume(startVol - fadeStep * 5);
+        fadeStep++;
+      }, 100);
+    }
+  
+    if (player && player.pauseVideo) player.pauseVideo();
+  
+    const interval = setInterval(() => {
+      if (current >= score) {
+        clearInterval(interval);
+        showMessage(score);
+        if (!skipped) sound.play();
+        if (!skipped) launchConfetti();
+      } else {
+        scoreEl.textContent = current;
+        current++;
+      }
+    }, delay);
 
       function showMessage(score) {
-        let message = "";
-        if (score < 10)        message = "🤬 Kupal!";
-        else if (score < 20)   message = "🤮 Eeew!";
-        else if (score < 30)   message = "🤢 Luh!!";
-        else if (score < 40)   message = "😒 Pwede na..";
-        else if (score < 50)   message = "😏 Konti nlng..";
-        else if (score < 60)   message = "🤞 Ayos!";
-        else if (score < 70)   message = "🥴 Sana all!";
-        else if (score < 80)   message = "👌 Petmalu!";
-        else if (score < 90)   message = "🫡 Lodi!";
-        else if (score < 99)   message = "🤩 Boom panes!";
-        else if (score == 100) message = "🙌 !@#%!";
-        messageEl.textContent = message;
-      }
+      let message = "";
+      if (score < 10) message = "🤬 Kupal!";
+      else if (score < 20) message = "🤮 Eeew!";
+      else if (score < 30) message = "🤢 Luh!!";
+      else if (score < 40) message = "😒 Pwede na..";
+      else if (score < 50) message = "😏 Konti nlng..";
+      else if (score < 60) message = "🤞 Ayos!";
+      else if (score < 70) message = "🥴 Sana all!";
+      else if (score < 80) message = "👌 Petmalu!";
+      else if (score < 90) message = "🫡 Lodi!";
+      else if (score < 99) message = "🤩 Boom panes!";
+      else if (score == 100) message = "🙌 !@#%!";
+      messageEl.textContent = message;
+    }
 
       function closeScoreBoard() {
-        if (!closed) {
-          scoreBoard.style.opacity = 0;
-          canvas.style.display = "none";
-          closed = true;
-          isScoreBoardVisible = false;
-          setTimeout(() => {
-            scoreBoard.style.pointerEvents = "none";
-            if (player && player.playVideo) {
-              player.playVideo();
-            }
-          }, 800);
-        }
+      if (!closed) {
+        scoreBoard.style.opacity = 0;
+        canvas.style.display = "none";
+        closed = true;
+        isScoreBoardVisible = false;
+        setTimeout(() => {
+          scoreBoard.style.pointerEvents = "none";
+          if (player && player.playVideo) player.playVideo();
+          if (player && player.setVolume) player.setVolume(100);
+        }, 800);
       }
-        scoreBoard.onclick = () => {
-        if (!skipped) {
-          clearInterval(interval);
-          scoreEl.textContent = score;
-          showMessage(score);
-          launchConfetti();
-          skipped = true;
-          sound.play();
-        } else {
-          closeScoreBoard();
-        }
-      };
-
-      sound.onended = () => closeScoreBoard();
-      document.body.addEventListener("click", () => {
-        if (skipped && isScoreBoardVisible) {
-          closeScoreBoard();
-        }
-      });
     }
+  
+    scoreBoard.onclick = () => {
+      if (!skipped) {
+        clearInterval(interval);
+        scoreEl.textContent = score;
+        showMessage(score);
+        launchConfetti();
+        skipped = true;
+        sound.play();
+      } else {
+        closeScoreBoard();
+      }
+    };
+  
+    sound.onended = () => closeScoreBoard();
+    document.body.addEventListener("click", () => {
+      if (skipped && isScoreBoardVisible) {
+        closeScoreBoard();
+      }
+    });
+  }
 
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
