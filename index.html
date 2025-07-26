@@ -78,10 +78,7 @@
       justify-content: flex-start;
       gap: 25px;
     }
-    .drawer.open {
-      left: 0;
-      display: flex;
-    }
+    .drawer.open { left: 0; }
     
     .drawer-handle {
       position: absolute;
@@ -156,7 +153,9 @@
       flex-direction: column;
       overflow: hidden;
     }
-    
+    .drawer.open {
+      display: flex;
+    }
     .next-box::after {
       content: "";
       position: absolute;
@@ -167,6 +166,9 @@
       background: linear-gradient(to bottom, transparent, #121212);
       pointer-events: none;
       z-index: 1;
+    }
+    .next-box::-webkit-scrollbar-thumb {
+      background: cyan;
     }
 
     #overflowCounter {
@@ -346,6 +348,7 @@
     }
       
     #popupModal.show {
+      display: block;
       opacity: 1;
       transform: translateX(-50%) scale(1);
     }
@@ -375,6 +378,65 @@
     
     .long-pressing {
     box-shadow: 0 0 7px red;
+    }
+    
+    /* 🎯 Score Display & Confetti */
+    .score-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 50px;
+      border: 3px solid #00ffc3;
+      border-radius: 30px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
+      animation: glow 1s infinite alternate;
+      max-width: 95%;
+      text-align: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    .score-label {
+      font-size: 1.3rem;
+      color: #ccc;
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+    }
+    .score-number {
+      font-size: 8rem;
+      font-weight: bold;
+      color: #00ffc3;
+      text-shadow: 0 0 40px #00ffc3;
+      animation: pulse 1s infinite ease-in-out;
+    }
+    .score-message {
+      margin-top: 25px;
+      font-size: 2.2rem;
+      color: #ffd700;
+      animation: fade-in 1.2s ease;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 20px #00ffc3; }
+      to { box-shadow: 0 0 60px #00ffc3; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
     }
       
   </style>
@@ -431,6 +493,15 @@
       <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
     </div>
   </div>
+
+  <!-- 🎯 SCORE COMPONENTS -->
+  <canvas id="confetti"></canvas>
+  <div class="score-container" id="scoreBoard">
+    <div class="score-label">Your Score</div>
+    <div class="score-number" id="score">0</div>
+    <div class="score-message" id="message">Hmmmm...</div>
+  </div>
+  <audio id="scoreSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_59b0e14547.mp3" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -516,8 +587,10 @@
     }
 
     function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
-    }
+      if (event.data === YT.PlayerState.ENDED) {
+        showScoreAnimation();
+        playNextFromQueue();
+      }
 
     function extractVideoId(url) {
       const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
@@ -767,6 +840,111 @@
         confirm.style.display = "none";
       }
     });
+
+    // 🎯 SCORE COMPONENTS
+    
+    function showScoreAnimation() {
+      const score = Math.floor(Math.random() * 101);
+      const scoreEl = document.getElementById("score");
+      const messageEl = document.getElementById("message");
+      const scoreBoard = document.getElementById("scoreBoard");
+      const sound = document.getElementById("scoreSound");
+
+      scoreBoard.style.opacity = 1;
+      scoreBoard.style.pointerEvents = "auto";
+
+      let current = 0;
+      const steps = score;
+      const duration = 3000;
+      const delay = Math.floor(duration / steps);
+
+      const interval = setInterval(() => {
+        if (current >= score) {
+          clearInterval(interval);
+          showMessage(score);
+          sound.play();
+          launchConfetti();
+        } else {
+          scoreEl.textContent = current;
+          current++;
+        }
+      }, delay);
+
+      function showMessage(score) {
+        let message = "";
+        if (score < 10)        message = "🤬 Kupal!";
+        else if (score < 20)   message = "🤮 Eeew!";
+        else if (score < 30)   message = "🤢 Luh!!";
+        else if (score < 40)   message = "😒 Pwede na..";
+        else if (score < 50)   message = "😏 Konti nlng..";
+        else if (score < 60)   message = "🤞 Ayos!";
+        else if (score < 70)   message = "🥴 Sana all!";
+        else if (score < 80)   message = "👌 Petmalu!";
+        else if (score < 90)   message = "🫡 Lodi!";
+        else if (score < 99)   message = "🤩 Boom panes!";
+        else if (score == 100) message = "🙌 !@#%!";
+        messageEl.textContent = message;
+      }
+
+      sound.onended = () => {
+        scoreBoard.style.opacity = 0;
+        setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
+      };
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const confetti = [];
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 5 + 2,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          tilt: Math.random() * 10 - 10,
+          tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+          tiltAngle: 0
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(c => {
+          ctx.beginPath();
+          ctx.lineWidth = c.r;
+          ctx.strokeStyle = c.color;
+          ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+          ctx.stroke();
+        });
+        update();
+      }
+
+      function update() {
+        confetti.forEach(c => {
+          c.y += Math.cos(c.d) + 2;
+          c.tiltAngle += c.tiltAngleIncrement;
+          c.tilt = Math.sin(c.tiltAngle) * 15;
+          if (c.y > canvas.height) {
+            c.y = -20;
+            c.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      function loop() {
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+      setTimeout(() => canvas.style.display = 'none', 6000);
+    }
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
