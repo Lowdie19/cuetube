@@ -591,8 +591,21 @@
     }
 
     function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        const duration = player.getDuration();
+        const timeCheck = setInterval(() => {
+          if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+            clearInterval(timeCheck);
+            return;
+          }
+          const time = player.getCurrentTime();
+          if (duration - time <= 5) {
+            showScoreAnimation();
+            clearInterval(timeCheck);
+          }
+        }, 1000);
+      }
       if (event.data === YT.PlayerState.ENDED) {
-        showScoreAnimation();
         playNextFromQueue();
       }
     }
@@ -838,12 +851,12 @@
       popupOverlay.classList.remove("visible");
     };
     
-    document.body.addEventListener("click", () => {
-      const confirm = document.getElementById("confirmDelete");
-      if (confirm.style.display !== "none") {
-        confirm.style.display = "none";
-      }
-    });
+    document.body.addEventListener("click", function handleBodyTap() {
+        if (skipped && !closed) {
+          closeScore();
+          document.body.removeEventListener("click", handleBodyTap);
+        }
+      });
 
     // 🎯 SCORE COMPONENTS
     
@@ -853,17 +866,19 @@
       const messageEl = document.getElementById("message");
       const scoreBoard = document.getElementById("scoreBoard");
       const sound = document.getElementById("scoreSound");
-    
+      const canvas = document.getElementById("confetti");
+
       scoreBoard.style.opacity = 1;
       scoreBoard.style.pointerEvents = "auto";
-    
+      canvas.style.display = 'block';
+
       let current = 0;
       const steps = score;
       const duration = 3000;
       const delay = Math.floor(duration / steps);
       let skipped = false;
       let closed = false;
-    
+
       const interval = setInterval(() => {
         if (current >= score) {
           clearInterval(interval);
@@ -875,7 +890,7 @@
           current++;
         }
       }, delay);
-    
+
       function showMessage(score) {
         let message = "";
         if (score < 10)        message = "🤬 Kupal!";
@@ -891,6 +906,15 @@
         else if (score == 100) message = "🙌 !@#%!";
         messageEl.textContent = message;
       }
+
+      function closeScore() {
+        scoreBoard.style.opacity = 0;
+        canvas.style.display = 'none';
+        closed = true;
+        setTimeout(() => {
+          scoreBoard.style.pointerEvents = "none";
+        }, 800);
+      }
         scoreBoard.onclick = () => {
             if (!skipped) {
               clearInterval(interval);
@@ -905,12 +929,8 @@
               setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
             }
           };
-      
-              sound.onended = () => {
-            if (!closed) {
-              scoreBoard.style.opacity = 0;
-              setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
-            }
+            sound.onended = () => {
+            if (!closed) closeScore();
           };
         }
 
