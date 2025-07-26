@@ -441,6 +441,11 @@
       left: 0;
       pointer-events: none;
       z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    canvas#confetti.hide {
+      opacity: 0;
     }
       
   </style>
@@ -499,7 +504,7 @@
   </div>
 
   <!-- 🎯 SCORE COMPONENTS -->
-  <canvas id="confetti"></canvas>
+ <canvas id="confetti"></canvas>
   <div class="score-container" id="scoreBoard">
     <div class="score-label">Your Score</div>
     <div class="score-number" id="score">0</div>
@@ -950,9 +955,10 @@
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      canvas.classList.remove('hide');
 
       const confetti = [];
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 120; i++) {
         confetti.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height - canvas.height,
@@ -964,6 +970,9 @@
           tiltAngle: 0
         });
       }
+
+      let count = 0;
+      const maxFrames = 120; // ~2 seconds at 60fps
 
       function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -983,22 +992,24 @@
           c.y += Math.cos(c.d) + 2;
           c.tiltAngle += c.tiltAngleIncrement;
           c.tilt = Math.sin(c.tiltAngle) * 15;
-          if (c.y > canvas.height) {
-            c.y = -20;
-            c.x = Math.random() * canvas.width;
-          }
         });
       }
 
       function loop() {
         draw();
-        requestAnimationFrame(loop);
+        count++;
+        if (count < maxFrames) {
+          requestAnimationFrame(loop);
+        } else {
+          canvas.classList.add('hide');
+          setTimeout(() => { canvas.style.display = 'none'; }, 1000);
+        }
       }
 
+      canvas.style.display = 'block';
       loop();
-      setTimeout(() => canvas.style.display = 'block', 6000);
     }
-
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
