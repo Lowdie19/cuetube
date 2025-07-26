@@ -130,12 +130,22 @@
       flex-direction: column;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
-      scroll-padding-bottom: 40px; /* ✅ ensures last item is fully visible */
-      touch-action: pan-y; /* allow vertical drag */
+      scroll-padding-bottom: 40px;
+      touch-action: pan-y;
       cursor: grab;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
     }
     .next-box:active {
       cursor: grabbing;
+    }
+    .next-box::-webkit-scrollbar-thumb {
+      background: transparent;
+      transition: background 0.3s ease;
+    }
+    .next-box:hover::-webkit-scrollbar-thumb,
+    .next-box.dragging::-webkit-scrollbar-thumb {
+      background: cyan;
     }
     .drawer > div {
       flex: 1;
@@ -710,36 +720,45 @@
         popupOverlay.classList.remove("visible");
       }, 1800);
     }
+    
     (function enableDragScroll() {
       const box = document.querySelector('.next-box');
       let isDown = false;
-      let startY;
-      let scrollTop;
-    
+      let startY, scrollTop;
+
       box.addEventListener('mousedown', (e) => {
         isDown = true;
-        box.classList.add('active');
+        box.classList.add('dragging');
         startY = e.pageY - box.offsetTop;
         scrollTop = box.scrollTop;
       });
-    
       box.addEventListener('mouseleave', () => {
         isDown = false;
-        box.classList.remove('active');
+        box.classList.remove('dragging');
       });
-    
       box.addEventListener('mouseup', () => {
         isDown = false;
-        box.classList.remove('active');
+        box.classList.remove('dragging');
       });
-    
       box.addEventListener('mousemove', (e) => {
         if (!isDown) return;
         e.preventDefault();
         const y = e.pageY - box.offsetTop;
-        const walk = (y - startY) * 1; // scroll-fastness
+        const walk = (y - startY);
         box.scrollTop = scrollTop - walk;
       });
+
+      let startYTouch = 0, scrollTopTouch = 0;
+      box.addEventListener("touchstart", e => {
+        startYTouch = e.touches[0].clientY;
+        scrollTopTouch = box.scrollTop;
+      }, { passive: true });
+
+      box.addEventListener("touchmove", e => {
+        const y = e.touches[0].clientY;
+        const walk = y - startYTouch;
+        box.scrollTop = scrollTopTouch - walk;
+      }, { passive: true });
     })();
 
   </script>
