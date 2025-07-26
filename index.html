@@ -202,8 +202,11 @@
       background: rgba(0,0,0,0.4);
       z-index: 90;
       display: none;
+      pointer-events: none;
     }
-    .drawer-overlay.visible { display: block; }
+    .drawer-overlay.visible {
+      pointer-events: auto;
+    }
 
     .youtube-wrapper {
       width: 100%;
@@ -462,10 +465,6 @@
     </div>
   </div>
   
-  <!-- Overlays -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
-
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
@@ -480,6 +479,10 @@
     <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromQueue()">Next</button>
   </div>
   </div>
+  
+  <!-- Overlays -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
   
   <!-- Popup -->
   <div id="popupOverlay"></div>
