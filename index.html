@@ -393,7 +393,7 @@
       padding: 50px;
       border: 3px solid #00ffc3;
       border-radius: 30px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 1.5);
       backdrop-filter: blur(12px);
       box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
       animation: glow 1s infinite alternate;
@@ -591,22 +591,19 @@
     }
 
     function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.PLAYING) {
-        const duration = player.getDuration();
-        const timeCheck = setInterval(() => {
-          if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
-            clearInterval(timeCheck);
-            return;
-          }
-          const time = player.getCurrentTime();
-          if (duration - time <= 5) {
-            showScoreAnimation();
-            clearInterval(timeCheck);
-          }
-        }, 1000);
-      }
       if (event.data === YT.PlayerState.ENDED) {
-        playNextFromQueue();
+        showScoreAnimation();
+        setTimeout(() => {
+          if (!isScoreBoardVisible) playNextFromQueue();
+          else {
+            const waitUntilClosed = setInterval(() => {
+              if (!isScoreBoardVisible) {
+                clearInterval(waitUntilClosed);
+                playNextFromQueue();
+              }
+            }, 500);
+          }
+        }, 5000);
       }
     }
     function extractVideoId(url) {
@@ -859,7 +856,8 @@
       });
 
     // 🎯 SCORE COMPONENTS
-    
+    let isScoreBoardVisible = false;
+
     function showScoreAnimation() {
       const score = Math.floor(Math.random() * 101);
       const scoreEl = document.getElementById("score");
@@ -870,7 +868,8 @@
 
       scoreBoard.style.opacity = 1;
       scoreBoard.style.pointerEvents = "auto";
-      canvas.style.display = 'block';
+      canvas.style.display = "block";
+      isScoreBoardVisible = true;
 
       let current = 0;
       const steps = score;
@@ -878,6 +877,10 @@
       const delay = Math.floor(duration / steps);
       let skipped = false;
       let closed = false;
+
+      if (player && player.pauseVideo) {
+        player.pauseVideo();
+      }
 
       const interval = setInterval(() => {
         if (current >= score) {
@@ -907,32 +910,40 @@
         messageEl.textContent = message;
       }
 
-      function closeScore() {
-        scoreBoard.style.opacity = 0;
-        canvas.style.display = 'none';
-        closed = true;
-        setTimeout(() => {
-          scoreBoard.style.pointerEvents = "none";
-        }, 800);
+      function closeScoreBoard() {
+        if (!closed) {
+          scoreBoard.style.opacity = 0;
+          canvas.style.display = "none";
+          closed = true;
+          isScoreBoardVisible = false;
+          setTimeout(() => {
+            scoreBoard.style.pointerEvents = "none";
+            if (player && player.playVideo) {
+              player.playVideo();
+            }
+          }, 800);
+        }
       }
         scoreBoard.onclick = () => {
-            if (!skipped) {
-              clearInterval(interval);
-              scoreEl.textContent = score;
-              showMessage(score);
-              launchConfetti();
-              skipped = true;
-              sound.play();
-            } else if (!closed) {
-              scoreBoard.style.opacity = 0;
-              closed = true;
-              setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
-            }
-          };
-            sound.onended = () => {
-            if (!closed) closeScore();
-          };
+        if (!skipped) {
+          clearInterval(interval);
+          scoreEl.textContent = score;
+          showMessage(score);
+          launchConfetti();
+          skipped = true;
+          sound.play();
+        } else {
+          closeScoreBoard();
         }
+      };
+
+      sound.onended = () => closeScoreBoard();
+      document.body.addEventListener("click", () => {
+        if (skipped && isScoreBoardVisible) {
+          closeScoreBoard();
+        }
+      });
+    }
 
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
