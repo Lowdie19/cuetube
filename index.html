@@ -204,7 +204,6 @@
       display: none;
     }
     .drawer-overlay.visible { display: block; }
-    .bottomDrawerOverlay.visible { display: block; }
 
     .youtube-wrapper {
       width: 100%;
@@ -482,7 +481,6 @@
       if (bottomDrawer.classList.contains("open")) {
         bottomDrawer.classList.remove("open");
         document.querySelector(".bottom-drawer-handle").style.display = "flex";
-        document.getElementById("bottomDrawerOverlay").classList.remove("visible");
       }
     }
   
@@ -492,7 +490,6 @@
     function toggleBottomDrawer() {
       const isOpen = bottomDrawer.classList.toggle("open");
       document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
-      document.getElementById("bottomDrawerOverlay").classList.toggle("visible", isOpen);
     
       if (isOpen) {
         const input = document.getElementById("youtubeInputDrawer");
@@ -760,6 +757,19 @@
         box.scrollTop = scrollTopTouch - walk;
       }, { passive: true });
     })();
+
+    document.getElementById("popupOverlay").onclick = () => {
+      const popup = document.getElementById("popupModal");
+      popup.classList.remove("show");
+      popupOverlay.classList.remove("visible");
+    };
+    
+    document.body.addEventListener("click", () => {
+      const confirm = document.getElementById("confirmDelete");
+      if (confirm.style.display !== "none") {
+        confirm.style.display = "none";
+      }
+    });
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
