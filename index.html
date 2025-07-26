@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -135,6 +135,7 @@
       cursor: grab;
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
+      position: relative;
     }
     .next-box:active {
       cursor: grabbing;
@@ -388,11 +389,11 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.75);
       padding: 50px;
       border: 3px solid #00ffc3;
       border-radius: 30px;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(12px);
       box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
       animation: glow 1s infinite alternate;
@@ -852,27 +853,29 @@
       const messageEl = document.getElementById("message");
       const scoreBoard = document.getElementById("scoreBoard");
       const sound = document.getElementById("scoreSound");
-
+    
       scoreBoard.style.opacity = 1;
       scoreBoard.style.pointerEvents = "auto";
-
+    
       let current = 0;
       const steps = score;
       const duration = 3000;
       const delay = Math.floor(duration / steps);
-
+      let skipped = false;
+      let closed = false;
+    
       const interval = setInterval(() => {
         if (current >= score) {
           clearInterval(interval);
           showMessage(score);
-          sound.play();
-          launchConfetti();
+          if (!skipped) sound.play();
+          if (!skipped) launchConfetti();
         } else {
           scoreEl.textContent = current;
           current++;
         }
       }, delay);
-
+    
       function showMessage(score) {
         let message = "";
         if (score < 10)        message = "🤬 Kupal!";
@@ -888,12 +891,28 @@
         else if (score == 100) message = "🙌 !@#%!";
         messageEl.textContent = message;
       }
-
-      sound.onended = () => {
-        scoreBoard.style.opacity = 0;
-        setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
-      };
-    }
+        scoreBoard.onclick = () => {
+            if (!skipped) {
+              clearInterval(interval);
+              scoreEl.textContent = score;
+              showMessage(score);
+              launchConfetti();
+              skipped = true;
+              sound.play();
+            } else if (!closed) {
+              scoreBoard.style.opacity = 0;
+              closed = true;
+              setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
+            }
+          };
+      
+              sound.onended = () => {
+            if (!closed) {
+              scoreBoard.style.opacity = 0;
+              setTimeout(() => scoreBoard.style.pointerEvents = "none", 800);
+            }
+          };
+        }
 
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
@@ -946,7 +965,7 @@
       }
 
       loop();
-      setTimeout(() => canvas.style.display = 'none', 6000);
+      setTimeout(() => canvas.style.display = 'block', 6000);
     }
 
   </script>
