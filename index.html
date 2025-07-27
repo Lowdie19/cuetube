@@ -418,7 +418,7 @@
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
   <div class="bottom-buttons inside">
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromQueue()">Next</button>
+    <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
   </div>
   </div>
   
@@ -433,7 +433,33 @@
       <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✓</button>
       <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
     </div>
+  </div
+
+    <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
+<div id="nextConfirmModal" style="
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  border: 2px solid cyan;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.3);
+">
+  <div style="font-size: 0.7em; color: white; margin-bottom: 20px;">
+    Are you sure you want to skip to the next video?
   </div>
+  <div style="display: flex; justify-content: space-between;">
+    <button class="cyan-btn" style="flex:1; margin-right: 5px;" onclick="confirmPlayNext()">Confirm</button>
+    <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
+  </div>
+</div>
   
   <!-- JS -->
   <script>
@@ -770,6 +796,21 @@
         confirm.style.display = "none";
       }
     });
+
+    function showNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "block";
+    document.getElementById("nextConfirmModal").style.display = "block";
+  }
+  
+    function hideNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "none";
+    document.getElementById("nextConfirmModal").style.display = "none";
+  }
+  
+    function confirmPlayNext() {
+    hideNextConfirm();
+    playNextFromQueue(); // this calls your existing next logic
+  }
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
