@@ -386,24 +386,25 @@
     
     /* 🎯 Score Display & Confetti */
     .score-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.75);
-      padding: 50px;
-      border: 3px solid #00ffc3;
-      border-radius: 30px;
-      background: rgba(0, 0, 0, 1.5);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
-      animation: glow 1s infinite alternate;
-      max-width: 95%;
-      text-align: center;
-      z-index: 10000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
-    }
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.75);
+    width: 280px;
+    height: 280px;
+    padding: 30px;
+    border: 3px solid #00ffc3;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 1.5);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
+    animation: glow 1s infinite alternate;
+    text-align: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
     .score-label {
       font-size: 1.3rem;
       color: #ccc;
@@ -441,6 +442,8 @@
       left: 0;
       pointer-events: none;
       z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
       
   </style>
@@ -506,6 +509,7 @@
     <div class="score-message" id="message">Hmmmm...</div>
   </div>
   <audio id="scoreSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_59b0e14547.mp3" preload="auto"></audio>
+  <audio id="confettiSound" src="https://cdn.pixabay.com/audio/2022/10/10/audio_188c2a60d3.mp3" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -981,64 +985,76 @@
     }
     
     function launchConfetti() {
-      const canvas = document.getElementById('confetti');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    
-      const confetti = [];
-      for (let i = 0; i < 150; i++) {
-        confetti.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height - canvas.height,
-          r: Math.random() * 6 + 4,
-          d: Math.random() * 5 + 2,
-          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-          tilt: Math.random() * 10 - 10,
-          tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-          tiltAngle: 0
-        });
-      }
-    
-      let animationFrame;
-    
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        confetti.forEach(c => {
-          ctx.beginPath();
-          ctx.lineWidth = c.r;
-          ctx.strokeStyle = c.color;
-          ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-          ctx.stroke();
-        });
-        update();
-      }
-    
-      function update() {
-        confetti.forEach(c => {
-          c.y += Math.cos(c.d) + 2;
-          c.tiltAngle += c.tiltAngleIncrement;
-          c.tilt = Math.sin(c.tiltAngle) * 15;
-          if (c.y > canvas.height) {
-            c.y = -20;
-            c.x = Math.random() * canvas.width;
-          }
-        });
-      }
-    
-      function loop() {
-        draw();
-        animationFrame = requestAnimationFrame(loop);
-      }
-    
-      loop();
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    const confettiSound = document.getElementById('confettiSound');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  
+    const confetti = [];
+    for (let i = 0; i < 150; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 5 + 2,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+        tiltAngle: 0
+      });
+    }
+  
+    canvas.style.opacity = 0;
+    canvas.style.transition = "opacity 0.5s ease";
+    canvas.style.display = "block";
+    requestAnimationFrame(() => (canvas.style.opacity = 1));
+  
+    if (confettiSound) confettiSound.play();
+  
+    let animationFrame;
+  
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+        ctx.stroke();
+      });
+      update();
+    }
+  
+    function update() {
+      confetti.forEach(c => {
+        c.y += Math.cos(c.d) + 2;
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+        if (c.y > canvas.height) {
+          c.y = -20;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+    }
+  
+    function loop() {
+      draw();
+      animationFrame = requestAnimationFrame(loop);
+    }
+  
+    loop();
+  
+    setTimeout(() => {
+      cancelAnimationFrame(animationFrame);
+      canvas.style.opacity = 0;
       setTimeout(() => {
-        cancelAnimationFrame(animationFrame);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         canvas.style.display = 'none';
-      }, 2000);
-    }
+      }, 500);
+    }, 2000);
+  }
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
