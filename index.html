@@ -433,25 +433,25 @@
       <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✓</button>
       <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
     </div>
-  </div
-
-    <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
-<div id="nextConfirmModal" style="
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #222;
-  border: 2px solid cyan;
-  border-radius: 10px;
-  padding: 20px;
-  z-index: 1000;
-  text-align: center;
-  width: 90%;
-  max-width: 320px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.3);
-">
+  </div>
+  
+  <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
+  <div id="nextConfirmModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #222;
+    border: 2px solid cyan;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1000;
+    text-align: center;
+    width: 90%;
+    max-width: 320px;
+    box-shadow: 0 0 20px rgba(0,255,255,0.3);
+    ">
   <div style="font-size: 0.7em; color: white; margin-bottom: 20px;">
     Are you sure you want to skip to the next video?
   </div>
@@ -460,6 +460,9 @@
     <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
   </div>
 </div>
+
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+  <audio id="successSound" src="success.mp3" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -589,6 +592,7 @@
       }
 
       showPopup("Reserved!", "lime");
+      playSuccessSound();
     }
 
     async function fetchTitle(videoId) {
@@ -663,41 +667,48 @@
     }
 
     function updateQueueDisplay() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      list.innerHTML = "";
-    
-      for (let i = currentIndex + 1; i < queue.length; i++) {
-        const div = document.createElement("div");
-        div.className = "title";
-        div.textContent = queue[i].title;
-        div.style.cursor = "pointer";
-    
-        let longPressTimer;
-        const startHandler = (e) => {
-          e.preventDefault();
-          div.classList.add("long-pressing");
-          longPressTimer = setTimeout(() => {
-            navigator.vibrate?.(50);
-            showDeleteConfirm(e, i);
-          }, 500);
-        };
-        const cancelHandler = () => {
-          clearTimeout(longPressTimer);
-          div.classList.remove("long-pressing");
-        };
-    
-        div.addEventListener("mousedown", startHandler);
-        div.addEventListener("touchstart", startHandler);
-        div.addEventListener("mouseup", cancelHandler);
-        div.addEventListener("mouseleave", cancelHandler);
-        div.addEventListener("touchend", cancelHandler);
-        div.addEventListener("touchcancel", cancelHandler);
-    
-        list.appendChild(div);
-      }
-
-      updateOverflowCounter();
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    list.innerHTML = "";
+  
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+      const div = document.createElement("div");
+      div.className = "title";
+      div.textContent = queue[i].title;
+      div.style.cursor = "pointer";
+  
+      let longPressTimer;
+      const startHandler = (e) => {
+        e.preventDefault();
+        div.classList.add("long-pressing");
+        longPressTimer = setTimeout(() => {
+          navigator.vibrate?.(50);
+          showDeleteConfirm(e, i);
+        }, 500);
+      };
+      const cancelHandler = () => {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
+      };
+  
+      div.addEventListener("mousedown", startHandler);
+      div.addEventListener("touchstart", startHandler);
+      div.addEventListener("mouseup", cancelHandler);
+      div.addEventListener("mouseleave", cancelHandler);
+      div.addEventListener("touchend", cancelHandler);
+      div.addEventListener("touchcancel", cancelHandler);
+  
+      list.appendChild(div);
+    }
+  
+    updateOverflowCounter();
+  
+    // ✅ Disable "Next" button if we're at the end
+      const nextBtn = document.getElementById("nextBtnDrawer");
+      const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+      nextBtn.disabled = !hasNext;
+      nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+      nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
     }
     
     function updateOverflowCounter() {
@@ -798,18 +809,46 @@
     });
 
     function showNextConfirm() {
-    document.getElementById("nextConfirmOverlay").style.display = "block";
-    document.getElementById("nextConfirmModal").style.display = "block";
-  }
+      document.getElementById("nextConfirmOverlay").style.display = "block";
+      document.getElementById("nextConfirmModal").style.display = "block";
+    }
   
     function hideNextConfirm() {
-    document.getElementById("nextConfirmOverlay").style.display = "none";
-    document.getElementById("nextConfirmModal").style.display = "none";
-  }
-  
+      document.getElementById("nextConfirmOverlay").style.display = "none";
+      document.getElementById("nextConfirmModal").style.display = "none";
+    }
+    
     function confirmPlayNext() {
-    hideNextConfirm();
-    playNextFromQueue(); // this calls your existing next logic
+      hideNextConfirm();
+      playNextFromQueue(); // this calls your existing next logic
+    }
+    function playClickSound() {
+    const click = document.getElementById("clickSound");
+    if (click) {
+      click.currentTime = 0;
+      click.play();
+    }
+  }
+
+    function playSuccessSound() {
+    const success = document.getElementById("successSound");
+    if (success) {
+      success.currentTime = 0;
+      success.play();
+    }
+  }
+    
+    document.querySelectorAll('.cyan-btn').forEach(btn => {
+    btn.addEventListener('click', playClickSound);
+  });
+
+    try {
+    const res = await fetch(...);
+    if (!res.ok) throw new Error("Video not found");
+    ...
+  } catch (err) {
+    showPopup("⚠️ Choose another Video!", "red");
+    return videoId;
   }
 
   </script>
