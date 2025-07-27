@@ -1,440 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>KaraOwkie - Room</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scoreboard Config</title>
   <style>
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2em;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
-    }
-    input[type="text"] {
-      width: 60%;
-      padding: 10px;
-      font-size: 1em;
-    }
-    button {
-      padding: 10px 20px;
-      margin-left: 10px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    #queue {
-      margin-top: 30px;
-      border-top: 1px solid #444;
-      padding-top: 10px;
-    }
-    .queue-item {
-      padding: 8px;
-      background: #222;
-      border: 1px solid #333;
-      margin-bottom: 5px;
-    }
-    
-    * { box-sizing: border-box; }
-    html, body {
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: 'Orbitron', sans-serif;
-      background-color: #0a0a0a;
-      color: white;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    .title-bar {
-      text-align: center;
-      font-size: 1.6em;
-      padding: 12px 0;
-      color: white;
-      background-color: #000;
-      position: relative;
-      animation: neon 3.0s ease-in-out infinite alternate;
-    }
-    @keyframes neon {
-      from { text-shadow: 0 0 10px magenta, 0 0 20px magenta; }
-      to { text-shadow: 0 0 20px cyan, 0 0 40px cyan; }
-    }
-    
-    .drawer {
-      position: fixed;
-      top: 0;
-      left: -240px;
-      width: 220px;
-      height: 100%;
-      background: rgba(20, 20, 20, 0.90);
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-      z-index: 99;
-      transition: left 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 25px;
-    }
-    .drawer.open { left: 0; }
-    
-    .drawer-handle {
-      position: absolute;
-      top: 0%;
-      right: -58px;
-      width: 50px;
-      height: 50px;
-      background: rgba(0, 0, 0, 0.0);
-      color: magenta;
-      font-size: 1.6em;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: right;
-      cursor: pointer;
-      z-index: 80;
-    }
-    
-    .nowplaying-box {
-      border: 2px solid cyan;
-      border-radius: 10px;
-      padding: 10px;
-      background: #121212;
-    }
-    
-    .nowplaying-box .label {
-      font-size: 0.7em;
-      color: #aaa;
-    }
-
-    .nowplaying-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 1.1em;
-      margin: 5px 0;
-      word-wrap: break-word;
-      font-weight: bold;
-    }
-    
-    .next-box {
-      border: none;
-      border-radius: 10px;
-      padding: 10px;
-      background: #121212;
-      flex: 1;
-      overflow-y: auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      scroll-padding-bottom: 40px;
-      touch-action: pan-y;
-      cursor: grab;
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
-      position: relative;
-    }
-    .next-box:active {
-      cursor: grabbing;
-    }
-    .next-box::-webkit-scrollbar-thumb {
-      background: transparent;
-      transition: background 0.3s ease;
-    }
-    .next-box:hover::-webkit-scrollbar-thumb,
-    .next-box.dragging::-webkit-scrollbar-thumb {
-      background: cyan;
-    }
-    .drawer > div {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
     }
-    .drawer.open {
-      display: flex;
-    }
-    .next-box::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 20px;
-      background: linear-gradient(to bottom, transparent, #121212);
-      pointer-events: none;
-      z-index: 1;
-    }
-    .next-box::-webkit-scrollbar-thumb {
-      background: cyan;
-    }
 
-    #overflowCounter {
-    text-align: center;
-    font-size: 0.7em;
-    color: #888;
-    margin-top: 5px;
-    display: none;
-    }
-    
-    .next-box .label {
-      font-size: 0.7em;
-      color: #aaa;
-    }
-    
-    .next-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 0.9em;
-      margin: 10px 0;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-weight: normal;
-    }
-    
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
-      z-index: 90;
-      display: none;
-      pointer-events: none;
-    }
-    .drawer-overlay.visible {
-      pointer-events: auto;
-    }
-
-    .youtube-wrapper {
-      width: 100%;
-      height: 70vh;
-      border: 5px solid cyan;
-      margin-top: 2vh;
-      margin-bottom: 5vh;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .url-input {
-      width: calc(100% - 20px);
-      margin: 0 10px 8px 10px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid cyan;
-      font-size: 1em;
-      background-color: white;
-      color: black;
-      text-align: center;
-    }
-
-    .bottom-buttons {
-      position: fixed;
-      bottom: 15px;
-      width: 100%;
-      padding: 0 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      z-index: 5;
-    }
-
-    .cyan-btn {
-      flex: 1;
-      padding: 14px;
-      background: #121212;
-      border: 2px solid cyan;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .cyan-btn:hover {
-      background: cyan;
-      color: black;
-    }
-    
-    .bottom-drawer {
-      position: fixed;
-      bottom: -160px;
-      left: 0;
-      width: 100%;
-      background: rgba(20, 20, 20, 0.95);
-      padding: 20px 15px 25px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-      transition: bottom 0.3s ease;
-      z-index: 98;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .bottom-drawer.open {
-      bottom: 0;
-    }
-    
-    .bottom-drawer-handle {position: absolute;
-      top: -70px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: none;
-      border: none;
-      color: magenta;
-      font-size: 1.8em;
-      cursor: pointer;
-      text-shadow: none; //* text-shadow: 0 0 6px magenta, 0 0 12px magenta; *//
-      z-index: 99;
-      transition: opacity 0.3s ease;
-    }
-    .bottom-drawer-handle[style*="display: none"] {
-      opacity: 0;
-    }
-    
-    .bottom-buttons.inside {
-      position: relative;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 75vh;
-      }
-      .drawer {
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      .url-input, .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-    }
-    
-    @media (max-height: 500px) {
-  .bottom-buttons { position: static; margin-top: 20px; }
-}
-    @media (hover: hover) {
-  .next-box::-webkit-scrollbar-thumb {
-    background: transparent;
-  }
-  .next-box:hover::-webkit-scrollbar-thumb {
-    background: cyan;
-  }
-}
-    
-    #popupModal {
-      display: none;
-      position: fixed;
-      top: 35%;
-      left: 50%;
-      transform: translateX(-50%) scale(0.8);
-      font-size: 1.5em;
-      font-weight: bold;
-      text-align: center;
-      z-index: 300;
-      pointer-events: none;
-      opacity: 0;
-      color: white;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime;
-    }
-      
-    #popupModal.show {
-      display: block;
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-    }
-    
-    #popupOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 250;
-      display: none;
-      transition: opacity 0.4s ease;
-    }
-
-    #popupOverlay.visible {
-      display: block;
-    }
-    #confirmDelete {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-    }
-    #confirmDelete.show {
-      opacity: 1;
-    }
-    
-    .long-pressing {
-    box-shadow: 0 0 7px red;
-    }
-    
-    /* 🎯 Score Display & Confetti */
     .score-container {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.75);
-      padding: 50px;
-      border: 3px solid #00ffc3;
-      border-radius: 30px;
-      background: rgba(0, 0, 0, 1.5);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
-      animation: glow 1s infinite alternate;
-      max-width: 95%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.95);
+      border: 2px solid #00ffc3;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #00ffc3;
       text-align: center;
+      padding: 30px;
+      max-width: 90%;
       z-index: 10000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
+      display: none;
     }
+
     .score-label {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: #ccc;
-      margin-bottom: 15px;
-      letter-spacing: 2px;
     }
+
     .score-number {
-      font-size: 8rem;
+      font-size: 6rem;
       font-weight: bold;
       color: #00ffc3;
-      text-shadow: 0 0 40px #00ffc3;
-      animation: pulse 1s infinite ease-in-out;
+      margin: 20px 0;
     }
+
     .score-message {
-      margin-top: 25px;
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       color: #ffd700;
-      animation: fade-in 1.2s ease;
     }
-    @keyframes glow {
-      from { box-shadow: 0 0 20px #00ffc3; }
-      to { box-shadow: 0 0 60px #00ffc3; }
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+
     canvas#confetti {
       position: fixed;
       top: 0;
@@ -442,603 +54,122 @@
       pointer-events: none;
       z-index: 9999;
     }
-      
   </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+<body>
 
-  <!-- Title -->
-  <div class="title-bar">KaraOwkie!</div>
-  
-  <!-- Drawer -->
-  <div class="drawer" id="drawer">
-    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
-      <div class="nowplaying-box">
-        <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">Please insert song..</div>
-      </div>
-      <div class="next-box">
-        <div class="label">NEXT</div>
-        <div id="nextList"></div>
-        <div id="overflowCounter"></div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- YouTube Player -->
-  <div class="youtube-wrapper">
-    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
-  </div>
-
-  <!-- Bottom Drawer -->
-  <div class="bottom-drawer" id="bottomDrawer">
-  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <div class="bottom-buttons inside">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="playNextFromQueue()">Next</button>
-  </div>
-  </div>
-  
-  <!-- Overlays -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
-  
-  <!-- Popup -->
-  <div id="popupOverlay"></div>
-  <div id="popupModal">Reserved!</div>
-
-  <!-- Delete Confirm Box -->
-  <div id="confirmDelete" style="display:none; position:absolute; background:#333; padding:10px; border-radius:6px; z-index:999;">
-    <div style="font-family:Arial,sans-serif; color:white; font-size:1em; margin-bottom:8px; text-align:center;">Delete?</div>
-    <div style="display:flex; gap:10px;">
-      <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✓</button>
-      <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
-    </div>
-  </div>
-
-  <!-- 🎯 SCORE COMPONENTS -->
   <canvas id="confetti"></canvas>
+
   <div class="score-container" id="scoreBoard">
     <div class="score-label">Your Score</div>
     <div class="score-number" id="score">0</div>
     <div class="score-message" id="message">Hmmmm...</div>
   </div>
-  <audio id="scoreSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_59b0e14547.mp3" preload="auto"></audio>
-  
-  <!-- JS -->
+
   <script>
-    let touchStartX = 0;
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('drawerOverlay');
-    const popupOverlay = document.getElementById("popupOverlay");
-  
-    function handleTouchStart(evt) {
-      touchStartX = evt.touches[0].clientX;
-    }
-  
-    function handleTouchMove(evt) {
-      const deltaX = evt.touches[0].clientX - touchStartX;
-      if (deltaX > 50) openDrawer();
-      else if (deltaX < -50) closeDrawer();
-    }
-  
-    function handleTap(evt) {
-      if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
-        closeDrawer();
-      }
-    }
-  
-    function toggleDrawer() {
-      if (drawer.classList.contains("open")) closeDrawer();
-      else openDrawer();
-    }
-  
-    function openDrawer() {
-      drawer.classList.add('open');
-      overlay.classList.add('visible');
-      document.getElementById('drawerHandle').style.display = 'none';
-      document.getElementById("confirmDelete").style.display = "none";
-    }
-  
-    function closeDrawer() {
-      drawer.classList.remove('open');
-      overlay.classList.remove('visible');
-      document.getElementById('drawerHandle').style.display = 'flex';
-      document.getElementById("confirmDelete").style.display = "none";
-    }
-  
-    function closeBottomDrawer() {
-      if (bottomDrawer.classList.contains("open")) {
-        bottomDrawer.classList.remove("open");
-        document.querySelector(".bottom-drawer-handle").style.display = "flex";
-      }
-    }
-  
-    let startY = 0;
-    const bottomDrawer = document.getElementById("bottomDrawer");
-  
-    function toggleBottomDrawer() {
-      const isOpen = bottomDrawer.classList.toggle("open");
-      document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
-    
-      if (isOpen) {
-        const input = document.getElementById("youtubeInputDrawer");
-        setTimeout(() => input.focus(), 50);
-      }
-    }
-
-    document.body.addEventListener("touchstart", evt => startY = evt.touches[0].clientY);
-    document.body.addEventListener("touchmove", evt => {
-      const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) toggleBottomDrawer();
-      else if (deltaY > 40) closeBottomDrawer();
-    });
-
-    let player;
-    let queue = [];
-    let currentIndex = -1;
-    let videoDurationCheckInterval;
-
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        events: {
-          onReady: () => console.log("Player Ready"),
-          onStateChange: onPlayerStateChange
-        },
-        origin: window.location.origin
-      });
-    }
-
-    function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.PLAYING) {
-      clearInterval(videoDurationCheckInterval);
-      videoDurationCheckInterval = setInterval(checkForScoreTrigger, 1000);
-    } else if (event.data === YT.PlayerState.ENDED) {
-      clearInterval(videoDurationCheckInterval);
-      showScoreAnimation();
-      waitForScoreToEndThenPlayNext();
-    }
-  }
-    function checkForScoreTrigger() {
-    if (!player || !player.getDuration || !player.getCurrentTime) return;
-    const duration = player.getDuration();
-    const currentTime = player.getCurrentTime();
-  
-    if (duration - currentTime <= 7 && !isScoreBoardVisible) {
-      clearInterval(videoDurationCheckInterval);
-      showScoreAnimation(true);
-    }
-  }
-    function waitForScoreToEndThenPlayNext() {
-    setTimeout(() => {
-      if (!isScoreBoardVisible) playNextFromQueue();
-      else {
-        const waitUntilClosed = setInterval(() => {
-          if (!isScoreBoardVisible) {
-            clearInterval(waitUntilClosed);
-            playNextFromQueue();
-          }
-        }, 500);
-      }
-    }, 5000);
-  }
-    
-    function extractVideoId(url) {
-      const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
-      return match ? match[1] : null;
-    }
-
-    async function autoPlayIfValidUrl(url) {
-      const trimmed = url.trim();
-      const id = extractVideoId(trimmed);
-      if (id && queue.every(q => q.id !== id)) {
-        document.getElementById("youtubeInputDrawer").value = "";
-        const title = await fetchTitle(id);
-        queue.push({ id, title });
-        if (currentIndex === -1 && player && player.loadVideoById) {
-          currentIndex = 0;
-          player.loadVideoById(id);
-          updateNowPlaying();
-        }
-        updateQueueDisplay();
-        showPopup("Reserved!", "lime");
-      }
-    }
-
-    async function reserveFromDrawer() {
-      const input = document.getElementById("youtubeInputDrawer");
-      const url = input.value.trim();
-      const videoId = extractVideoId(url);
-      if (!videoId) return alert("Invalid YouTube URL");
-
-      const title = await fetchTitle(videoId);
-      queue.push({ id: videoId, title });
-      updateQueueDisplay();
-
-      input.value = ""; // Clear the input box after reserving
-
-      if (currentIndex === -1 && player && player.loadVideoById) {
-        currentIndex = 0;
-        player.loadVideoById(queue[currentIndex].id);
-        updateNowPlaying();
-      }
-
-      showPopup("Reserved!", "lime");
-    }
-
-    async function fetchTitle(videoId) {
-      try {
-        const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-        const data = await res.json();
-        return data.title || videoId;
-      } catch (err) {
-        return videoId;
-      }
-    }
-    
-    setTimeout(() => {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      if (!list || !overflow) return;
-    
-      const totalHeight = list.scrollHeight;
-      const visibleHeight = list.clientHeight;
-      const scrollable = totalHeight > visibleHeight;
-    
-      if (scrollable) {
-        const items = list.children;
-        let shown = 0;
-        let accHeight = 0;
-        for (let i = 0; i < items.length; i++) {
-          accHeight += items[i].offsetHeight;
-          if (accHeight < visibleHeight) shown++;
-        }
-        const remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
-      }
-    }, 100);
-
-    function showDeleteConfirm(e, index) {
-      const confirmBox = document.getElementById("confirmDelete");
-      const x = e.clientX || (e.touches && e.touches[0].clientX);
-      const y = e.clientY || (e.touches && e.touches[0].clientY);
-      confirmBox.style.left = `${x + 10}px`;
-      confirmBox.style.top = `${y}px`;
-      confirmBox.style.display = "block";
-
-      const yes = document.getElementById("yesBtn");
-      const no = document.getElementById("noBtn");
-
-      yes.onclick = () => {
-        queue.splice(index, 1);                     // remove item
-        confirmBox.style.display = "none";          // hide modal
-        updateQueueDisplay();                       // update list
-        // NOTE: we do NOT call closeDrawer() anymore
-      };
-      
-      no.onclick = () => {
-        confirmBox.style.display = "none";
-      };
-    }
-
-    function playNextFromQueue() {
-      if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-        showPopup("No next song.", "red");
-        return;
-      }
-
-      currentIndex++;
-      player.loadVideoById(queue[currentIndex].id);
-      updateNowPlaying();
-      updateQueueDisplay();
-      showPopup("Next song!", "magenta");
-    }
-
-    function updateQueueDisplay() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      list.innerHTML = "";
-    
-      for (let i = currentIndex + 1; i < queue.length; i++) {
-        const div = document.createElement("div");
-        div.className = "title";
-        div.textContent = queue[i].title;
-        div.style.cursor = "pointer";
-    
-        let longPressTimer;
-        const startHandler = (e) => {
-          e.preventDefault();
-          div.classList.add("long-pressing");
-          longPressTimer = setTimeout(() => {
-            navigator.vibrate?.(50);
-            showDeleteConfirm(e, i);
-          }, 500);
-        };
-        const cancelHandler = () => {
-          clearTimeout(longPressTimer);
-          div.classList.remove("long-pressing");
-        };
-    
-        div.addEventListener("mousedown", startHandler);
-        div.addEventListener("touchstart", startHandler);
-        div.addEventListener("mouseup", cancelHandler);
-        div.addEventListener("mouseleave", cancelHandler);
-        div.addEventListener("touchend", cancelHandler);
-        div.addEventListener("touchcancel", cancelHandler);
-    
-        list.appendChild(div);
-      }
-
-      updateOverflowCounter();
-    }
-    
-    function updateOverflowCounter() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      if (!list || !overflow) return;
-    
-      const totalHeight = list.scrollHeight;
-      const visibleHeight = list.clientHeight;
-      const scrollable = totalHeight > visibleHeight;
-    
-      if (scrollable) {
-        const items = list.children;
-        let shown = 0;
-        let accHeight = 0;
-        for (let i = 0; i < items.length; i++) {
-          accHeight += items[i].offsetHeight;
-          if (accHeight < visibleHeight) shown++;
-        }
-        const remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
-      }
-    }
-
-    function updateNowPlaying() {
-      const nowTitleEl = document.getElementById("nowTitle");
-      nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
-    }
-    
-    function showPopup(text, glowColor) {
-      const popup = document.getElementById("popupModal");
-      popup.innerText = text;
-      popup.style.color = "white";
-      popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
-
-      popupOverlay.classList.add("visible");
-      popup.classList.add("show");
-      setTimeout(() => {
-        popup.classList.remove("show");
-        popupOverlay.classList.remove("visible");
-      }, 1800);
-    }
-    
-    (function enableDragScroll() {
-      const box = document.querySelector('.next-box');
-      let isDown = false;
-      let startY, scrollTop;
-
-      box.addEventListener('mousedown', (e) => {
-        isDown = true;
-        box.classList.add('dragging');
-        startY = e.pageY - box.offsetTop;
-        scrollTop = box.scrollTop;
-      });
-      box.addEventListener('mouseleave', () => {
-        isDown = false;
-        box.classList.remove('dragging');
-      });
-      box.addEventListener('mouseup', () => {
-        isDown = false;
-        box.classList.remove('dragging');
-      });
-      box.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const y = e.pageY - box.offsetTop;
-        const walk = (y - startY);
-        box.scrollTop = scrollTop - walk;
-      });
-
-      let startYTouch = 0, scrollTopTouch = 0;
-      box.addEventListener("touchstart", e => {
-        startYTouch = e.touches[0].clientY;
-        scrollTopTouch = box.scrollTop;
-      }, { passive: true });
-
-      box.addEventListener("touchmove", e => {
-        const y = e.touches[0].clientY;
-        const walk = y - startYTouch;
-        box.scrollTop = scrollTopTouch - walk;
-      }, { passive: true });
-    })();
-
-    document.getElementById("popupOverlay").onclick = () => {
-      const popup = document.getElementById("popupModal");
-      popup.classList.remove("show");
-      popupOverlay.classList.remove("visible");
-    };
-    
-    document.body.addEventListener("click", function handleBodyTap() {
-        if (skipped && !closed) {
-          closeScore();
-          document.body.removeEventListener("click", handleBodyTap);
-        }
-      });
-
-    // 🎯 SCORE COMPONENTS
-    let isScoreBoardVisible = false;
-
-    function showScoreAnimation(triggeredBeforeEnd = false) {
-    const score = Math.floor(Math.random() * 101);
-    const scoreEl = document.getElementById("score");
-    const messageEl = document.getElementById("message");
-    const scoreBoard = document.getElementById("scoreBoard");
-    const sound = document.getElementById("scoreSound");
-    const canvas = document.getElementById("confetti");
-  
-    scoreBoard.style.opacity = 1;
-    scoreBoard.style.pointerEvents = "auto";
-    canvas.style.display = "block";
-    isScoreBoardVisible = true;
-  
-    let current = 0;
-    const steps = score;
-    const duration = 3000;
-    const delay = Math.floor(duration / steps);
+    let isScoreVisible = false;
     let skipped = false;
     let closed = false;
 
-      // Fade audio volume if video still playing
-    if (triggeredBeforeEnd && player && player.getVolume) {
-      const startVol = player.getVolume();
-      let fadeStep = 0;
-      const fadeOut = setInterval(() => {
-        if (fadeStep >= 20 || !isScoreBoardVisible) {
-          clearInterval(fadeOut);
-          return;
+    function showScoreBoard(finalScore) {
+      const board = document.getElementById('scoreBoard');
+      const scoreEl = document.getElementById('score');
+      const messageEl = document.getElementById('message');
+      board.style.display = 'block';
+      isScoreVisible = true;
+
+      let current = 0;
+      const duration = 6000;
+      const delay = Math.floor(duration / finalScore);
+
+      const interval = setInterval(() => {
+        if (current >= finalScore) {
+          clearInterval(interval);
+          displayMessage(finalScore);
+        } else {
+          scoreEl.textContent = current;
+          current++;
         }
-        player.setVolume(startVol - fadeStep * 5);
-        fadeStep++;
-      }, 100);
-    }
-  
-    if (player && player.pauseVideo) player.pauseVideo();
-  
-    const interval = setInterval(() => {
-      if (current >= score) {
-        clearInterval(interval);
-        showMessage(score);
-        if (!skipped) sound.play();
-        if (!skipped) launchConfetti();
-      } else {
-        scoreEl.textContent = current;
-        current++;
-      }
-    }, delay);
+      }, delay);
 
-      function showMessage(score) {
-      let message = "";
-      if (score < 10) message = "🤬 Kupal!";
-      else if (score < 20) message = "🤮 Eeew!";
-      else if (score < 30) message = "🤢 Luh!!";
-      else if (score < 40) message = "😒 Pwede na..";
-      else if (score < 50) message = "😏 Konti nlng..";
-      else if (score < 60) message = "🤞 Ayos!";
-      else if (score < 70) message = "🥴 Sana all!";
-      else if (score < 80) message = "👌 Petmalu!";
-      else if (score < 90) message = "🫡 Lodi!";
-      else if (score < 99) message = "🤩 Boom panes!";
-      else if (score == 100) message = "🙌 !@#%!";
-      messageEl.textContent = message;
-    }
+      function displayMessage(score) {
+        if (score < 20) messageEl.textContent = "🤮 Eeew!";
+        else if (score < 50) messageEl.textContent = "😏 Konti nlng..";
+        else if (score < 80) messageEl.textContent = "👌 Petmalu!";
+        else messageEl.textContent = "🤩 Boom panes!";
+      }
 
-      function closeScoreBoard() {
-      if (!closed) {
-        scoreBoard.style.opacity = 0;
-        canvas.style.display = "none";
-        closed = true;
-        isScoreBoardVisible = false;
-        setTimeout(() => {
-          scoreBoard.style.pointerEvents = "none";
-          if (player && player.playVideo) player.playVideo();
-          if (player && player.setVolume) player.setVolume(100);
-        }, 800);
-      }
-    }
-  
-    scoreBoard.onclick = () => {
-      if (!skipped) {
-        clearInterval(interval);
-        scoreEl.textContent = score;
-        showMessage(score);
-        launchConfetti();
-        skipped = true;
-        sound.play();
-      } else {
-        closeScoreBoard();
-      }
-    };
-  
-    sound.onended = () => closeScoreBoard();
-    document.body.addEventListener("click", () => {
-      if (skipped && isScoreBoardVisible) {
-        closeScoreBoard();
-      }
-    });
-  }
-
-    function launchConfetti() {
-      const canvas = document.getElementById('confetti');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.getElementById("confetti");
+      const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const confetti = [];
-      for (let i = 0; i < 150; i++) {
-        confetti.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height - canvas.height,
-          r: Math.random() * 6 + 4,
-          d: Math.random() * 5 + 2,
-          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-          tilt: Math.random() * 10 - 10,
-          tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-          tiltAngle: 0
-        });
-      }
+      const confetti = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 5 + 1,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngle: 0
+      }));
 
-      let animationFrame;
-
-      function draw() {
+      function drawConfetti() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         confetti.forEach(c => {
           ctx.beginPath();
           ctx.lineWidth = c.r;
           ctx.strokeStyle = c.color;
-          ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+          ctx.moveTo(c.x + c.tilt, c.y);
+          ctx.lineTo(c.x, c.y + c.tilt);
           ctx.stroke();
         });
-        update();
-        animationFrame = requestAnimationFrame(draw);
       }
 
-      function update() {
+      function updateConfetti() {
         confetti.forEach(c => {
-          c.y += Math.cos(c.d) + 2;
-          c.tiltAngle += c.tiltAngleIncrement;
-          c.tilt = Math.sin(c.tiltAngle) * 15;
-          if (c.y > canvas.height) {
-            c.y = -20;
-            c.x = Math.random() * canvas.width;
-          }
+          c.y += Math.cos(c.d);
+          c.tiltAngle += 0.05;
+          c.tilt = Math.sin(c.tiltAngle) * 10;
         });
       }
 
-      draw();
+      const confettiTimer = setInterval(() => {
+        updateConfetti();
+        drawConfetti();
+      }, 30);
 
-      // Stop confetti when scoreboard closes
-      const observer = new MutationObserver(() => {
-        if (document.getElementById("scoreBoard").style.opacity == "0") {
-          cancelAnimationFrame(animationFrame);
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          canvas.style.display = 'none';
-          observer.disconnect();
-        }
-      });
+      // stop confetti
+      setTimeout(() => {
+        clearInterval(confettiTimer);
+        canvas.style.display = 'none';
+      }, 2000);
 
-      observer.observe(document.getElementById("scoreBoard"), { attributes: true, attributeFilter: ['style'] });
+      // auto-close after 10 sec
+      setTimeout(() => closeScoreBoard(), 10000);
     }
+
+    function closeScoreBoard() {
+      const board = document.getElementById('scoreBoard');
+      board.style.display = 'none';
+      isScoreVisible = false;
+    }
+
+    document.body.addEventListener('click', () => {
+      if (!isScoreVisible) return;
+
+      if (!skipped) {
+        skipped = true;
+        document.getElementById('score').textContent = finalScore;
+        document.getElementById('message').textContent = "🥳 Surprise!";
+      } else {
+        closeScoreBoard();
+        skipped = false;
+      }
+    });
+
+    // example trigger (simulate at 10s before video ends)
+    setTimeout(() => showScoreBoard(Math.floor(Math.random() * 101)), 3000);
   </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
