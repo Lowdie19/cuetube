@@ -386,41 +386,47 @@
     
     /* 🎯 Score Display & Confetti */
     .score-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.75);
-    width: 280px;
-    height: 280px;
-    padding: 30px;
-    border: 3px solid #00ffc3;
-    border-radius: 20px;
-    background: rgba(0, 0, 0, 1.5);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
-    animation: glow 1s infinite alternate;
-    text-align: center;
-    z-index: 10000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
-  }
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.75);
+      width: 90vw;
+      height: 90vw;
+      max-width: 350px;
+      max-height: 350px;
+      padding: 30px 20px;
+      border: 3px solid #00ffc3;
+      border-radius: 30px;
+      background: rgba(0, 0, 0, 1.5);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
+      animation: glow 1s infinite alternate;
+      text-align: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
     .score-label {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       color: #ccc;
-      margin-bottom: 15px;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
     }
     .score-number {
-      font-size: 8rem;
+      font-size: 4rem;
       font-weight: bold;
       color: #00ffc3;
       text-shadow: 0 0 40px #00ffc3;
       animation: pulse 1s infinite ease-in-out;
     }
     .score-message {
-      margin-top: 25px;
-      font-size: 2.2rem;
+      margin-top: 15px;
+      font-size: 1.4rem;
       color: #ffd700;
       animation: fade-in 1.2s ease;
     }
