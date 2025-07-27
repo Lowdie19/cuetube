@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KaraOwkie - Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -135,7 +135,6 @@
       cursor: grab;
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
-      position: relative;
     }
     .next-box:active {
       cursor: grabbing;
@@ -203,11 +202,8 @@
       background: rgba(0,0,0,0.4);
       z-index: 90;
       display: none;
-      pointer-events: none;
     }
-    .drawer-overlay.visible {
-      pointer-events: auto;
-    }
+    .drawer-overlay.visible { display: block; }
 
     .youtube-wrapper {
       width: 100%;
@@ -383,74 +379,6 @@
     .long-pressing {
     box-shadow: 0 0 7px red;
     }
-    
-    /* 🎯 Score Display & Confetti */
-    .score-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.75);
-      width: 90vw;
-      height: 90vw;
-      max-width: 350px;
-      max-height: 350px;
-      padding: 30px 20px;
-      border: 3px solid #00ffc3;
-      border-radius: 30px;
-      background: rgba(0, 0, 0, 1.5);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 60px rgba(0, 255, 200, 0.6);
-      animation: glow 1s infinite alternate;
-      text-align: center;
-      z-index: 10000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    .score-label {
-      font-size: 0.8rem;
-      color: #ccc;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .score-number {
-      font-size: 3.0rem;
-      font-weight: bold;
-      color: #00ffc3;
-      text-shadow: 0 0 40px #00ffc3;
-      animation: pulse 1s infinite ease-in-out;
-    }
-    .score-message {
-      margin-top: 0.8px;
-      font-size: 1.0rem;
-      color: #ffd700;
-      animation: fade-in 1.2s ease;
-    }
-    @keyframes glow {
-      from { box-shadow: 0 0 20px #00ffc3; }
-      to { box-shadow: 0 0 60px #00ffc3; }
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    canvas#confetti {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
       
   </style>
 </head>
@@ -475,6 +403,10 @@
     </div>
   </div>
   
+  <!-- Overlays -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
     <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
@@ -490,10 +422,6 @@
   </div>
   </div>
   
-  <!-- Overlays -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
-  
   <!-- Popup -->
   <div id="popupOverlay"></div>
   <div id="popupModal">Reserved!</div>
@@ -506,16 +434,6 @@
       <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
     </div>
   </div>
-
-  <!-- 🎯 SCORE COMPONENTS -->
-  <canvas id="confetti"></canvas>
-  <div class="score-container" id="scoreBoard">
-    <div class="score-label">Your Score</div>
-    <div class="score-number" id="score">0</div>
-    <div class="score-message" id="message">Hmmmm...</div>
-  </div>
-  <audio id="scoreSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_59b0e14547.mp3" preload="auto"></audio>
-  <audio id="confettiSound" src="https://cdn.pixabay.com/audio/2022/10/10/audio_188c2a60d3.mp3" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -589,7 +507,6 @@
     let player;
     let queue = [];
     let currentIndex = -1;
-    let videoDurationCheckInterval;
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
@@ -602,43 +519,9 @@
     }
 
     function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.PLAYING) {
-      clearInterval(videoDurationCheckInterval);
-      videoDurationCheckInterval = setInterval(checkForScoreTrigger, 1000);
-    } else if (event.data === YT.PlayerState.ENDED) {
-      clearInterval(videoDurationCheckInterval);
-      showScoreAnimation();
-      waitForScoreToEndThenPlayNext();
-    } else if (event.data === YT.PlayerState.ENDED) {
-      clearInterval(videoDurationCheckInterval);
-      showScoreAnimation();
-      waitForScoreToEndThenPlayNext();
+      if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
     }
-  }
-    function checkForScoreTrigger() {
-    if (!player || !player.getDuration || !player.getCurrentTime) return;
-    const duration = player.getDuration();
-    const currentTime = player.getCurrentTime();
-  
-    if (duration - currentTime <= 7 && !isScoreBoardVisible) {
-      clearInterval(videoDurationCheckInterval);
-      showScoreAnimation(true);
-    }
-  }
-    function waitForScoreToEndThenPlayNext() {
-    setTimeout(() => {
-      if (!isScoreBoardVisible) playNextFromQueue();
-      else {
-        const waitUntilClosed = setInterval(() => {
-          if (!isScoreBoardVisible) {
-            clearInterval(waitUntilClosed);
-            playNextFromQueue();
-          }
-        }, 500);
-      }
-    }, 5000);
-  }
-    
+
     function extractVideoId(url) {
       const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
       return match ? match[1] : null;
@@ -881,186 +764,13 @@
       popupOverlay.classList.remove("visible");
     };
     
-    document.body.addEventListener("click", function handleBodyTap() {
-        if (skipped && !closed) {
-          closeScore();
-          document.body.removeEventListener("click", handleBodyTap);
-        }
-      });
+    document.body.addEventListener("click", () => {
+      const confirm = document.getElementById("confirmDelete");
+      if (confirm.style.display !== "none") {
+        confirm.style.display = "none";
+      }
+    });
 
-    // 🎯 Scoreboard System
-    
-    let isScoreBoardVisible = false;
-    let skipped = false;
-    let closed = false;
-    
-    function showScoreAnimation(triggeredBeforeEnd = false) {
-      const score = Math.floor(Math.random() * 101);
-      const scoreEl = document.getElementById("score");
-      const messageEl = document.getElementById("message");
-      const scoreBoard = document.getElementById("scoreBoard");
-      const sound = document.getElementById("scoreSound");
-      const canvas = document.getElementById("confetti");
-    
-      scoreBoard.style.opacity = 1;
-      scoreBoard.style.pointerEvents = "auto";
-      canvas.style.display = "block";
-      isScoreBoardVisible = true;
-      skipped = false;
-      closed = false;
-    
-      if (player && player.pauseVideo) player.pauseVideo();
-      if (triggeredBeforeEnd && player && player.getVolume) {
-        let fadeStep = 0;
-        const startVol = player.getVolume();
-        const fadeOut = setInterval(() => {
-          if (fadeStep >= 20 || !isScoreBoardVisible) return clearInterval(fadeOut);
-          player.setVolume(startVol - fadeStep * 5);
-          fadeStep++;
-        }, 100);
-      }
-    
-      let current = 0;
-      const steps = score;
-      const duration = 6000;
-      const delay = Math.floor(duration / steps);
-    
-      const interval = setInterval(() => {
-        if (current >= score) {
-          clearInterval(interval);
-          scoreEl.textContent = score;
-          showMessage(score);
-          launchConfetti();
-          if (!skipped) sound.play();
-          setTimeout(closeScore, 4000);
-        } else {
-          scoreEl.textContent = current;
-          current++;
-        }
-      }, delay);
-    
-      scoreBoard.onclick = () => {
-        if (!skipped) {
-          clearInterval(interval);
-          scoreEl.textContent = score;
-          showMessage(score);
-          launchConfetti();
-          skipped = true;
-          sound.play();
-        } else {
-          closeScore();
-        }
-      };
-    
-      function closeScore() {
-        if (closed) return;
-        closed = true;
-        isScoreBoardVisible = false;
-        scoreBoard.style.opacity = 0;
-        canvas.style.display = 'none';
-        setTimeout(() => {
-          scoreBoard.style.pointerEvents = "none";
-          if (player && player.playVideo) player.playVideo();
-          if (player && player.setVolume) player.setVolume(100);
-        }, 800);
-      }
-    
-      sound.onended = () => closeScore();
-      document.body.addEventListener("click", function tapOnceToClose() {
-        if (skipped && isScoreBoardVisible) {
-          closeScore();
-          document.body.removeEventListener("click", tapOnceToClose);
-        }
-      });
-    
-      function showMessage(score) {
-        let message = "";
-        if (score < 10) message = "🤬 Kupal!";
-        else if (score < 20) message = "🤮 Eeew!";
-        else if (score < 30) message = "🤢 Luh!!";
-        else if (score < 40) message = "😒 Pwede na..";
-        else if (score < 50) message = "😏 Konti nlng..";
-        else if (score < 60) message = "🤞 Ayos!";
-        else if (score < 70) message = "🥴 Sana all!";
-        else if (score < 80) message = "👌 Petmalu!";
-        else if (score < 90) message = "🫡 Lodi!";
-        else if (score < 99) message = "🤩 Boom panes!";
-        else if (score == 100) message = "🙌 !@#%!";
-        messageEl.textContent = message;
-      }
-    }
-    
-    function launchConfetti() {
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    const confettiSound = document.getElementById('confettiSound');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  
-    const confetti = [];
-    for (let i = 0; i < 150; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * 5 + 2,
-        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-        tilt: Math.random() * 10 - 10,
-        tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-        tiltAngle: 0
-      });
-    }
-  
-    canvas.style.opacity = 0;
-    canvas.style.transition = "opacity 0.5s ease";
-    canvas.style.display = "block";
-    requestAnimationFrame(() => (canvas.style.opacity = 1));
-  
-    if (confettiSound) confettiSound.play();
-  
-    let animationFrame;
-  
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach(c => {
-        ctx.beginPath();
-        ctx.lineWidth = c.r;
-        ctx.strokeStyle = c.color;
-        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-        ctx.stroke();
-      });
-      update();
-    }
-  
-    function update() {
-      confetti.forEach(c => {
-        c.y += Math.cos(c.d) + 2;
-        c.tiltAngle += c.tiltAngleIncrement;
-        c.tilt = Math.sin(c.tiltAngle) * 15;
-        if (c.y > canvas.height) {
-          c.y = -20;
-          c.x = Math.random() * canvas.width;
-        }
-      });
-    }
-  
-    function loop() {
-      draw();
-      animationFrame = requestAnimationFrame(loop);
-    }
-  
-    loop();
-  
-    setTimeout(() => {
-      cancelAnimationFrame(animationFrame);
-      canvas.style.opacity = 0;
-      setTimeout(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.display = 'none';
-      }, 500);
-    }, 2000);
-  }
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
