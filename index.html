@@ -466,217 +466,185 @@
   
   <!-- JS -->
   <script>
-    let touchStartX = 0;
+  let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
     const popupOverlay = document.getElementById("popupOverlay");
-  
-    function handleTouchStart(evt) {
-      touchStartX = evt.touches[0].clientX;
-    }
-  
-    function handleTouchMove(evt) {
-      const deltaX = evt.touches[0].clientX - touchStartX;
-      if (deltaX > 50) openDrawer();
-      else if (deltaX < -50) closeDrawer();
-    }
-  
-    function handleTap(evt) {
-      if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
-        closeDrawer();
-      }
-    }
-  
-    function toggleDrawer() {
-      if (drawer.classList.contains("open")) closeDrawer();
-      else openDrawer();
-    }
-  
-    function openDrawer() {
-      drawer.classList.add('open');
-      overlay.classList.add('visible');
-      document.getElementById('drawerHandle').style.display = 'none';
-      document.getElementById("confirmDelete").style.display = "none";
-    }
-  
-    function closeDrawer() {
-      drawer.classList.remove('open');
-      overlay.classList.remove('visible');
-      document.getElementById('drawerHandle').style.display = 'flex';
-      document.getElementById("confirmDelete").style.display = "none";
-    }
-  
-    function closeBottomDrawer() {
-      if (bottomDrawer.classList.contains("open")) {
-        bottomDrawer.classList.remove("open");
-        document.querySelector(".bottom-drawer-handle").style.display = "flex";
-      }
-    }
-  
-    let startY = 0;
-    const bottomDrawer = document.getElementById("bottomDrawer");
-  
-    function toggleBottomDrawer() {
-      const isOpen = bottomDrawer.classList.toggle("open");
-      document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
-    
-      if (isOpen) {
-        const input = document.getElementById("youtubeInputDrawer");
-        setTimeout(() => input.focus(), 50);
-      }
-    }
 
-    document.body.addEventListener("touchstart", evt => startY = evt.touches[0].clientY);
-    document.body.addEventListener("touchmove", evt => {
-      const deltaY = evt.touches[0].clientY - startY;
-      if (deltaY < -40) toggleBottomDrawer();
-      else if (deltaY > 40) closeBottomDrawer();
-    });
+  function handleTouchStart(evt) {
+    touchStartX = evt.touches[0].clientX;
+  }
 
-    let player;
-    let queue = [];
-    let currentIndex = -1;
+  function handleTouchMove(evt) {
+    const deltaX = evt.touches[0].clientX - touchStartX;
+    if (deltaX > 50) openDrawer();
+    else if (deltaX < -50) closeDrawer();
+  }
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        events: {
-          onReady: () => console.log("Player Ready"),
-          onStateChange: onPlayerStateChange
-        },
-        origin: window.location.origin
-      });
+  function handleTap(evt) {
+    if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+      closeDrawer();
     }
+  }
 
-    function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
+  function toggleDrawer() {
+    if (drawer.classList.contains("open")) closeDrawer();
+    else openDrawer();
+  }
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('visible');
+    document.getElementById('drawerHandle').style.display = 'none';
+    document.getElementById("confirmDelete").style.display = "none";
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
+    document.getElementById('drawerHandle').style.display = 'flex';
+    document.getElementById("confirmDelete").style.display = "none";
+  }
+
+  function closeBottomDrawer() {
+    if (bottomDrawer.classList.contains("open")) {
+      bottomDrawer.classList.remove("open");
+      document.querySelector(".bottom-drawer-handle").style.display = "flex";
     }
+  }
 
-    function extractVideoId(url) {
-      const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
-      return match ? match[1] : null;
-    }
+  let startY = 0;
+  const bottomDrawer = document.getElementById("bottomDrawer");
 
-    async function autoPlayIfValidUrl(url) {
-      const trimmed = url.trim();
-      const id = extractVideoId(trimmed);
-      if (id && queue.every(q => q.id !== id)) {
-        document.getElementById("youtubeInputDrawer").value = "";
-        const title = await fetchTitle(id);
-        queue.push({ id, title });
-        if (currentIndex === -1 && player && player.loadVideoById) {
-          currentIndex = 0;
-          player.loadVideoById(id);
-          updateNowPlaying();
-        }
-        updateQueueDisplay();
-        showPopup("Reserved!", "lime");
-      }
-    }
+  function toggleBottomDrawer() {
+    const isOpen = bottomDrawer.classList.toggle("open");
+    document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
 
-    async function reserveFromDrawer() {
+    if (isOpen) {
       const input = document.getElementById("youtubeInputDrawer");
-      const url = input.value.trim();
-      const videoId = extractVideoId(url);
-      if (!videoId) return alert("Invalid YouTube URL");
-
-      const title = await fetchTitle(videoId);
-      queue.push({ id: videoId, title });
-      updateQueueDisplay();
-
-      input.value = ""; // Clear the input box after reserving
-
-      if (currentIndex === -1 && player && player.loadVideoById) {
-        currentIndex = 0;
-        player.loadVideoById(queue[currentIndex].id);
-        updateNowPlaying();
-      }
-
-      showPopup("Reserved!", "lime");
-      playSuccessSound();
+      setTimeout(() => input.focus(), 50);
     }
+  }
 
-    async function fetchTitle(videoId) {
-      try {
-        const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-        const data = await res.json();
-        return data.title || videoId;
-      } catch (err) {
-        return videoId;
-      }
+  document.body.addEventListener("touchstart", evt => {
+    startY = evt.touches[0].clientY;
+    handleTouchStart(evt);
+  });
+
+  document.body.addEventListener("touchmove", evt => {
+    const deltaY = evt.touches[0].clientY - startY;
+    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+      toggleBottomDrawer(); // swipe up to open only if it's not already open
+    } else if (deltaY > 40) {
+      closeBottomDrawer(); // swipe down always closes
     }
-    
-    setTimeout(() => {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      if (!list || !overflow) return;
-    
-      const totalHeight = list.scrollHeight;
-      const visibleHeight = list.clientHeight;
-      const scrollable = totalHeight > visibleHeight;
-    
-      if (scrollable) {
-        const items = list.children;
-        let shown = 0;
-        let accHeight = 0;
-        for (let i = 0; i < items.length; i++) {
-          accHeight += items[i].offsetHeight;
-          if (accHeight < visibleHeight) shown++;
-        }
-        const remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
-      }
-    }, 100);
+    handleTouchMove(evt);
+  });
 
-    function showDeleteConfirm(e, index) {
-      const confirmBox = document.getElementById("confirmDelete");
-      const x = e.clientX || (e.touches && e.touches[0].clientX);
-      const y = e.clientY || (e.touches && e.touches[0].clientY);
-      confirmBox.style.left = `${x + 10}px`;
-      confirmBox.style.top = `${y}px`;
-      confirmBox.style.display = "block";
+  document.body.addEventListener("click", handleTap);
 
-      const yes = document.getElementById("yesBtn");
-      const no = document.getElementById("noBtn");
+  let player;
+  let queue = [];
+  let currentIndex = -1;
 
-      yes.onclick = () => {
-        queue.splice(index, 1);                     // remove item
-        confirmBox.style.display = "none";          // hide modal
-        updateQueueDisplay();                       // update list
-        // NOTE: we do NOT call closeDrawer() anymore
-      };
-      
-      no.onclick = () => {
-        confirmBox.style.display = "none";
-      };
-    }
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+      events: {
+        onReady: () => console.log("Player Ready"),
+        onStateChange: onPlayerStateChange
+      },
+      origin: window.location.origin
+    });
+  }
 
-    function playNextFromQueue() {
-      if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-        showPopup("No next song.", "red");
-        return;
-      }
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
+  }
 
-      currentIndex++;
+  function extractVideoId(url) {
+    const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
+    return match ? match[1] : null;
+  }
+
+  async function reserveFromDrawer() {
+    const input = document.getElementById("youtubeInputDrawer");
+    const url = input.value.trim();
+    const videoId = extractVideoId(url);
+    if (!videoId) return alert("Invalid YouTube URL");
+
+    const title = await fetchTitle(videoId);
+    queue.push({ id: videoId, title });
+    updateQueueDisplay();
+
+    input.value = ""; // Clear the input box after reserving
+
+    if (currentIndex === -1 && player && player.loadVideoById) {
+      currentIndex = 0;
       player.loadVideoById(queue[currentIndex].id);
       updateNowPlaying();
-      updateQueueDisplay();
-      showPopup("Next song!", "magenta");
     }
 
-    function updateQueueDisplay() {
+    showPopup("Reserved!", "lime");
+    playSuccessSound();
+  }
+
+  async function fetchTitle(videoId) {
+    try {
+      const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      const data = await res.json();
+      return data.title || videoId;
+    } catch (err) {
+      showPopup("⚠️ Choose another Video!", "red");
+      return videoId;
+    }
+  }
+
+  function showDeleteConfirm(e, index) {
+    const confirmBox = document.getElementById("confirmDelete");
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    confirmBox.style.left = `${x + 10}px`;
+    confirmBox.style.top = `${y}px`;
+    confirmBox.style.display = "block";
+
+    const yes = document.getElementById("yesBtn");
+    const no = document.getElementById("noBtn");
+
+    yes.onclick = () => {
+      queue.splice(index, 1);
+      confirmBox.style.display = "none";
+      updateQueueDisplay();
+    };
+
+    no.onclick = () => {
+      confirmBox.style.display = "none";
+    };
+  }
+
+  function playNextFromQueue() {
+    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+      showPopup("No next song.", "red");
+      return;
+    }
+
+    currentIndex++;
+    player.loadVideoById(queue[currentIndex].id);
+    updateNowPlaying();
+    updateQueueDisplay();
+    showPopup("Next song!", "magenta");
+  }
+
+  function updateQueueDisplay() {
     const list = document.getElementById("nextList");
     const overflow = document.getElementById("overflowCounter");
     list.innerHTML = "";
-  
+
     for (let i = currentIndex + 1; i < queue.length; i++) {
       const div = document.createElement("div");
       div.className = "title";
       div.textContent = queue[i].title;
       div.style.cursor = "pointer";
-  
+
       let longPressTimer;
       const startHandler = (e) => {
         e.preventDefault();
@@ -690,139 +658,139 @@
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
       };
-  
+
       div.addEventListener("mousedown", startHandler);
       div.addEventListener("touchstart", startHandler);
       div.addEventListener("mouseup", cancelHandler);
       div.addEventListener("mouseleave", cancelHandler);
       div.addEventListener("touchend", cancelHandler);
       div.addEventListener("touchcancel", cancelHandler);
-  
+
       list.appendChild(div);
     }
-  
+
     updateOverflowCounter();
-  
-    // ✅ Disable "Next" button if we're at the end
-      const nextBtn = document.getElementById("nextBtnDrawer");
-      const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-      nextBtn.disabled = !hasNext;
-      nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-      nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-    }
-    
-    function updateOverflowCounter() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      if (!list || !overflow) return;
-    
-      const totalHeight = list.scrollHeight;
-      const visibleHeight = list.clientHeight;
-      const scrollable = totalHeight > visibleHeight;
-    
-      if (scrollable) {
-        const items = list.children;
-        let shown = 0;
-        let accHeight = 0;
-        for (let i = 0; i < items.length; i++) {
-          accHeight += items[i].offsetHeight;
-          if (accHeight < visibleHeight) shown++;
-        }
-        const remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
+
+    const nextBtn = document.getElementById("nextBtnDrawer");
+    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+    nextBtn.disabled = !hasNext;
+    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+  }
+
+  function updateOverflowCounter() {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    if (!list || !overflow) return;
+
+    const totalHeight = list.scrollHeight;
+    const visibleHeight = list.clientHeight;
+    const scrollable = totalHeight > visibleHeight;
+
+    if (scrollable) {
+      const items = list.children;
+      let shown = 0;
+      let accHeight = 0;
+      for (let i = 0; i < items.length; i++) {
+        accHeight += items[i].offsetHeight;
+        if (accHeight < visibleHeight) shown++;
       }
+      const remainingCount = items.length - shown;
+      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+      overflow.style.display = "block";
+    } else {
+      overflow.style.display = "none";
     }
+  }
 
-    function updateNowPlaying() {
-      const nowTitleEl = document.getElementById("nowTitle");
-      nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
-    }
-    
-    function showPopup(text, glowColor) {
-      const popup = document.getElementById("popupModal");
-      popup.innerText = text;
-      popup.style.color = "white";
-      popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
+  function updateNowPlaying() {
+    const nowTitleEl = document.getElementById("nowTitle");
+    nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
+  }
 
-      popupOverlay.classList.add("visible");
-      popup.classList.add("show");
-      setTimeout(() => {
-        popup.classList.remove("show");
-        popupOverlay.classList.remove("visible");
-      }, 1800);
-    }
-    
-    (function enableDragScroll() {
-      const box = document.querySelector('.next-box');
-      let isDown = false;
-      let startY, scrollTop;
+  function showPopup(text, glowColor) {
+    const popup = document.getElementById("popupModal");
+    popup.innerText = text;
+    popup.style.color = "white";
+    popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
 
-      box.addEventListener('mousedown', (e) => {
-        isDown = true;
-        box.classList.add('dragging');
-        startY = e.pageY - box.offsetTop;
-        scrollTop = box.scrollTop;
-      });
-      box.addEventListener('mouseleave', () => {
-        isDown = false;
-        box.classList.remove('dragging');
-      });
-      box.addEventListener('mouseup', () => {
-        isDown = false;
-        box.classList.remove('dragging');
-      });
-      box.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const y = e.pageY - box.offsetTop;
-        const walk = (y - startY);
-        box.scrollTop = scrollTop - walk;
-      });
-
-      let startYTouch = 0, scrollTopTouch = 0;
-      box.addEventListener("touchstart", e => {
-        startYTouch = e.touches[0].clientY;
-        scrollTopTouch = box.scrollTop;
-      }, { passive: true });
-
-      box.addEventListener("touchmove", e => {
-        const y = e.touches[0].clientY;
-        const walk = y - startYTouch;
-        box.scrollTop = scrollTopTouch - walk;
-      }, { passive: true });
-    })();
-
-    document.getElementById("popupOverlay").onclick = () => {
-      const popup = document.getElementById("popupModal");
+    popupOverlay.classList.add("visible");
+    popup.classList.add("show");
+    setTimeout(() => {
       popup.classList.remove("show");
       popupOverlay.classList.remove("visible");
-    };
-    
-    document.body.addEventListener("click", () => {
-      const confirm = document.getElementById("confirmDelete");
-      if (confirm.style.display !== "none") {
-        confirm.style.display = "none";
-      }
+    }, 1800);
+  }
+
+  (function enableDragScroll() {
+    const box = document.querySelector('.next-box');
+    let isDown = false;
+    let startY, scrollTop;
+
+    box.addEventListener('mousedown', (e) => {
+      isDown = true;
+      box.classList.add('dragging');
+      startY = e.pageY - box.offsetTop;
+      scrollTop = box.scrollTop;
+    });
+    box.addEventListener('mouseleave', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mouseup', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const y = e.pageY - box.offsetTop;
+      const walk = (y - startY);
+      box.scrollTop = scrollTop - walk;
     });
 
-    function showNextConfirm() {
-      document.getElementById("nextConfirmOverlay").style.display = "block";
-      document.getElementById("nextConfirmModal").style.display = "block";
+    let startYTouch = 0, scrollTopTouch = 0;
+    box.addEventListener("touchstart", e => {
+      startYTouch = e.touches[0].clientY;
+      scrollTopTouch = box.scrollTop;
+    }, { passive: true });
+
+    box.addEventListener("touchmove", e => {
+      const y = e.touches[0].clientY;
+      const walk = y - startYTouch;
+      box.scrollTop = scrollTopTouch - walk;
+    }, { passive: true });
+  })();
+
+  document.getElementById("popupOverlay").onclick = () => {
+    const popup = document.getElementById("popupModal");
+    popup.classList.remove("show");
+    popupOverlay.classList.remove("visible");
+  };
+
+  document.body.addEventListener("click", () => {
+    const confirm = document.getElementById("confirmDelete");
+    if (confirm.style.display !== "none") {
+      confirm.style.display = "none";
     }
-  
-    function hideNextConfirm() {
-      document.getElementById("nextConfirmOverlay").style.display = "none";
-      document.getElementById("nextConfirmModal").style.display = "none";
-    }
-    
-    function confirmPlayNext() {
-      hideNextConfirm();
-      playNextFromQueue(); // this calls your existing next logic
-    }
-    function playClickSound() {
+  });
+
+  function showNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "block";
+    document.getElementById("nextConfirmModal").style.display = "block";
+  }
+
+  function hideNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "none";
+    document.getElementById("nextConfirmModal").style.display = "none";
+  }
+
+  function confirmPlayNext() {
+    hideNextConfirm();
+    playNextFromQueue();
+  }
+
+  function playClickSound() {
     const click = document.getElementById("clickSound");
     if (click) {
       click.currentTime = 0;
@@ -830,26 +798,17 @@
     }
   }
 
-    function playSuccessSound() {
+  function playSuccessSound() {
     const success = document.getElementById("successSound");
     if (success) {
       success.currentTime = 0;
       success.play();
     }
   }
-    
-    document.querySelectorAll('.cyan-btn').forEach(btn => {
+
+  document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
-
-    try {
-    const res = await fetch(...);
-    if (!res.ok) throw new Error("Video not found");
-    ...
-  } catch (err) {
-    showPopup("⚠️ Choose another Video!", "red");
-    return videoId;
-  }
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
