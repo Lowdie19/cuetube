@@ -689,6 +689,13 @@
     nextBtn.disabled = !hasNext;
     nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
     nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+    const nextBox = document.querySelector(".next-box");
+    if (queue.length - (currentIndex + 1) >= 1) {
+      nextBox.style.display = "flex";
+    } else {
+      nextBox.style.display = "none";
+    }
   }
 
   function updateOverflowCounter() {
