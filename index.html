@@ -461,8 +461,9 @@
   </div>
 </div>
 
-  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
-  <audio id="successSound" src="success.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="click.wav" preload="auto"></audio>
+  <audio id="successSound" src="success.wav" preload="auto"></audio>
+  <audio id="errorSound" src="error.wav" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -790,21 +791,32 @@
     playNextFromQueue();
   }
 
-  function playClickSound() {
-    const click = document.getElementById("clickSound");
-    if (click) {
-      click.currentTime = 0;
-      click.play();
-    }
+  // Play click sound
+function playClickSound() {
+  const click = document.getElementById("clickSound");
+  if (click) {
+    click.currentTime = 0;
+    click.play().catch((e) => console.log("Click sound blocked", e));
   }
+}
 
-  function playSuccessSound() {
-    const success = document.getElementById("successSound");
-    if (success) {
-      success.currentTime = 0;
-      success.play();
-    }
+// Play success sound
+function playSuccessSound() {
+  const success = document.getElementById("successSound");
+  if (success) {
+    success.currentTime = 0;
+    success.play().catch((e) => console.log("Success sound blocked", e));
   }
+}
+
+// Play error sound
+function playErrorSound() {
+  const error = document.getElementById("errorSound");
+  if (error) {
+    error.currentTime = 0;
+    error.play().catch((e) => console.log("Error sound blocked", e));
+  }
+}
 
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
