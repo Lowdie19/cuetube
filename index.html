@@ -652,13 +652,13 @@
     const list = document.getElementById("nextList");
     const overflow = document.getElementById("overflowCounter");
     list.innerHTML = "";
-
+  
     for (let i = currentIndex + 1; i < queue.length; i++) {
       const div = document.createElement("div");
       div.className = "title";
       div.textContent = queue[i].title;
       div.style.cursor = "pointer";
-
+  
       let longPressTimer;
       const startHandler = (e) => {
         e.preventDefault();
@@ -672,16 +672,24 @@
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
       };
-
+  
       div.addEventListener("mousedown", startHandler);
       div.addEventListener("touchstart", startHandler);
       div.addEventListener("mouseup", cancelHandler);
       div.addEventListener("mouseleave", cancelHandler);
       div.addEventListener("touchend", cancelHandler);
       div.addEventListener("touchcancel", cancelHandler);
-
+  
       list.appendChild(div);
     }
+  
+    // ✅ ADD THIS SECTION:
+    const hasQueue = queue.length > currentIndex + 1;
+    const nextBox = document.querySelector('.next-box');
+    if (nextBox) {
+      nextBox.style.display = hasQueue ? "flex" : "none";
+    }
+  }
 
     updateOverflowCounter();
 
@@ -690,7 +698,7 @@
     nextBtn.disabled = !hasNext;
     nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
     nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-    const hasQueue = queue.length > currentIndex + 1;
+    const hasQueue = queue.length > currentIndex + 0;
     document.querySelector('.next-box').style.display = hasQueue ? "flex" : "none";
   }
 
