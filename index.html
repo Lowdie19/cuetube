@@ -380,6 +380,10 @@
     .long-pressing {
     box-shadow: 0 0 7px red;
     }
+
+    .hidden {
+    display: none !important;
+    }
       
   </style>
 </head>
@@ -688,6 +692,13 @@
     const nextBox = document.querySelector('.next-box');
     if (nextBox) {
       nextBox.style.display = hasQueue ? "flex" : "none";
+    }
+    console.log("✅ Queue Length:", queue.length, "📍 Current Index:", currentIndex);
+
+    const hasQueue = queue.length > currentIndex + 1;
+    const nextBox = document.querySelector('.next-box');
+    if (nextBox) {
+      nextBox.classList.toggle("hidden", !hasQueue);
     }
   }
 
