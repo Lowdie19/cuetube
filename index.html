@@ -570,31 +570,31 @@
   }
 
   async function reserveFromDrawer() {
-    const input = document.getElementById("youtubeInputDrawer");
-    const url = input.value.trim();
-    const videoId = extractVideoId(url);
-    if (!videoId) {
+  const input = document.getElementById("youtubeInputDrawer");
+  const url = input.value.trim();
+  const videoId = extractVideoId(url);
+  if (!videoId) {
     showPopup("⚠️ Invalid YouTube URL!", "red");
     playErrorSound();
     return;
   }
+
+  const title = await fetchTitle(videoId);
+  queue.push({ id: videoId, title });
+  console.log(queue); // 🔍 This logs the current queue to the console
+  updateQueueDisplay();
+
+  input.value = "";
+
+  if (currentIndex === -1 && player && player.loadVideoById) {
+    currentIndex = 0;
+    player.loadVideoById(queue[currentIndex].id);
+    updateNowPlaying();
   }
 
-    const title = await fetchTitle(videoId);
-    queue.push({ id: videoId, title });
-    updateQueueDisplay();
-
-    input.value = ""; // Clear the input box after reserving
-
-    if (currentIndex === -1 && player && player.loadVideoById) {
-      currentIndex = 0;
-      player.loadVideoById(queue[currentIndex].id);
-      updateNowPlaying();
-    }
-
-    showPopup("Reserved!", "lime");
-    playSuccessSound();
-  }
+  showPopup("Reserved!", "lime");
+  playSuccessSound();
+}
 
   async function fetchTitle(videoId) {
     try {
