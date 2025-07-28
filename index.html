@@ -409,9 +409,8 @@
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <div class="youtube-wrapper" id="youtubeContainer">
-  <img id="placeholderImage" src="KaraOwkie_Icon.png" style="width:100%; height:100%; object-fit:cover;" alt="Placeholder" />
-</div>
+    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1"></iframe>
+  </div>
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
@@ -571,48 +570,31 @@
   }
 
   async function reserveFromDrawer() {
-  const input = document.getElementById("youtubeInputDrawer");
-  const url = input.value.trim();
-  const videoId = extractVideoId(url);
-  if (!videoId) {
+    const input = document.getElementById("youtubeInputDrawer");
+    const url = input.value.trim();
+    const videoId = extractVideoId(url);
+    if (!videoId) {
     showPopup("⚠️ Invalid YouTube URL!", "red");
     playErrorSound();
     return;
   }
-
-  const title = await fetchTitle(videoId);
-  queue.push({ id: videoId, title });
-  console.log(queue); // 🔍 This logs the current queue to the console
-  updateQueueDisplay();
-
-  input.value = "";
-
-  if (!document.getElementById("player")) {
-    const container = document.getElementById("youtubeContainer");
-
-    container.innerHTML = `<iframe id="player" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&controls=1" allow="autoplay" style="width:100%; height:100%; border:none;"></iframe>`;
-
-    setTimeout(() => {
-      player = new YT.Player('player', {
-        events: {
-          onReady: () => {
-            player.loadVideoById(queue[currentIndex].id);
-          },
-          onStateChange: onPlayerStateChange
-        },
-        origin: window.location.origin
-      });
-    }, 100);
-  } else {
-    player.loadVideoById(queue[currentIndex].id);
   }
 
-  updateNowPlaying();
-}
+    const title = await fetchTitle(videoId);
+    queue.push({ id: videoId, title });
+    updateQueueDisplay();
 
-  showPopup("Reserved!", "lime");
-  playSuccessSound();
-}
+    input.value = ""; // Clear the input box after reserving
+
+    if (currentIndex === -1 && player && player.loadVideoById) {
+      currentIndex = 0;
+      player.loadVideoById(queue[currentIndex].id);
+      updateNowPlaying();
+    }
+
+    showPopup("Reserved!", "lime");
+    playSuccessSound();
+  }
 
   async function fetchTitle(videoId) {
     try {
@@ -624,7 +606,7 @@
     playErrorSound();
     return videoId;
   }
-  }
+
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
     const x = e.clientX || (e.touches && e.touches[0].clientX);
