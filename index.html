@@ -382,9 +382,11 @@
     }
 
     .hidden {
-    display: none !important;
+      display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
     }
-      
+    
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -698,9 +700,17 @@
     const hasQueue = queue.length > currentIndex + 1;
     const nextBox = document.querySelector('.next-box');
     if (nextBox) {
-      nextBox.classList.toggle("hidden", !hasQueue);
+      if (hasQueue) {
+        nextBox.classList.remove("hidden");
+        nextBox.style.pointerEvents = "auto";
+        nextBox.style.opacity = "1";
+      } else {
+        nextBox.classList.add("hidden");
+        nextBox.style.pointerEvents = "none";
+        nextBox.style.opacity = "0";
+      }
     }
-  }
+    }
 
     updateOverflowCounter();
 
