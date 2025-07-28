@@ -379,6 +379,18 @@
     .long-pressing {
     box-shadow: 0 0 7px red;
     }
+
+    @keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+  }
+  .shake {
+    animation: shake 0.4s ease;
+  }
       
   </style>
 </head>
@@ -572,12 +584,16 @@
   async function reserveFromDrawer() {
     const input = document.getElementById("youtubeInputDrawer");
     const url = input.value.trim();
-    const videoId = extractVideoId(url);
+    const videoId = getYouTubeVideoID(input.value);
     if (!videoId) {
-    showPopup("⚠️ Invalid YouTube URL!", "red");
-    playErrorSound();
-    return;
-  }
+      showPopup("⚠️ Invalid YouTube URL!", "red");
+      playErrorSound();
+      return;
+
+      const input = document.getElementById("youtubeInputDrawer");
+      input.classList.add("shake");
+      setTimeout(() => input.classList.remove("shake"), 500);
+    }
 
     const title = await fetchTitle(videoId);
     queue.push({ id: videoId, title });
@@ -605,7 +621,8 @@
     playErrorSound();
     return videoId;
   }
-
+  }
+    
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
     const x = e.clientX || (e.touches && e.touches[0].clientX);
