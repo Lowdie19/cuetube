@@ -692,12 +692,15 @@
     nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
 
     const nextBox = document.querySelector(".next-box");
-    if (queue.length - (currentIndex + 1) >= 1) {
-      nextBox.style.display = "flex";
+    if (queue.length >= 2) {
+    nextBox.style.display = "flex";
+    nextBox.innerHTML = `
+      <p class="box-label">NEXT</p>
+      <p class="queue-title">${queue[1].title}</p>
+    `;
     } else {
       nextBox.style.display = "none";
     }
-  }
 
   function updateOverflowCounter() {
     const list = document.getElementById("nextList");
@@ -842,7 +845,11 @@ function playErrorSound() {
     btn.addEventListener('click', playClickSound);
   });
     
-  window.addEventListener("load", () => {
+  if (queue.length >= 2) {
+  nextBox.style.display = "flex";
+  } else {
+    nextBox.style.display = "none";
+  }
   updateQueueDisplay();
 
   const nextBox = document.querySelector(".next-box");
