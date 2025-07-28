@@ -841,18 +841,18 @@ function playErrorSound() {
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
-
-  window.addEventListener("load", () => {
-    updateQueueDisplay();
-  });
     
   window.addEventListener("load", () => {
-    const nextBox = document.querySelector(".next-box");
-    if (queue.length <= 1) {
-      nextBox.style.display = "none";
-    }
-  });
+  updateQueueDisplay();
 
+  const nextBox = document.querySelector(".next-box");
+  if (queue.length >= 2) {
+    nextBox.style.display = "flex";
+  } else {
+    nextBox.style.display = "none";
+  }
+});
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
