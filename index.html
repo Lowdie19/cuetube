@@ -491,6 +491,7 @@
   function toggleDrawer() {
     if (drawer.classList.contains("open")) closeDrawer();
     else openDrawer();
+    playClickSound();
   }
 
   function openDrawer() {
@@ -525,6 +526,7 @@
       const input = document.getElementById("youtubeInputDrawer");
       setTimeout(() => input.focus(), 50);
     }
+    playClickSound();
   }
 
   document.body.addEventListener("touchstart", evt => {
@@ -571,7 +573,11 @@
     const input = document.getElementById("youtubeInputDrawer");
     const url = input.value.trim();
     const videoId = extractVideoId(url);
-    if (!videoId) return alert("Invalid YouTube URL");
+    if (!videoId) {
+    showPopup("⚠️ Invalid YouTube URL!", "red");
+    playErrorSound();
+    return;
+  }
 
     const title = await fetchTitle(videoId);
     queue.push({ id: videoId, title });
@@ -595,9 +601,9 @@
       const data = await res.json();
       return data.title || videoId;
     } catch (err) {
-      showPopup("⚠️ Choose another Video!", "red");
-      return videoId;
-    }
+    showPopup("⚠️ Choose another Video!", "red");
+    playErrorSound();
+    return videoId;
   }
 
   function showDeleteConfirm(e, index) {
