@@ -135,6 +135,7 @@
       cursor: grab;
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
+      transition: opacity 0.3s ease;
     }
     .next-box:active {
       cursor: grabbing;
@@ -689,6 +690,8 @@
     nextBtn.disabled = !hasNext;
     nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
     nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+    const hasQueue = queue.length > currentIndex + 1;
+    document.querySelector('.next-box').style.display = hasQueue ? "flex" : "none";
   }
 
   function updateOverflowCounter() {
@@ -720,6 +723,14 @@
     const nowTitleEl = document.getElementById("nowTitle");
     nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
   }
+    const nextBox = document.querySelector('.next-box');
+    if (hasQueue) {
+      nextBox.style.opacity = "1";
+      nextBox.style.pointerEvents = "auto";
+    } else {
+      nextBox.style.opacity = "0";
+      nextBox.style.pointerEvents = "none";
+    }
 
   function showPopup(text, glowColor) {
     const popup = document.getElementById("popupModal");
