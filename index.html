@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KaraOwkie - Room</title>
+  <title>CueTube</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
     h1 {
@@ -119,7 +119,6 @@
     }
     
     .next-box {
-      display: none;
       border: none;
       border-radius: 10px;
       padding: 10px;
@@ -386,7 +385,7 @@
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
-  <div class="title-bar">KaraOwkie!</div>
+  <div class="title-bar">CueTube!</div>
   
   <!-- Drawer -->
   <div class="drawer" id="drawer">
@@ -396,7 +395,7 @@
         <div class="label">NOW PLAYING</div>
         <div class="title" id="nowTitle">Please insert song..</div>
       </div>
-      <div class="next-box">
+      <div class="next-box" id="nextBox">
         <div class="label">NEXT</div>
         <div id="nextList"></div>
         <div id="overflowCounter"></div>
@@ -438,22 +437,22 @@
   
   <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
   <div id="nextConfirmModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #222;
-    border: 2px solid cyan;
-    border-radius: 10px;
-    padding: 20px;
-    z-index: 1000;
-    text-align: center;
-    width: 90%;
-    max-width: 320px;
-    box-shadow: 0 0 20px rgba(0,255,255,0.3);
-    ">
-  <div style="font-size: 0.7em; color: white; margin-bottom: 20px;">
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  border: 2px solid cyan;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.3);
+">
+  <div id="nextConfirmText" style="font-size: 0.7em; color: white; margin-bottom: 20px;">
     Are you sure you want to skip to the next video?
   </div>
   <div style="display: flex; justify-content: space-between;">
@@ -547,100 +546,10 @@
 
   document.body.addEventListener("click", handleTap);
 
-    //let player;
-    //let queue = [];
-    const queue = [];
-    let currentIndex = -1;
-    let isPlaying = false;
+  let player;
+  let queue = [];
+  let currentIndex = -1;
 
-    function updateQueueDisplay() {
-    const queueList = document.getElementById("queueList");
-    const nextList = document.getElementById("nextList");
-    queueList.innerHTML = "";
-    nextList.innerHTML = "";
-
-    if (queue.length === 0) {
-      queueList.innerHTML = "<p class='empty'>No songs in queue</p>";
-    } else {
-      const currentItem = document.createElement("div");
-      currentItem.className = "title playing";
-      currentItem.textContent = queue[currentIndex]?.title || "No song playing";
-      queueList.appendChild(currentItem);
-    }
-
-    for (let i = currentIndex + 1; i < queue.length; i++) {
-      const item = document.createElement("div");
-      item.className = "title";
-      item.textContent = queue[i].title;
-      nextList.appendChild(item);
-    }
-
-    updateOverflowCounter();
-
-    const nextBtn = document.getElementById("nextBtnDrawer");
-    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-    nextBtn.disabled = !hasNext;
-    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-
-    const nextBox = document.querySelector(".next-box");
-    nextBox.style.display = hasNext ? "flex" : "none";
-  }
-
-  function updateOverflowCounter() {
-    const overflowCounter = document.getElementById("overflowCounter");
-    const remaining = queue.length - (currentIndex + 2);
-    if (remaining > 0) {
-      overflowCounter.textContent = `+${remaining} more`;
-      overflowCounter.style.display = "block";
-    } else {
-      overflowCounter.style.display = "none";
-    }
-  }
-
-  function reserveVideo(title) {
-    queue.push({ title });
-    if (currentIndex === -1) {
-      currentIndex = 0;
-      isPlaying = true;
-    }
-    updateQueueDisplay();
-    showReserveToast(title);
-  }
-
-  function showReserveToast(title) {
-    const toast = document.getElementById("toast");
-    toast.textContent = `Reserved: ${title}`;
-    toast.classList.add("show");
-    setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2000);
-  }
-
-  function showNextConfirm() {
-    document.getElementById("nextConfirm").style.display = "flex";
-  }
-
-  function hideNextConfirm() {
-    document.getElementById("nextConfirm").style.display = "none";
-  }
-
-  function confirmPlayNext() {
-    hideNextConfirm();
-    playNextFromQueue();
-    updateQueueDisplay(); // ✅ Make sure Next drawer and button update
-  }
-
-  function playNextFromQueue() {
-    if (currentIndex + 1 < queue.length) {
-      currentIndex++;
-      isPlaying = true;
-      updateQueueDisplay();
-    }
-  }
-
-
-    
   if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
@@ -724,13 +633,94 @@
       confirmBox.style.display = "none";
     };
   }
+
+  function playNextFromQueue() {
+    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+      showPopup("No next song.", "red");
+      return;
+    }
+
     currentIndex++;
     player.loadVideoById(queue[currentIndex].id);
     updateNowPlaying();
     updateQueueDisplay();
     showPopup("Next song!", "magenta");
   }
-    
+
+  function updateQueueDisplay() {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    list.innerHTML = "";
+
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+      const div = document.createElement("div");
+      div.className = "title";
+      div.textContent = queue[i].title;
+      div.style.cursor = "pointer";
+
+      let longPressTimer;
+      const startHandler = (e) => {
+        e.preventDefault();
+        div.classList.add("long-pressing");
+        longPressTimer = setTimeout(() => {
+          navigator.vibrate?.(50);
+          showDeleteConfirm(e, i);
+        }, 500);
+      };
+      const cancelHandler = () => {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
+      };
+
+      div.addEventListener("mousedown", startHandler);
+      div.addEventListener("touchstart", startHandler);
+      div.addEventListener("mouseup", cancelHandler);
+      div.addEventListener("mouseleave", cancelHandler);
+      div.addEventListener("touchend", cancelHandler);
+      div.addEventListener("touchcancel", cancelHandler);
+
+      list.appendChild(div);
+    }
+
+    updateOverflowCounter();
+
+    const nextBtn = document.getElementById("nextBtnDrawer");
+    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+    nextBtn.disabled = !hasNext;
+    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+    // Show/hide the NEXT box based on how many songs are queued after current
+    const nextBox = document.getElementById("nextBox");
+    const upcomingCount = queue.length - (currentIndex + 1);
+    nextBox.style.display = upcomingCount >= 2 ? "flex" : "none";
+  }
+
+  function updateOverflowCounter() {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    if (!list || !overflow) return;
+
+    const totalHeight = list.scrollHeight;
+    const visibleHeight = list.clientHeight;
+    const scrollable = totalHeight > visibleHeight;
+
+    if (scrollable) {
+      const items = list.children;
+      let shown = 0;
+      let accHeight = 0;
+      for (let i = 0; i < items.length; i++) {
+        accHeight += items[i].offsetHeight;
+        if (accHeight < visibleHeight) shown++;
+      }
+      const remainingCount = items.length - shown;
+      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+      overflow.style.display = "block";
+    } else {
+      overflow.style.display = "none";
+    }
+  }
+
   function updateNowPlaying() {
     const nowTitleEl = document.getElementById("nowTitle");
     nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
@@ -803,7 +793,17 @@
     }
   });
 
-  function showNextConfirm() {
+    function showNextConfirm() {
+    const messages = [
+      "Ready to jump to the next song?",
+      "Skip this one and move on?",
+      "Next up? Let's go!",
+      "Want to move to the next jam?",
+      "Time to switch it up?"
+    ];
+    const random = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById("nextConfirmText").innerText = random;
+  
     document.getElementById("nextConfirmOverlay").style.display = "block";
     document.getElementById("nextConfirmModal").style.display = "block";
   }
@@ -816,7 +816,6 @@
   function confirmPlayNext() {
     hideNextConfirm();
     playNextFromQueue();
-    updateQueueDisplay(); // ✅ Make sure Next drawer and button update
   }
 
   // Play click sound
@@ -849,7 +848,7 @@ function playErrorSound() {
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
-       
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
