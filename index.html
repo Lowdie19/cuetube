@@ -575,30 +575,33 @@
   }
 
   async function reserveFromDrawer() {
-    const input = document.getElementById("youtubeInputDrawer");
-    const url = input.value.trim();
-    const videoId = extractVideoId(url);
-    if (!videoId) {
+  const input = document.getElementById("youtubeInputDrawer");
+  const url = input.value.trim();
+  const videoId = extractVideoId(url);
+  if (!videoId) {
     showPopup("⚠️ Invalid YouTube URL!", "red");
     playErrorSound();
     return;
   }
 
-    const title = await fetchTitle(videoId);
+  const title = await fetchTitle(videoId);
+  
+  // If it's the first video being added
+  if (queue.length === 0 && currentIndex === -1) {
     queue.push({ id: videoId, title });
-    updateQueueDisplay();
-
-    input.value = ""; // Clear the input box after reserving
-
-    if (currentIndex === -1 && player && player.loadVideoById) {
-      currentIndex = 0;
-      player.loadVideoById(queue[currentIndex].id);
-      updateNowPlaying();
-    }
-
-    showPopup("Reserved!", "lime");
-    playSuccessSound();
+    currentIndex = 0;
+    player.loadVideoById(videoId);
+    updateNowPlaying();
+  } else {
+    // Add to the end of queue
+    queue.push({ id: videoId, title });
   }
+
+  updateQueueDisplay();
+  input.value = "";
+  showPopup("Reserved!", "lime");
+  playSuccessSound();
+}
 
   async function fetchTitle(videoId) {
     try {
@@ -693,7 +696,7 @@
     // Show/hide the NEXT box based on how many songs are queued after current
     const nextBox = document.getElementById("nextBox");
     const upcomingCount = queue.length - (currentIndex + 1);
-    nextBox.style.display = upcomingCount >= 2 ? "flex" : "none";
+    nextBox.style.display = upcomingCount >= 1 ? "flex" : "none";
   }
 
   function updateOverflowCounter() {
@@ -721,10 +724,25 @@
     }
   }
 
-  function updateNowPlaying() {
+   function updateNowPlaying() {
     const nowTitleEl = document.getElementById("nowTitle");
-    nowTitleEl.textContent = queue[currentIndex].title || `Video ID: ${queue[currentIndex].id}`;
+    const current = queue[currentIndex];
+  
+    if (!current) return;
+  
+    let title = current.title || `Video ID: ${current.id}`;
+    let remaining = queue.length - (currentIndex + 1);
+  
+    if (remaining === 0) {
+      title += " (no songs next)";
+      nowTitleEl.style.textShadow = "0 0 8px magenta, 0 0 16px magenta";
+    } else {
+      nowTitleEl.style.textShadow = "none";
+    }
+  
+    nowTitleEl.textContent = title;
   }
+
 
   function showPopup(text, glowColor) {
     const popup = document.getElementById("popupModal");
