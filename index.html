@@ -180,10 +180,11 @@
   <audio id="successSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
 
   <script>
-    let player;
-    let queue = [];
+    //let player;
+    const queue = [];
     let currentIndex = -1;
-
+    let isPlaying = false;
+    
     function toggleDrawer() {
       const drawer = document.getElementById("queueDrawer");
       drawer.classList.toggle("open");
@@ -211,75 +212,10 @@
       }
     }
 
-    function showNextConfirm() {
-      document.getElementById("nextConfirm").style.display = "block";
-    }
-
-    function hideNextConfirm() {
-      document.getElementById("nextConfirm").style.display = "none";
-    }
-
-    function playNextFromQueue() {
-      if (queue.length > 0 && currentIndex + 1 < queue.length) {
-        currentIndex++;
-        const next = queue[currentIndex];
-        playVideo(next.videoId);
-        updateQueueDisplay();
-        playSuccessSound();
-      }
-    }
-
     function reserveVideo(videoId, title) {
       queue.push({ videoId, title });
       updateQueueDisplay();
       playSuccessSound();
-    }
-
-    function updateQueueDisplay() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      list.innerHTML = "";
-
-      for (let i = currentIndex + 1; i < queue.length; i++) {
-        const item = document.createElement("div");
-        item.className = "queue-item";
-        item.textContent = queue[i].title;
-        list.appendChild(item);
-      }
-
-      updateOverflowCounter();
-
-      const nextBtn = document.getElementById("nextBtnDrawer");
-      const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-      nextBtn.disabled = !hasNext;
-      nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-      nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-
-      const nextBox = document.querySelector(".next-box");
-      if (queue.length >= 2) {
-        nextBox.style.display = "flex";
-        nextBox.innerHTML = `
-          <p class="box-label">NEXT</p>
-          <p class="queue-title">${queue[1].title}</p>
-        `;
-      } else {
-        nextBox.style.display = "none";
-      }
-    }
-
-    function updateOverflowCounter() {
-      const overflow = document.getElementById("overflowCounter");
-      const count = queue.length - (currentIndex + 1);
-      if (count > 5) {
-        overflow.textContent = `+${count - 5} more in queue`;
-      } else {
-        overflow.textContent = "";
-      }
-    }
-
-    function confirmPlayNext() {
-      hideNextConfirm();
-      playNextFromQueue();
     }
 
     function playClickSound() {
@@ -311,6 +247,92 @@
         }
       }
     });
+    
+    function updateQueueDisplay() {
+    const queueList = document.getElementById("queueList");
+    const nextList = document.getElementById("nextList");
+    queueList.innerHTML = "";
+    nextList.innerHTML = "";
+
+    if (queue.length === 0) {
+      queueList.innerHTML = "<p class='empty'>No songs in queue</p>";
+    } else {
+      const currentItem = document.createElement("div");
+      currentItem.className = "title playing";
+      currentItem.textContent = queue[currentIndex]?.title || "No song playing";
+      queueList.appendChild(currentItem);
+    }
+
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+      const item = document.createElement("div");
+      item.className = "title";
+      item.textContent = queue[i].title;
+      nextList.appendChild(item);
+    }
+
+    updateOverflowCounter();
+
+    const nextBtn = document.getElementById("nextBtnDrawer");
+    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+    nextBtn.disabled = !hasNext;
+    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+    const nextBox = document.querySelector(".next-box");
+    nextBox.style.display = hasNext ? "flex" : "none";
+  }
+
+  function updateOverflowCounter() {
+    const overflowCounter = document.getElementById("overflowCounter");
+    const remaining = queue.length - (currentIndex + 2);
+    if (remaining > 0) {
+      overflowCounter.textContent = `+${remaining} more`;
+      overflowCounter.style.display = "block";
+    } else {
+      overflowCounter.style.display = "none";
+    }
+  }
+
+  function reserveVideo(title) {
+    queue.push({ title });
+    if (currentIndex === -1) {
+      currentIndex = 0;
+      isPlaying = true;
+    }
+    updateQueueDisplay();
+    showReserveToast(title);
+  }
+
+  function showReserveToast(title) {
+    const toast = document.getElementById("toast");
+    toast.textContent = `Reserved: ${title}`;
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2000);
+  }
+
+  function showNextConfirm() {
+    document.getElementById("nextConfirm").style.display = "flex";
+  }
+
+  function hideNextConfirm() {
+    document.getElementById("nextConfirm").style.display = "none";
+  }
+
+  function confirmPlayNext() {
+    hideNextConfirm();
+    playNextFromQueue();
+    updateQueueDisplay(); // ✅ Make sure Next drawer and button update
+  }
+
+  function playNextFromQueue() {
+    if (currentIndex + 1 < queue.length) {
+      currentIndex++;
+      isPlaying = true;
+      updateQueueDisplay();
+    }
+  }
   </script>
 
   <script src="https://www.youtube.com/iframe_api"></script>
