@@ -901,30 +901,22 @@ function showExitConfirm() {
     document.getElementById("exitConfirmOverlay").style.display = "none";
     document.getElementById("exitConfirmModal").style.display = "none";
   }
-  
-  // Exit App
-  function exitApp() {
-    if (navigator.app && navigator.app.exitApp) {
-      navigator.app.exitApp(); // Android APK exit
-    } else {
-      window.close(); // Try to close tab (may not work everywhere)
-    }
+    
+    function exitApp() {
+  // Try to exit if running in Android WebView with Cordova-style exit
+  if (typeof navigator !== "undefined" && navigator.app && navigator.app.exitApp) {
+    navigator.app.exitApp();
+  } 
+  // Otherwise, try to close tab (may not work on all browsers)
+  else if (typeof window !== "undefined" && window.close) {
+    window.close();
+  } 
+    
+  // As a last resort for WebIntoApp (free), load about:blank
+  else {
+    window.location.href = "about:blank";
   }
-  
-  // Android Back Button Handler
-  document.addEventListener("backbutton", function (e) {
-    e.preventDefault();
-    showExitConfirm();
-  }, false);
-  
-  // Fallback Key Detection (for WebIntoApp or dev test)
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Backspace" || e.keyCode === 8) {
-      e.preventDefault();
-      showExitConfirm();
-    }
-  });
-  
+  }
   // Browser Exit Confirm
   window.addEventListener("beforeunload", function (e) {
     e.preventDefault();
@@ -967,6 +959,19 @@ function playErrorSound() {
   window.addEventListener("beforeunload", function (e) {
   e.preventDefault();
   e.returnValue = "";
+});
+
+// Intercept Android back button using history
+window.addEventListener("load", () => {
+// Push dummy history state to trap the back button
+  history.pushState(null, document.title, location.href);
+});
+    
+window.addEventListener("popstate", function (e) {
+// Show confirmation instead of exiting
+  showExitConfirm();
+// Re-push the dummy state so user must confirm before exiting
+  history.pushState(null, document.title, location.href);
 });
 
   </script>
