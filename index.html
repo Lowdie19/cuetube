@@ -304,6 +304,44 @@
       gap: 10px;
     }
 
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+    }
+    
+    .modal-content p {
+      font-size: 1.1em;
+      color: white;
+      margin-bottom: 20px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
     @media (orientation: landscape) {
       .youtube-wrapper {
         height: 75vh;
@@ -319,16 +357,17 @@
     }
     
     @media (max-height: 500px) {
-  .bottom-buttons { position: static; margin-top: 20px; }
-}
+      .bottom-buttons { position: static; margin-top: 20px; }
+    }
+    
     @media (hover: hover) {
-  .next-box::-webkit-scrollbar-thumb {
-    background: transparent;
-  }
-  .next-box:hover::-webkit-scrollbar-thumb {
-    background: cyan;
-  }
-}
+      .next-box::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+      .next-box:hover::-webkit-scrollbar-thumb {
+        background: cyan;
+      }
+    }
     
     #popupModal {
       display: none;
@@ -368,10 +407,12 @@
     #popupOverlay.visible {
       display: block;
     }
+    
     #confirmDelete {
     transition: opacity 0.3s ease;
     opacity: 1;
     }
+    
     #confirmDelete.show {
       opacity: 1;
     }
@@ -435,6 +476,7 @@
     </div>
   </div>
   
+  <!-- Next Confirm Modal -->
   <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
   <div id="nextConfirmModal" style="
   display: none;
@@ -458,6 +500,18 @@
   <div style="display: flex; justify-content: space-between;">
     <button class="cyan-btn" style="flex:1; margin-right: 5px;" onclick="confirmPlayNext()">Confirm</button>
     <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
+  </div>
+</div>
+
+<!-- Exit Confirmation Modal -->
+<div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
+<div id="exitConfirmModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <p>Are you sure you want to exit CueTube?</p>
+    <div class="modal-buttons">
+      <button class="cyan-btn" onclick="exitApp()">Exit</button>
+      <button class="cyan-btn" onclick="hideExitConfirm()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -836,6 +890,49 @@
     playNextFromQueue();
   }
 
+  // Show Exit Confirm
+function showExitConfirm() {
+  document.getElementById("exitConfirmOverlay").style.display = "block";
+  document.getElementById("exitConfirmModal").style.display = "block";
+}
+
+  // Hide Exit Confirm
+  function hideExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "none";
+    document.getElementById("exitConfirmModal").style.display = "none";
+  }
+  
+  // Exit App
+  function exitApp() {
+    if (navigator.app && navigator.app.exitApp) {
+      navigator.app.exitApp(); // Android APK exit
+    } else {
+      window.close(); // Try to close tab (may not work everywhere)
+    }
+  }
+  
+  // Android Back Button Handler
+  document.addEventListener("backbutton", function (e) {
+    e.preventDefault();
+    showExitConfirm();
+  }, false);
+  
+  // Fallback Key Detection (for WebIntoApp or dev test)
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Backspace" || e.keyCode === 8) {
+      e.preventDefault();
+      showExitConfirm();
+    }
+  });
+  
+  // Browser Exit Confirm
+  window.addEventListener("beforeunload", function (e) {
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
+    
+
   // Play click sound
 function playClickSound() {
   const click = document.getElementById("clickSound");
@@ -866,6 +963,11 @@ function playErrorSound() {
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
+
+  window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
