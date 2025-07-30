@@ -330,18 +330,6 @@
       box-shadow: 0 0 20px rgba(0,255,255,0.3);
     }
     
-    .modal-content-white p {
-      font-size: 1.0em;
-      color: white;
-      margin-bottom: 20px;
-    }
-
-    .modal-content-red p {
-      font-size: 1.0em;
-      color: red;
-      margin-bottom: 20px;
-    }
-    
     .modal-buttons {
       display: flex;
       justify-content: center;
@@ -511,12 +499,11 @@
 <!-- Exit Confirmation Modal -->
 <div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
 <div id="exitConfirmModal" class="modal" style="display:none;">
-  <div class="modal-content-white">
-    <p>Are you sure you want to exit?</p>
-    <p>All reserved will be deleted.</p>
-  <div class="modal-content-red">
-    <p>click back button to exit</p>
-    <div class="modal-buttons">
+  <div class="modal-content">
+    <p style="color: white; margin-bottom: 4px;">Are you sure you want to exit?</p>
+    <p style="color: white; margin-bottom: 4px;">All reserved will be deleted.</p>
+    <p style="color: #ff4c4c; margin-bottom: 12px;">click back button to exit</p>
+    <div class="modal-buttons" style="justify-content: center;">
       <button class="cyan-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
   </div>
@@ -897,29 +884,29 @@
     playNextFromQueue();
   }
 
-  // Show Exit Confirm
-function showExitConfirm() {
-  document.getElementById("exitConfirmOverlay").style.display = "block";
-  document.getElementById("exitConfirmModal").style.display = "block";
-}
+// Show Exit Modal
+  function showExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "block";
+    document.getElementById("exitConfirmModal").style.display = "block";
+  }
 
-  // Hide Exit Confirm
+  // Hide Exit Modal
   function hideExitConfirm() {
     document.getElementById("exitConfirmOverlay").style.display = "none";
     document.getElementById("exitConfirmModal").style.display = "none";
   }
-    
-  // Otherwise, try to close tab (may not work on all browsers)
-  else if (typeof window !== "undefined" && window.close) {
-    window.close();
-  } 
-    
-  // As a last resort for WebIntoApp (free), load about:blank
-  else {
-    window.location.href = "about:blank";
-  }
-  }
-  // Browser Exit Confirm
+
+  // Android/WebView Back Button Handler
+  window.addEventListener("load", () => {
+    history.pushState(null, document.title, location.href);
+  });
+
+  window.addEventListener("popstate", function (e) {
+    showExitConfirm();
+    history.pushState(null, document.title, location.href);
+  });
+
+  // PC/Browser close confirmation
   window.addEventListener("beforeunload", function (e) {
     e.preventDefault();
     e.returnValue = "";
