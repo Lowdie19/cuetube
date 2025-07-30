@@ -320,7 +320,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: #222;
-      border: 2px solid cyan;
+      border: 2px solid red;
       border-radius: 10px;
       padding: 20px;
       z-index: 1000;
@@ -330,16 +330,21 @@
       box-shadow: 0 0 20px rgba(0,255,255,0.3);
     }
     
-    .modal-content p {
-      font-size: 1.1em;
+    .modal-content-white p {
+      font-size: 1.0em;
       color: white;
+      margin-bottom: 20px;
+    }
+
+    .modal-content-red p {
+      font-size: 1.0em;
+      color: red;
       margin-bottom: 20px;
     }
     
     .modal-buttons {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      justify-content: center;
     }
 
     @media (orientation: landscape) {
@@ -506,10 +511,12 @@
 <!-- Exit Confirmation Modal -->
 <div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
 <div id="exitConfirmModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <p>Are you sure you want to exit CueTube?</p>
+  <div class="modal-content-white">
+    <p>Are you sure you want to exit?</p>
+    <p>All reserved will be deleted.</p>
+  <div class="modal-content-red">
+    <p>click back button to exit</p>
     <div class="modal-buttons">
-      <button class="cyan-btn" onclick="exitApp()">Exit</button>
       <button class="cyan-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
   </div>
@@ -902,11 +909,6 @@ function showExitConfirm() {
     document.getElementById("exitConfirmModal").style.display = "none";
   }
     
-    function exitApp() {
-  // Try to exit if running in Android WebView with Cordova-style exit
-  if (typeof navigator !== "undefined" && navigator.app && navigator.app.exitApp) {
-    navigator.app.exitApp();
-  } 
   // Otherwise, try to close tab (may not work on all browsers)
   else if (typeof window !== "undefined" && window.close) {
     window.close();
