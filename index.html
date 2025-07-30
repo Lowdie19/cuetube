@@ -330,9 +330,10 @@
       box-shadow: 0 0 20px red;
     }
     
-    .modal-buttons {
+    .single-btn {
       width: 45%;
-      max-width: 200px;
+      max-width: 200px; /* Match Next button's look */
+      padding-top: 20px;
     }
 
     @media (orientation: landscape) {
@@ -500,11 +501,11 @@
 <div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
 <div id="exitConfirmModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <p style="color: white; margin-bottom: 1.5px;">Are you sure you want to exit?</p>
+    <p style="color: white; margin-bottom: 2px;">Are you sure you want to exit?</p>
     <p style="color: white; margin-bottom: 2px;">All reserved will be deleted.</p>
     <p style="color: #ff4c4c; margin-bottom: 20px;">click back button to exit</p>
     <div class="modal-buttons" style="justify-content: center;">
-      <button class="cyan-btn" onclick="hideExitConfirm()">Cancel</button>
+      <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
   </div>
 </div>
