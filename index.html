@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CueTube</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -204,23 +204,16 @@
       display: none;
     }
     .drawer-overlay.visible { display: block; }
-    
-    .video-container {
-      position: relative;
+
+    .youtube-wrapper {
       width: 100%;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-      height: 0;
-      overflow: hidden;
-      background: black;
-      border: 2px solid cyan;
-      border-radius: 8px;
-      box-shadow: 0 0 15px cyan;
+      height: 70vh;
+      border: 5px solid cyan;
+      margin-top: 2vh;
+      margin-bottom: 5vh;
     }
-    
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+
+    iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -343,9 +336,8 @@
     }
 
     @media (orientation: landscape) {
-      .video-container {
-      max-height: 60vh; /* max 60% of viewport height */
-    }
+      .youtube-wrapper {
+        height: 75vh;
       }
       .drawer {
         height: 100vh; /* Full screen height in landscape */
@@ -450,9 +442,9 @@
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
 
   <!-- YouTube Player -->
-  <div class="video-container">
-  <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
-</div>
+  <div class="youtube-wrapper">
+    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"></iframe>
+  </div>
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
