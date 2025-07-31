@@ -420,7 +420,6 @@
 
   <!-- Title -->
   <div class="title-bar">CueTube!</div>
-  <button class="cyan-btn" onclick="clearQueue()">Clear Queue</button>
   
   <!-- Drawer -->
   <div class="drawer" id="drawer">
@@ -516,162 +515,219 @@
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   
   <!-- JS -->
-<script>
-  let player;
-  let queue = [];
-  let currentIndex = -1;
+  <script>
+    
+    let player;
+    let queue = [];
+    let currentIndex = -1;
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player("player", {
-      height: "0",
-      width: "0",
-      playerVars: {
-        autoplay: 1,
-        controls: 1,
-        modestbranding: 1,
-        rel: 0,
-        enablejsapi: 1
-      },
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange
+    function saveQueueState() {
+      localStorage.setItem("cueTubeQueue", JSON.stringify(queue));
+      localStorage.setItem("cueTubeIndex", currentIndex.toString());
+    }
+    
+    function loadQueueState() {
+      const savedQueue = localStorage.getItem("cueTubeQueue");
+      const savedIndex = localStorage.getItem("cueTubeIndex");
+    
+      if (savedQueue) {
+        queue = JSON.parse(savedQueue);
+        currentIndex = savedIndex ? parseInt(savedIndex) : 0;
+    
+        if (queue[currentIndex]) {
+          player.loadVideoById(queue[currentIndex].id);
+          updateNowPlaying();
+          updateQueueDisplay();
+          saveQueueState();
+        }
       }
-    });
+    }
+
+    function onPlayerReady(event) {
+  loadQueueState();
+}
+
+    
+  let touchStartX = 0;
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const popupOverlay = document.getElementById("popupOverlay");
+
+  function handleTouchStart(evt) {
+    touchStartX = evt.touches[0].clientX;
   }
 
-  function onPlayerReady() {
-    restoreQueueFromLocalStorage(); // Load queue on startup
+  function handleTouchMove(evt) {
+    const deltaX = evt.touches[0].clientX - touchStartX;
+    if (deltaX > 50) openDrawer();
+    else if (deltaX < -50) closeDrawer();
   }
+
+  function handleTap(evt) {
+    if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+      closeDrawer();
+    }
+  }
+
+  function toggleDrawer() {
+    if (drawer.classList.contains("open")) closeDrawer();
+    else openDrawer();
+    playClickSound();
+  }
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('visible');
+    document.getElementById('drawerHandle').style.display = 'none';
+    document.getElementById("confirmDelete").style.display = "none";
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
+    document.getElementById('drawerHandle').style.display = 'flex';
+    document.getElementById("confirmDelete").style.display = "none";
+  }
+
+  function closeBottomDrawer() {
+    if (bottomDrawer.classList.contains("open")) {
+      bottomDrawer.classList.remove("open");
+      document.querySelector(".bottom-drawer-handle").style.display = "flex";
+    }
+  }
+
+  let startY = 0;
+  const bottomDrawer = document.getElementById("bottomDrawer");
+
+  function toggleBottomDrawer() {
+    const isOpen = bottomDrawer.classList.toggle("open");
+    document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+
+    if (isOpen) {
+      const input = document.getElementById("youtubeInputDrawer");
+      setTimeout(() => input.focus(), 50);
+    }
+    playClickSound();
+  }
+
+  document.body.addEventListener("touchstart", evt => {
+    startY = evt.touches[0].clientY;
+    handleTouchStart(evt);
+  });
+
+  document.body.addEventListener("touchmove", evt => {
+    const deltaY = evt.touches[0].clientY - startY;
+    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+      toggleBottomDrawer(); // swipe up to open only if it's not already open
+    } else if (deltaY > 40) {
+      closeBottomDrawer(); // swipe down always closes
+    }
+    handleTouchMove(evt);
+  });
+
+  document.body.addEventListener("click", handleTap);
+
+  if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
+  function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange
+    },
+    origin: window.location.origin
+  });
+}
 
   function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-      playNextFromQueue();
-    }
+    if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
   }
 
-  function saveQueueToLocalStorage() {
-    localStorage.setItem("cueTubeQueue", JSON.stringify(queue));
-    localStorage.setItem("cueTubeIndex", currentIndex.toString());
-  }
-
-  function restoreQueueFromLocalStorage() {
-    const savedQueue = localStorage.getItem("cueTubeQueue");
-    const savedIndex = localStorage.getItem("cueTubeIndex");
-
-    if (savedQueue) {
-      queue = JSON.parse(savedQueue);
-      currentIndex = savedIndex ? parseInt(savedIndex) : 0;
-
-      if (queue[currentIndex]) {
-        player.loadVideoById(queue[currentIndex].id);
-        updateNowPlaying();
-        updateQueueDisplay();
-      }
-    }
-  }
-
-  function reserveFromDrawer() {
-    const url = document.getElementById("youtubeUrl").value;
-    const videoId = extractVideoID(url);
-
-    if (videoId) {
-      fetchVideoTitle(videoId, (title) => {
-        queue.push({ id: videoId, title: title });
-        if (currentIndex === -1) {
-          currentIndex = 0;
-          player.loadVideoById(videoId);
-        }
-        updateNowPlaying();
-        updateQueueDisplay();
-        saveQueueToLocalStorage(); // Save change
-        document.getElementById("youtubeUrl").value = "";
-        showPopup("Video Reserved ✔", "lime");
-        playSound("success.mp3");
-      });
-    } else {
-      showPopup("Invalid YouTube URL", "red");
-      playSound("error.mp3");
-    }
-  }
-
-  function playNextFromQueue() {
-    if (currentIndex + 1 < queue.length) {
-      currentIndex++;
-      player.loadVideoById(queue[currentIndex].id);
-      updateNowPlaying();
-      updateQueueDisplay();
-      saveQueueToLocalStorage(); // Save index update
-    }
-  }
-
-  function confirmPlayNext() {
-    document.getElementById("confirmSkipModal").style.display = "block";
-  }
-
-  function confirmDelete(index) {
-    const modal = document.getElementById("confirmDeleteModal");
-    modal.style.display = "block";
-
-    const yes = document.getElementById("deleteYes");
-    const no = document.getElementById("deleteNo");
-
-    yes.onclick = () => {
-      if (index >= 0 && index < queue.length) {
-        queue.splice(index, 1);
-        if (index <= currentIndex && currentIndex > 0) currentIndex--;
-        updateQueueDisplay();
-        updateNowPlaying();
-        saveQueueToLocalStorage(); // Save after delete
-        modal.style.display = "none";
-      }
-    };
-
-    no.onclick = () => {
-      modal.style.display = "none";
-    };
-  }
-
-  function clearQueue() {
-    queue = [];
-    currentIndex = -1;
-    localStorage.removeItem("cueTubeQueue");
-    localStorage.removeItem("cueTubeIndex");
-    updateNowPlaying();
-    updateQueueDisplay();
-    player.stopVideo();
-    showPopup("Queue cleared", "red");
-  }
-
-  function extractVideoID(url) {
-    const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
+  function extractVideoId(url) {
+    const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
     return match ? match[1] : null;
   }
 
-  function fetchVideoTitle(videoId, callback) {
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = `https://www.youtube.com/embed/${videoId}`;
-    document.body.appendChild(iframe);
-    setTimeout(() => {
-      callback(`Video: ${videoId}`);
-      document.body.removeChild(iframe);
-    }, 500);
+  async function reserveFromDrawer() {
+  const input = document.getElementById("youtubeInputDrawer");
+  const url = input.value.trim();
+  const videoId = extractVideoId(url);
+  if (!videoId) {
+    showPopup("⚠️ Invalid YouTube URL!", "red");
+    playErrorSound();
+    return;
   }
 
-  function updateNowPlaying() {
-    const nowBox = document.getElementById("nowBox");
-    const glow = document.getElementById("nowPlayingGlow");
-    nowBox.innerHTML = "";
+  const title = await fetchTitle(videoId);
+  
+  // If it's the first video being added
+  if (queue.length === 0 && currentIndex === -1) {
+    queue.push({ id: videoId, title });
+    currentIndex = 0;
+    player.loadVideoById(videoId);
+    updateNowPlaying();
+  } else {
+    // Add to the end of queue
+    queue.push({ id: videoId, title });
+  }
 
-    if (currentIndex >= 0 && currentIndex < queue.length) {
-      const div = document.createElement("div");
-      div.className = "title";
-      div.textContent = queue[currentIndex].title;
-      nowBox.appendChild(div);
-      glow.classList.add("glow");
-    } else {
-      glow.classList.remove("glow");
+  updateQueueDisplay();
+  saveQueueState();
+  input.value = "";
+  showPopup("Reserved!", "lime");
+  playSuccessSound();
+}
+
+  async function fetchTitle(videoId) {
+    try {
+      const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      const data = await res.json();
+      return data.title || videoId;
+    } catch (err) {
+    showPopup("⚠️ Choose another Video!", "red");
+    playErrorSound();
+    return videoId;
+  }
+  }
+
+  function showDeleteConfirm(e, index) {
+    const confirmBox = document.getElementById("confirmDelete");
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    confirmBox.style.left = `${x + 10}px`;
+    confirmBox.style.top = `${y}px`;
+    confirmBox.style.display = "block";
+
+    const yes = document.getElementById("yesBtn");
+    const no = document.getElementById("noBtn");
+
+    yes.onclick = () => {
+      queue.splice(index, 1);
+      confirmBox.style.display = "none";
+      updateQueueDisplay();
+      saveQueueState();
+    };
+
+    no.onclick = () => {
+      confirmBox.style.display = "none";
+    };
+  }
+
+  function playNextFromQueue() {
+    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+      showPopup("No next song.", "red");
+      return;
     }
+
+    currentIndex++;
+    player.loadVideoById(queue[currentIndex].id);
+    updateNowPlaying();
+    updateQueueDisplay();
+    saveQueueState();
+    showPopup("Next song!", "magenta");
   }
 
   function updateQueueDisplay() {
@@ -685,44 +741,263 @@
       div.textContent = queue[i].title;
       div.style.cursor = "pointer";
 
-      let pressTimer;
-      div.addEventListener("mousedown", () => {
-        pressTimer = setTimeout(() => confirmDelete(i), 1000);
-      });
-      div.addEventListener("mouseup", () => clearTimeout(pressTimer));
-      div.addEventListener("mouseleave", () => clearTimeout(pressTimer));
-      div.addEventListener("touchstart", () => {
-        pressTimer = setTimeout(() => confirmDelete(i), 1000);
-      });
-      div.addEventListener("touchend", () => clearTimeout(pressTimer));
+      let longPressTimer;
+      const startHandler = (e) => {
+        e.preventDefault();
+        div.classList.add("long-pressing");
+        longPressTimer = setTimeout(() => {
+          navigator.vibrate?.(50);
+          showDeleteConfirm(e, i);
+        }, 500);
+      };
+      const cancelHandler = () => {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
+      };
+
+      div.addEventListener("mousedown", startHandler);
+      div.addEventListener("touchstart", startHandler);
+      div.addEventListener("mouseup", cancelHandler);
+      div.addEventListener("mouseleave", cancelHandler);
+      div.addEventListener("touchend", cancelHandler);
+      div.addEventListener("touchcancel", cancelHandler);
+
       list.appendChild(div);
     }
 
-    const overflowCount = queue.length - (currentIndex + 1);
-    overflow.style.display = overflowCount > 5 ? "block" : "none";
-    overflow.textContent = `${overflowCount - 5}+ more`;
+    updateOverflowCounter();
+
+    const nextBtn = document.getElementById("nextBtnDrawer");
+    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+    nextBtn.disabled = !hasNext;
+    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+    // Show/hide the NEXT box based on how many songs are queued after current
+    const nextBox = document.getElementById("nextBox");
+    const upcomingCount = queue.length - (currentIndex + 1);
+    nextBox.style.display = upcomingCount >= 1 ? "flex" : "none";
   }
 
-  function showPopup(message, color) {
-    const popup = document.getElementById("popup");
-    popup.textContent = message;
-    popup.style.color = color;
-    popup.style.display = "block";
+  function updateOverflowCounter() {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    if (!list || !overflow) return;
+
+    const totalHeight = list.scrollHeight;
+    const visibleHeight = list.clientHeight;
+    const scrollable = totalHeight > visibleHeight;
+
+    if (scrollable) {
+      const items = list.children;
+      let shown = 0;
+      let accHeight = 0;
+      for (let i = 0; i < items.length; i++) {
+        accHeight += items[i].offsetHeight;
+        if (accHeight < visibleHeight) shown++;
+      }
+      const remainingCount = items.length - shown;
+      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+      overflow.style.display = "block";
+    } else {
+      overflow.style.display = "none";
+    }
+  }
+
+   function updateNowPlaying() {
+    const nowTitleEl = document.getElementById("nowTitle");
+    const current = queue[currentIndex];
+  
+    if (!current) return;
+  
+    let title = current.title || `Video ID: ${current.id}`;
+    let remaining = queue.length - (currentIndex + 1);
+  
+    if (remaining === 0) {
+      title += " (no songs next)";
+      nowTitleEl.style.textShadow = "0 0 8px magenta, 0 0 16px magenta";
+    } else {
+      nowTitleEl.style.textShadow = "none";
+    }
+  
+    nowTitleEl.textContent = title;
+    updateNowPlaying()
+  }
+
+
+  function showPopup(text, glowColor) {
+    const popup = document.getElementById("popupModal");
+    popup.innerText = text;
+    popup.style.color = "white";
+    popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
+
+    popupOverlay.classList.add("visible");
+    popup.classList.add("show");
     setTimeout(() => {
-      popup.style.display = "none";
-    }, 2000);
+      popup.classList.remove("show");
+      popupOverlay.classList.remove("visible");
+    }, 1800);
   }
 
-  function playSound(file) {
-    const audio = new Audio(`assets/${file}`);
-    audio.play();
+  (function enableDragScroll() {
+    const box = document.querySelector('.next-box');
+    let isDown = false;
+    let startY, scrollTop;
+
+    box.addEventListener('mousedown', (e) => {
+      isDown = true;
+      box.classList.add('dragging');
+      startY = e.pageY - box.offsetTop;
+      scrollTop = box.scrollTop;
+    });
+    box.addEventListener('mouseleave', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mouseup', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const y = e.pageY - box.offsetTop;
+      const walk = (y - startY);
+      box.scrollTop = scrollTop - walk;
+    });
+
+    let startYTouch = 0, scrollTopTouch = 0;
+    box.addEventListener("touchstart", e => {
+      startYTouch = e.touches[0].clientY;
+      scrollTopTouch = box.scrollTop;
+    }, { passive: true });
+
+    box.addEventListener("touchmove", e => {
+      const y = e.touches[0].clientY;
+      const walk = y - startYTouch;
+      box.scrollTop = scrollTopTouch - walk;
+    }, { passive: true });
+  })();
+
+  document.getElementById("popupOverlay").onclick = () => {
+    const popup = document.getElementById("popupModal");
+    popup.classList.remove("show");
+    popupOverlay.classList.remove("visible");
+  };
+
+  document.body.addEventListener("click", () => {
+    const confirm = document.getElementById("confirmDelete");
+    if (confirm.style.display !== "none") {
+      confirm.style.display = "none";
+    }
+  });
+
+    function showNextConfirm() {
+    const messages = [
+      "Ready to jump to the next song?",
+      "Skip this one and move on?",
+      "Next up? Let's go!",
+      "Want to move to the next jam?",
+      "Time to switch it up?"
+    ];
+    const random = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById("nextConfirmText").innerText = random;
+  
+    document.getElementById("nextConfirmOverlay").style.display = "block";
+    document.getElementById("nextConfirmModal").style.display = "block";
   }
 
-  window.addEventListener("beforeunload", (e) => {
+  function hideNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "none";
+    document.getElementById("nextConfirmModal").style.display = "none";
+  }
+
+  function confirmPlayNext() {
+    hideNextConfirm();
+    playNextFromQueue();
+  }
+
+// Show Exit Modal
+  function showExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "block";
+    document.getElementById("exitConfirmModal").style.display = "block";
+    playErrorSound();
+  }
+
+  // Hide Exit Modal
+  function hideExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "none";
+    document.getElementById("exitConfirmModal").style.display = "none";
+  }
+
+  // Android/WebView Back Button Handler
+  window.addEventListener("load", () => {
+    history.pushState(null, document.title, location.href);
+  });
+
+  window.addEventListener("popstate", function (e) {
+    showExitConfirm();
+    history.pushState(null, document.title, location.href);
+  });
+
+  // PC/Browser close confirmation
+  window.addEventListener("beforeunload", function (e) {
     e.preventDefault();
     e.returnValue = "";
   });
-</script>
+
+    
+
+  // Play click sound
+function playClickSound() {
+  const click = document.getElementById("clickSound");
+  if (click) {
+    click.currentTime = 0;
+    click.play().catch((e) => console.log("Click sound blocked", e));
+  }
+}
+
+// Play success sound
+function playSuccessSound() {
+  const success = document.getElementById("successSound");
+  if (success) {
+    success.currentTime = 0;
+    success.play().catch((e) => console.log("Success sound blocked", e));
+  }
+}
+
+// Play error sound
+function playErrorSound() {
+  const error = document.getElementById("errorSound");
+  if (error) {
+    error.currentTime = 0;
+    error.play().catch((e) => console.log("Error sound blocked", e));
+  }
+}
+
+  document.querySelectorAll('.cyan-btn').forEach(btn => {
+    btn.addEventListener('click', playClickSound);
+  });
+
+  window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+// Intercept Android back button using history
+window.addEventListener("load", () => {
+// Push dummy history state to trap the back button
+  history.pushState(null, document.title, location.href);
+});
+    
+window.addEventListener("popstate", function (e) {
+// Show confirmation instead of exiting
+  showExitConfirm();
+// Re-push the dummy state so user must confirm before exiting
+  history.pushState(null, document.title, location.href);
+});
+
+  </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
