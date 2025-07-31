@@ -1002,8 +1002,8 @@ function playErrorSound() {
 function playTrashSound() {
   const trash = document.getElementById("trashSound");
   if (trash) {
-    error.currentTime = 0;
-    error.play().catch((e) => console.log("trash sound blocked", e));
+    trash.currentTime = 0;
+    trash.play().catch((e) => console.log("trash sound blocked", e));
   }
 }
 
