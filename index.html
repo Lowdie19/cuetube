@@ -134,7 +134,7 @@
       border: none;
       border-radius: 10px;
       padding: 10px;
-      background: #121212;
+      background: rgba(20, 20, 20, 0.90);
       flex: 1;
       overflow-y: auto;
       min-height: 0;
@@ -423,7 +423,8 @@
     }
     
     .long-pressing {
-    box-shadow: 0 0 7px red;
+      background: red;
+      box-shadow: 0 0 10px red;
     }
       
   </style>
@@ -476,11 +477,11 @@
   <div id="popupModal">Reserved!</div>
 
   <!-- Delete Confirm Box -->
-  <div id="confirmDelete" style="display:none; position:absolute; background:#333; padding:10px; border-radius:6px; z-index:999;">
-    <div style="font-family:Arial,sans-serif; color:white; font-size:1em; margin-bottom:8px; text-align:center;">Delete?</div>
-    <div style="display:flex; gap:10px;">
-      <button id="yesBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:lime; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✓</button>
-      <button id="noBtn" style="font-family:Arial,sans-serif; font-weight:bold; background-color:red; color:white; padding:6px 12px; border-radius:6px; border:none; cursor:pointer;">✗</button>
+  <div id="confirmDelete" style="display:none; background: #222; position:absolute; box-shadow: 0 0 10px red; border:2px solid red; padding:10px; border-radius:6px; z-index:999; margin-top:5px;">
+    <div style="color:#ff4c4c; font-size:1em; margin-bottom:15px; text-align:center;">Delete?</div>
+    <div style="display:flex; gap:5px; margin-bottom:5px;">
+      <button id="yesBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-left: 15px;">Confirm</button>
+      <button id="noBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-right: 15px;">Cancel</button>
     </div>
   </div>
   
@@ -495,14 +496,14 @@
   background: #222;
   border: 2px solid cyan;
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   z-index: 1000;
   text-align: center;
   width: 90%;
   max-width: 320px;
   box-shadow: 0 0 20px rgba(0,255,255,0.3);
 ">
-  <div id="nextConfirmText" style="font-size: 1.1em; color: white; margin-bottom: 20px;">
+  <div id="nextConfirmText" style="font-size: 1.1em; color: white; margin-bottom: 15px;">
     Are you sure you want to skip to the next video?
   </div>
   <div style="display: flex; justify-content: space-between;">
