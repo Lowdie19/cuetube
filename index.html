@@ -716,53 +716,73 @@
   }
 
   function updateQueueDisplay() {
-    const list = document.getElementById("nextList");
-    const overflow = document.getElementById("overflowCounter");
-    list.innerHTML = "";
+  const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
+  list.innerHTML = "";
 
-    for (let i = currentIndex + 1; i < queue.length; i++) {
-      const div = document.createElement("div");
-      div.className = "title";
-      div.textContent = queue[i].title;
-      div.style.cursor = "pointer";
+  for (let i = currentIndex + 1; i < queue.length; i++) {
+    const div = document.createElement("div");
+    div.className = "title";
+    div.textContent = queue[i].title;
+    div.style.cursor = "pointer";
 
-      let longPressTimer;
-      const startHandler = (e) => {
-        e.preventDefault();
-        div.classList.add("long-pressing");
-        longPressTimer = setTimeout(() => {
-          navigator.vibrate?.(50);
-          showDeleteConfirm(e, i);
-        }, 500);
-      };
-      const cancelHandler = () => {
+    let longPressTimer;
+    let longPressTriggered = false;
+
+    const startHandler = (e) => {
+      e.preventDefault();
+      longPressTriggered = false;
+      div.classList.add("long-pressing");
+
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        navigator.vibrate?.(50);
+        showDeleteConfirm(e, i);
+      }, 500);
+    };
+
+    const endHandler = () => {
+      if (!longPressTriggered) {
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
-      };
+      }
+    };
 
-      div.addEventListener("mousedown", startHandler);
-      div.addEventListener("touchstart", startHandler);
-      div.addEventListener("mouseup", cancelHandler);
-      div.addEventListener("mouseleave", cancelHandler);
-      div.addEventListener("touchend", cancelHandler);
-      div.addEventListener("touchcancel", cancelHandler);
+    const cancelHandler = () => {
+      clearTimeout(longPressTimer);
+      div.classList.remove("long-pressing");
+    };
 
-      list.appendChild(div);
-    }
+    // Events for both mouse and touch
+    div.addEventListener("mousedown", startHandler);
+    div.addEventListener("touchstart", startHandler, { passive: false });
 
-    updateOverflowCounter();
+    div.addEventListener("mouseup", endHandler);
+    div.addEventListener("mouseleave", cancelHandler);
+    div.addEventListener("touchend", endHandler);
+    div.addEventListener("touchcancel", cancelHandler);
 
-    const nextBtn = document.getElementById("nextBtnDrawer");
-    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-    nextBtn.disabled = !hasNext;
-    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+    // Optional: Right-click support for desktop
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      showDeleteConfirm(e, i);
+    });
 
-    // Show/hide the NEXT box based on how many songs are queued after current
-    const nextBox = document.getElementById("nextBox");
-    const upcomingCount = queue.length - (currentIndex + 1);
-    nextBox.style.display = upcomingCount >= 1 ? "flex" : "none";
+    list.appendChild(div);
   }
+
+  updateOverflowCounter();
+
+  const nextBtn = document.getElementById("nextBtnDrawer");
+  const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+  nextBtn.disabled = !hasNext;
+  nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+  nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+  const nextBox = document.getElementById("nextBox");
+  const upcomingCount = queue.length - (currentIndex + 1);
+  nextBox.style.display = upcomingCount >= 1 ? "flex" : "none";
+}
 
   function updateOverflowCounter() {
     const list = document.getElementById("nextList");
