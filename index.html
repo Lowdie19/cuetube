@@ -546,6 +546,7 @@
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="successSound" src="success.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
+  <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -712,6 +713,7 @@
       queue.splice(index, 1);
       confirmBox.style.display = "none";
       updateQueueDisplay();
+      playTrashSound();
     };
 
     no.onclick = () => {
@@ -993,6 +995,15 @@ function playErrorSound() {
   if (error) {
     error.currentTime = 0;
     error.play().catch((e) => console.log("Error sound blocked", e));
+  }
+}
+    
+// Play trash sound
+function playTrashSound() {
+  const error = document.getElementById("trashSound");
+  if (trash) {
+    error.currentTime = 0;
+    error.play().catch((e) => console.log("trash sound blocked", e));
   }
 }
 
