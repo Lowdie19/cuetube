@@ -61,8 +61,11 @@
     .title-icon {
       height: 32px;
       margin-right: 10px;
+      object-fit: contain;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
       animation: pulseGlow 2s infinite ease-in-out;
-    }
+      border-radius: 6px; /* Optional: soften corners if your PNG isn't round */
+      background: transparent;
     
     /* Neon text effect */
     .title-text {
@@ -84,24 +87,25 @@
 
     @keyframes pulseGlowSmall {
       0% {
-        box-shadow: 0 0 6px rgba(0, 255, 255, 1);
+        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
       }
       50% {
-        box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+        box-shadow: 0 0 12px rgba(0, 255, 255, 1);
       }
       100% {
-        box-shadow: 0 0 6px rgba(0, 255, 255, 1);
+        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
       }
     }
-    
+        
     /* Responsive adjustments for phones */
     @media (max-width: 600px) {
       .title-icon {
         height: 28px;
         margin-right: 8px;
-        box-shadow: 0 0 6px rgba(0, 255, 255, 1);
+        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
         animation: pulseGlowSmall 2s infinite ease-in-out;
       }
+    }
     
       .title-text {
         font-size: 20px;
