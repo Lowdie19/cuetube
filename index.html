@@ -77,8 +77,8 @@
     
     /* Neon image glow using drop-shadow */
     @keyframes neon-glow {
-      from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
-      to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
+      from { filter: drop-shadow(0 0 .5px cyan); }
+      to { filter: drop-shadow(0 0 2px cyan); }
     }
     
     .drawer {
@@ -456,9 +456,9 @@
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
-<div class="title-bar">
-  <img src="CueTube%20Icon.png" alt="CueTube Icon" class="title-icon">
-  CueTube!
+<div class="title-bar" style="display: flex; align-items: center;">
+  <span class="title-icon" style="font-size: 24px; margin-right: 10px;">CueTube!</span>
+  <img src="CueTube%20Icon.png" alt="CueTube Icon" style="height: 32px;">
 </div>
   
   <!-- Drawer -->
