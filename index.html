@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="icon" type="image/png" href="CueTube Icon.png">
   <title>CueTube</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -56,22 +56,29 @@
       color: white;
       background-color: #000;
       position: relative;
-      animation: neon 3.0s ease-in-out infinite alternate;
+      animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
     }
-
+    
     .title-icon {
       height: 30px;
       width: 30px;
-      animation: neon 3.0s ease-in-out infinite alternate;
+      animation: neon-glow 3.0s ease-in-out infinite alternate;
     }
-
-    @keyframes neon {
+    
+    /* Neon text animation */
+    @keyframes neon-text {
       from { text-shadow: 0 0 5px cyan, 0 0 10px cyan; }
       to { text-shadow: 0 0 15px cyan, 0 0 25px cyan; }
+    }
+    
+    /* Neon image glow using drop-shadow */
+    @keyframes neon-glow {
+      from { filter: drop-shadow(0 0 5px cyan) drop-shadow(0 0 10px cyan); }
+      to { filter: drop-shadow(0 0 15px cyan) drop-shadow(0 0 25px cyan); }
     }
     
     .drawer {
