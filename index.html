@@ -50,68 +50,36 @@
     }
 
     .title-bar {
+      text-align: center;
+      font-size: 1.5em;
+      padding: 15px 0;
+      color: white;
+      background-color: #000;
+      position: relative;
+      animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
-      margin-top: 12px;
+      gap: 10px;
     }
     
-    /* Icon */
     .title-icon {
-      height: 32px;
-      margin-right: 10px;
-      object-fit: contain;
-      box-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
-      animation: pulseGlow 2s infinite ease-in-out;
-      border-radius: 6px; /* Optional: soften corners if your PNG isn't round */
-      background: transparent;
-    
-    /* Neon text effect */
-    .title-text {
-      font-size: 24px;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
-      animation: pulse 2s infinite;
+      height: 30px;
+      width: 30px;
+      animation: neon-glow 3.0s ease-in-out infinite alternate;
     }
     
-    /* Pulse animation */
-    @keyframes pulse {
-      0%, 100% {
-        text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
-      }
-      50% {
-        text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
-      }
-    }
-
-    @keyframes pulseGlowSmall {
-      0% {
-        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
-      }
-      50% {
-        box-shadow: 0 0 12px rgba(0, 255, 255, 1);
-      }
-      100% {
-        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
-      }
-    }
-        
-    /* Responsive adjustments for phones */
-    @media (max-width: 600px) {
-      .title-icon {
-        height: 28px;
-        margin-right: 8px;
-        box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
-        animation: pulseGlowSmall 2s infinite ease-in-out;
-      }
+    /* Neon text animation */
+    @keyframes neon-text {
+      from { text-shadow: 0 0 5px cyan, 0 0 10px cyan; }
+      to { text-shadow: 0 0 15px cyan, 0 0 25px cyan; }
     }
     
-      .title-text {
-        font-size: 20px;
-      }
+    /* Neon image glow using drop-shadow */
+    @keyframes neon-glow {
+      from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
+      to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
     }
-
     
     .drawer {
       position: fixed;
@@ -490,7 +458,7 @@
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube%20Icon.png" alt="CueTube Icon" class="title-icon">
-  <span class="title-text glow">CueTube!</span>
+  CueTube!
 </div>
   
   <!-- Drawer -->
