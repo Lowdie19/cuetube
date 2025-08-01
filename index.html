@@ -453,6 +453,29 @@
       background: red;
       box-shadow: 0 0 10px red;
     }
+
+    /* For URL box */
+    input[type="text"]::placeholder {
+      color: #ccc;
+      opacity: 1;
+    }
+    
+    input[type="text"] {
+      border: 2px solid magenta;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: black;
+      color: white;
+      box-shadow: none;
+      transition: box-shadow 0.3s ease;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 10px magenta, 0 0 20px magenta;
+      border-color: magenta;
+    }  /* For URL box */
       
   </style>
 </head>
