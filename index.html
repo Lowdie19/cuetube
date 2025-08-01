@@ -303,7 +303,7 @@
       bottom: -160px;
       left: 0;
       width: 100%;
-      background: rgba(20, 20, 20, 0.95);
+      background: rgba(40, 40, 40, 0.90);
       padding: 20px 15px 25px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
       transition: bottom 0.3s ease;
@@ -456,16 +456,16 @@
 
     /* For URL box */
     input[type="text"]::placeholder {
-      color: #ccc;
-      opacity: 1;
+      color: white;
+      opacity: .3;
     }
     
     input[type="text"] {
-      border: 2px solid magenta;
+      border: 2px magenta;
       border-radius: 8px;
       padding: 10px;
       font-size: 16px;
-      background-color: black;
+      background-color: #121212;
       color: white;
       box-shadow: none;
       transition: box-shadow 0.3s ease;
@@ -473,8 +473,9 @@
     
     input[type="text"]:focus {
       outline: none;
-      box-shadow: 0 0 10px magenta, 0 0 20px magenta;
+      box-shadow: 0 0 2px magenta, 0 0 8px magenta;
       border-color: magenta;
+      border: 2px solid magenta;
     }  /* For URL box */
       
   </style>
