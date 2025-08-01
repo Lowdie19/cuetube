@@ -709,6 +709,7 @@
     currentIndex = 0;
     player.loadVideoById(videoId);
     updateNowPlaying();
+    
   } else {
     // Add to the end of queue
     queue.push({ id: videoId, title });
@@ -718,6 +719,7 @@
   input.value = "";
   showPopup("Reserved!", "lime");
   playSuccessSound();
+  closeBottomDrawer();
 }
 
   async function fetchTitle(videoId) {
