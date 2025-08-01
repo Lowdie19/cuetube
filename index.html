@@ -581,6 +581,7 @@
   <audio id="successSound" src="success.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
+  <audio id="slideSound" src="slide.wav" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -602,13 +603,14 @@
   function handleTap(evt) {
     if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
       closeDrawer();
+      playSlideSound();
     }
   }
 
   function toggleDrawer() {
     if (drawer.classList.contains("open")) closeDrawer();
     else openDrawer();
-    playClickSound();
+    playSlideSound();
   }
 
   function openDrawer() {
@@ -649,6 +651,7 @@
   document.body.addEventListener("touchstart", evt => {
     startY = evt.touches[0].clientY;
     handleTouchStart(evt);
+    playSlideSound();
   });
 
   document.body.addEventListener("touchmove", evt => {
@@ -657,6 +660,7 @@
       toggleBottomDrawer(); // swipe up to open only if it's not already open
     } else if (deltaY > 40) {
       closeBottomDrawer(); // swipe down always closes
+      playSlideSound();
     }
     handleTouchMove(evt);
   });
@@ -1043,10 +1047,19 @@ function playTrashSound() {
   }
 }
 
+// Play slide sound
+function playSlideSound() {
+  const trash = document.getElementById("slideSound");
+  if (slide) {
+    slide.currentTime = 0;
+    slide.play().catch((e) => console.log("slide sound blocked", e));
+  }
+}
+
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
-
+    
   window.addEventListener("beforeunload", function (e) {
   e.preventDefault();
   e.returnValue = "";
