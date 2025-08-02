@@ -283,6 +283,11 @@
       color: white;
       font-size: 14px;
       padding: 0 12px;
+
+      line-height: 36px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
     }
 
     .bottom-buttons {
@@ -400,32 +405,10 @@
       padding-right: 48px;
     }
     
-    .paste-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-color: #121212;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: box-shadow 0.2s ease;
+    .paste-btn-icon:active img {
+      filter: drop-shadow(0 0 5px magenta);
     }
     
-    .paste-btn:active {
-      box-shadow: 0 0 10px magenta, 0 0 20px magenta;
-    }
-    
-    .paste-btn svg {
-      stroke: cyan;
-    }
-    
-    /* Optional glow effect for input */
-    .url-input.glow {
-      box-shadow: 0 0 10px cyan, 0 0 20px cyan;
-    }
-
     @media (orientation: landscape) {
       .youtube-wrapper {
         height: 75vh;
@@ -591,12 +574,8 @@
   <div class="url-container">
   <div class="url-group">
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <button id="pasteButton" class="paste-btn" title="Paste from clipboard" onclick="pasteToUrlBox()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="cyan" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M16 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" />
-      <path d="M9 2v4" />
-      <path d="M15 2v4" />
-    </svg>
+  <button id="pasteButton" class="paste-btn-icon" title="Paste from clipboard" onclick="pasteFromClipboard()">
+    <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
   </button>
 </div>
   <div class="bottom-buttons inside">
@@ -660,7 +639,8 @@
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
-  <audio id="successSound" src="success.wav" preload="auto"></audio>
+  <audio id="successSound" src="success.wav" preload="auto"
+    ></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
@@ -836,26 +816,6 @@
     return videoId;
   }
   }
-    
-  async function pasteToUrlBox() {
-      const input = document.getElementById("youtubeInputDrawer");
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text) {
-          input.value = text;
-          input.focus();
-          input.classList.add("glow");
-          setTimeout(() => input.classList.remove("glow"), 1000);
-        } else {
-          showPopup("📋 Clipboard is empty!", "red");
-          playErrorSound();
-        }
-      } catch (err) {
-        console.error("Clipboard access failed", err);
-        showPopup("⚠️ Clipboard access denied!", "red");
-        playErrorSound();
-      }
-    }
 
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
@@ -1224,11 +1184,18 @@ window.addEventListener("popstate", function (e) {
     
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
+
+    function pasteFromClipboard() {
+      navigator.clipboard.readText().then(text => {
+        document.getElementById("youtubeInputDrawer").value = text;
+      });
+    }
         
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
