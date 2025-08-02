@@ -603,14 +603,12 @@
   function handleTap(evt) {
     if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
       closeDrawer();
-      playSlideSound();
     }
   }
 
   function toggleDrawer() {
     if (drawer.classList.contains("open")) closeDrawer();
     else openDrawer();
-    playSlideSound();
   }
 
   function openDrawer() {
@@ -618,6 +616,7 @@
     overlay.classList.add('visible');
     document.getElementById('drawerHandle').style.display = 'none';
     document.getElementById("confirmDelete").style.display = "none";
+    playSlideSound();
   }
 
   function closeDrawer() {
@@ -625,12 +624,14 @@
     overlay.classList.remove('visible');
     document.getElementById('drawerHandle').style.display = 'flex';
     document.getElementById("confirmDelete").style.display = "none";
+    playSlideSound();
   }
 
   function closeBottomDrawer() {
     if (bottomDrawer.classList.contains("open")) {
       bottomDrawer.classList.remove("open");
       document.querySelector(".bottom-drawer-handle").style.display = "flex";
+      playSlideSound();
     }
   }
 
@@ -645,13 +646,12 @@
       const input = document.getElementById("youtubeInputDrawer");
       setTimeout(() => input.focus(), 50);
     }
-    playClickSound();
+      playSlideSound();
   }
 
   document.body.addEventListener("touchstart", evt => {
     startY = evt.touches[0].clientY;
     handleTouchStart(evt);
-    playSlideSound();
   });
 
   document.body.addEventListener("touchmove", evt => {
@@ -660,7 +660,6 @@
       toggleBottomDrawer(); // swipe up to open only if it's not already open
     } else if (deltaY > 40) {
       closeBottomDrawer(); // swipe down always closes
-      playSlideSound();
     }
     handleTouchMove(evt);
   });
@@ -1049,7 +1048,7 @@ function playTrashSound() {
 
 // Play slide sound
 function playSlideSound() {
-  const trash = document.getElementById("slideSound");
+  const slide = document.getElementById("slideSound");
   if (slide) {
     slide.currentTime = 0;
     slide.play().catch((e) => console.log("slide sound blocked", e));
@@ -1082,3 +1081,4 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
