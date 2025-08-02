@@ -268,9 +268,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 100%;
-      margin: 10px 0;
-      gap: 6px; /* ⬅️ This controls spacing between URL box and button */
+      position: relative;
+      gap: 15px;
     }
         
     .url-input {
@@ -331,6 +330,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 20px 15px 25px; /* bottom is 25px default */
     }
     
     .bottom-drawer.open {
@@ -1223,21 +1223,23 @@ window.addEventListener("popstate", function (e) {
     }
 
   function adjustForKeyboard() {
-    const isLandscape = window.innerWidth > window.innerHeight;
     const drawer = document.getElementById('bottomDrawer');
-    const viewport = window.visualViewport;
+    const isLandscape = window.innerWidth > window.innerHeight;
 
-    if (!viewport || !isLandscape) {
-      drawer.style.paddingBottom = '25px'; // default
+    if (!window.visualViewport || !isLandscape) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
+      drawer.style.paddingBottom = '25px';
       return;
     }
 
-    const keyboardHeight = window.innerHeight - viewport.height - viewport.offsetTop;
+    const vp = window.visualViewport;
+    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
 
     if (keyboardHeight > 100) {
-      // Keyboard is visible
+      drawer.style.transition = 'padding-bottom 0.25s ease';
       drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
     } else {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
       drawer.style.paddingBottom = '25px';
     }
   }
@@ -1247,12 +1249,18 @@ window.addEventListener("popstate", function (e) {
     visualViewport.addEventListener("scroll", adjustForKeyboard);
   }
 
-  window.addEventListener("orientationchange", adjustForKeyboard);
-        
+  window.addEventListener("orientationchange", () => {
+    setTimeout(adjustForKeyboard, 200); // Give time for reflow
+  });
+
+  // Initial call in case landscape is already active
+  window.addEventListener("DOMContentLoaded", adjustForKeyboard);
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
