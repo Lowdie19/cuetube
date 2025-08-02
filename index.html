@@ -50,24 +50,23 @@
     }
 
     .title-bar {
-      .title-bar {
+      text-align: center;
+      font-size: 1.5em;
+      padding: 15px 0;
+      color: cyan;
+      background-color: black;
+      position: relative;
+      animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin: 10px;
-      animation: neon-text 3.0s ease-in-out infinite alternate;
+      gap: 20px;
     }
     
     .title-icon {
       height: 30px;
       width: 30px;
       animation: neon-glow 3.0s ease-in-out infinite alternate;
-    }
-    
-    .title-text {
-      font-size: 24px;
-      font-weight: bold;
     }
     
     /* Neon text animation */
@@ -81,22 +80,7 @@
       from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
       to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
     }
-      
-    @media screen and (orientation: landscape) and (max-width: 900px) {
-    .title-icon {
-      width: 32px;
-      height: 32px;
-    }
-  
-    .title-text {
-      font-size: 16px;
-    }
-  
-    .title-bar {
-      gap: 6px;
-      margin: 5px;
-    }
-  }
+    
     .drawer {
       position: fixed;
       top: 0;
@@ -505,8 +489,8 @@
 
   <!-- Title -->
 <div class="title-bar">
-  <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
-  <span class="title-text">CueTube!</span>
+  <img src="CueTube%20Icon.png" alt="CueTube Icon" class="title-icon">
+  CueTube!
 </div>
   
   <!-- Drawer -->
@@ -1131,8 +1115,6 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
