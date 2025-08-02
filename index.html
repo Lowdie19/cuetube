@@ -393,6 +393,12 @@
       }
     }
     
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .title-bar {
+        display: none !important;
+      }
+    }
+    
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
     }
@@ -489,8 +495,8 @@
 
   <!-- Title -->
 <div class="title-bar">
-  <img src="CueTube%20Icon.png" alt="CueTube Icon" class="title-icon">
-  CueTube!
+  <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
+  <span class="title-text">CueTube!</span>
 </div>
   
   <!-- Drawer -->
@@ -1115,6 +1121,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
