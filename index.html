@@ -585,20 +585,23 @@
 </div>
 
   <!-- Bottom Drawer -->
-  <div class="bottom-drawer" id="bottomDrawer">
+<div class="bottom-drawer" id="bottomDrawer">
   <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+  
   <div class="url-container">
-  <div class="url-group">
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
-    <img src="paste-icon.png" alt="Paste" class="paste-icon-image" />
-  </button>
+    <div class="url-group">
+      <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+      <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
+        <img src="CueTube Icon.png" alt="Paste" class="paste-icon-image" />
+      </button>
+    </div>
+
+    <div class="bottom-buttons inside">
+      <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+      <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
+    </div>
+  </div>
 </div>
-  <div class="bottom-buttons inside">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
-  </div>
-  </div>
   
   <!-- Popup -->
   <div id="popupOverlay"></div>
@@ -1222,6 +1225,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
