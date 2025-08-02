@@ -763,6 +763,7 @@
   function playNextFromQueue() {
     if (queue.length === 0 || currentIndex + 1 >= queue.length) {
       showPopup("No next song.", "red");
+      playErrorSound();
       return;
     }
 
@@ -1081,4 +1082,5 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
