@@ -1207,11 +1207,29 @@ window.addEventListener("popstate", function (e) {
 // Re-push the dummy state so user must confirm before exiting
   history.pushState(null, document.title, location.href);
 });
-  
+
+    function goFullscreenIfLandscape() {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      const doc = document.documentElement;
+    
+      if (isLandscape && doc.requestFullscreen) {
+        doc.requestFullscreen().catch((err) => {
+          console.warn("Fullscreen request failed:", err);
+        });
+      }
+    }
+    
+    window.addEventListener("orientationchange", goFullscreenIfLandscape);
+    window.addEventListener("resize", goFullscreenIfLandscape);
+    
+    // Optional: manual trigger on user click (some browsers require gesture)
+    document.addEventListener("click", goFullscreenIfLandscape);
+        
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
