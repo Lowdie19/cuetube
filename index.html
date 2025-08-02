@@ -258,6 +258,7 @@
     }
 
     iframe {
+      display: block;
       width: 100%;
       height: 100%;
       border: none;
@@ -488,6 +489,16 @@
       border-color: magenta;
       border: 2px solid magenta;
     }  /* For URL box */
+
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
       
   </style>
 </head>
@@ -521,8 +532,12 @@
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <iframe id="player" src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"></iframe>
-  </div>
+  <iframe
+    id="player"
+    src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
+    allowfullscreen
+  ></iframe>
+</div>
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
@@ -1121,6 +1136,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
