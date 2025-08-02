@@ -1206,20 +1206,45 @@ window.addEventListener("popstate", function (e) {
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
 
-    function pasteFromClipboard() {
-      navigator.clipboard.readText().then(text => {
-        const input = document.getElementById("youtubeInputDrawer");
-        input.value = text;
-    
-        // Validate YouTube URL
-        const videoId = extractVideoId(text);
-        if (!videoId) {
-          input.value = ""; // Optional: clear input
-          showPopup("⚠️ Invalid YouTube URL!", "red");
-          playErrorSound();
+    async function pasteFromClipboard() {
+      const inputField = document.getElementById("youtubeInputDrawer");
+  
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputField.value = text.trim();
+          validatePastedURL(text.trim());
           return;
+        } catch (err) {
+          console.warn("Clipboard API failed, using fallback.");
+          // fallback below
         }
-      });
+      }
+  
+      // Fallback for Android / older WebViews
+      const tempInput = document.createElement("input");
+      tempInput.setAttribute("type", "text");
+      tempInput.style.position = "absolute";
+      tempInput.style.left = "-9999px";
+      document.body.appendChild(tempInput);
+      tempInput.focus();
+  
+      const pastedManually = document.execCommand("paste"); // Opens native paste dialog (on Android, may require user input)
+  
+      setTimeout(() => {
+        const pastedText = tempInput.value.trim();
+        document.body.removeChild(tempInput);
+        inputField.value = pastedText;
+        validatePastedURL(pastedText);
+      }, 300);
+    }
+  
+    function validatePastedURL(url) {
+      const validYouTube = /(youtube\.com|youtu\.be)/i.test(url);
+      if (!validYouTube) {
+        showPopup("⚠️ Invalid YouTube URL!", "red");
+        playErrorSound?.();
+      }
     }
 
   function adjustForKeyboard() {
@@ -1260,6 +1285,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
