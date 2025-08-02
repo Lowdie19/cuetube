@@ -156,15 +156,15 @@
     }
     
     .next-box {
+      display: flex;
+      flex-direction: column;
       border: none;
       border-radius: 10px;
       padding: 10px;
-      background: rgba(00, 00, 00, 0.00);
+      background: rgba(0, 0, 0, 0.0);
       flex: 1;
       overflow-y: auto;
       min-height: 0;
-      display: flex;
-      flex-direction: column;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       scroll-padding-bottom: 40px;
@@ -173,6 +173,11 @@
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
     }
+    
+    .next-box.hidden {
+      display: none !important;
+    }
+
     .next-box:active {
       cursor: grabbing;
     }
@@ -489,20 +494,20 @@
 </div>
   
   <!-- Drawer -->
-  <div class="drawer" id="drawer">
-    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+<div class="drawer" id="drawer">
+  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
     <div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
         <div class="title" id="nowTitle">...</div>
       </div>
-      <div class="next-box" id="nextBox">
+      <div class="next-box hidden">
         <div class="label">NEXT</div>
         <div id="nextList"></div>
         <div id="overflowCounter"></div>
       </div>
     </div>
-  </div>
+</div>
   
   <!-- Overlays -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
@@ -624,6 +629,9 @@
   document.getElementById("confirmDelete").style.display = "none";
   playSlideSound();
 }
+  document.addEventListener("DOMContentLoaded", () => {
+  updateQueueDisplay();
+});
 
   function closeDrawer() {
     drawer.classList.remove('open');
@@ -853,10 +861,20 @@
   nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
   nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
 
-  const nextBox = document.getElementById("nextBox");
+  const nextBox = document.querySelector('.next-box');
   const upcomingCount = queue.length - (currentIndex + 1);
-  nextBox.style.display = upcomingCount >= 1 ? "flex" : "none";
-}
+  
+  // Hide or show next-box based on upcoming songs
+  if (upcomingCount >= 1) {
+    nextBox.classList.remove('hidden');
+  } else {
+    nextBox.classList.add('hidden');
+  }
+  }
+    
+  document.addEventListener("DOMContentLoaded", () => {
+  updateQueueDisplay();
+});
 
   function updateOverflowCounter() {
     const list = document.getElementById("nextList");
@@ -1092,11 +1110,12 @@ window.addEventListener("popstate", function (e) {
 // Re-push the dummy state so user must confirm before exiting
   history.pushState(null, document.title, location.href);
 });
-
+  
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
