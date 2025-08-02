@@ -612,12 +612,18 @@
   }
 
   function openDrawer() {
-    drawer.classList.add('open');
-    overlay.classList.add('visible');
-    document.getElementById('drawerHandle').style.display = 'none';
-    document.getElementById("confirmDelete").style.display = "none";
-    playSlideSound();
+  // Close bottom drawer if open
+  if (bottomDrawer.classList.contains("open")) {
+    bottomDrawer.classList.remove("open");
+    document.querySelector(".bottom-drawer-handle").style.display = "flex";
   }
+
+  drawer.classList.add('open');
+  overlay.classList.add('visible');
+  document.getElementById('drawerHandle').style.display = 'none';
+  document.getElementById("confirmDelete").style.display = "none";
+  playSlideSound();
+}
 
   function closeDrawer() {
     drawer.classList.remove('open');
@@ -639,15 +645,24 @@
   const bottomDrawer = document.getElementById("bottomDrawer");
 
   function toggleBottomDrawer() {
-    const isOpen = bottomDrawer.classList.toggle("open");
-    document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+  const isOpen = bottomDrawer.classList.toggle("open");
+  document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
 
-    if (isOpen) {
-      const input = document.getElementById("youtubeInputDrawer");
-      setTimeout(() => input.focus(), 50);
+  if (isOpen) {
+    // Close left drawer if open
+    if (drawer.classList.contains("open")) {
+      drawer.classList.remove("open");
+      overlay.classList.remove("visible");
+      document.getElementById('drawerHandle').style.display = 'flex';
+      document.getElementById("confirmDelete").style.display = "none";
     }
-      playSlideSound();
+
+    const input = document.getElementById("youtubeInputDrawer");
+    setTimeout(() => input.focus(), 50);
   }
+
+  playSlideSound();
+}
 
   document.body.addEventListener("touchstart", evt => {
     startY = evt.touches[0].clientY;
@@ -1082,5 +1097,6 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
