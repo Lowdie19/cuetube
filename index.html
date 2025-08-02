@@ -264,16 +264,25 @@
       border: none;
     }
 
+    .url-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin: 10px 0;
+      gap: 6px; /* ⬅️ This controls spacing between URL box and button */
+    }
+        
     .url-input {
-      width: calc(100% - 20px);
-      margin: 0 10px 8px 10px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid cyan;
-      font-size: 1em;
-      background-color: white;
-      color: black;
-      text-align: center;
+      flex: 1;
+      max-width: 420px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background-color: #1a1a1a;
+      color: white;
+      font-size: 14px;
+      padding: 0 12px;
     }
 
     .bottom-buttons {
@@ -378,6 +387,43 @@
     .single-btn {
       width: 45%;
       max-width: 200px;
+    }
+
+    .url-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    
+    .url-input {
+      width: 100%;
+      padding-right: 48px;
+    }
+    
+    .paste-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #121212;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+    }
+    
+    .paste-btn:active {
+      box-shadow: 0 0 10px magenta, 0 0 20px magenta;
+    }
+    
+    .paste-btn svg {
+      stroke: cyan;
+    }
+    
+    /* Optional glow effect for input */
+    .url-input.glow {
+      box-shadow: 0 0 10px cyan, 0 0 20px cyan;
     }
 
     @media (orientation: landscape) {
@@ -542,7 +588,17 @@
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
   <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+  <div class="url-container">
+  <div class="url-group">
   <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+  <button id="pasteButton" class="paste-btn" title="Paste from clipboard" onclick="pasteToUrlBox()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="cyan" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" />
+      <path d="M9 2v4" />
+      <path d="M15 2v4" />
+    </svg>
+  </button>
+</div>
   <div class="bottom-buttons inside">
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
     <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
@@ -780,6 +836,26 @@
     return videoId;
   }
   }
+    
+  async function pasteToUrlBox() {
+      const input = document.getElementById("youtubeInputDrawer");
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          input.value = text;
+          input.focus();
+          input.classList.add("glow");
+          setTimeout(() => input.classList.remove("glow"), 1000);
+        } else {
+          showPopup("📋 Clipboard is empty!", "red");
+          playErrorSound();
+        }
+      } catch (err) {
+        console.error("Clipboard access failed", err);
+        showPopup("⚠️ Clipboard access denied!", "red");
+        playErrorSound();
+      }
+    }
 
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
@@ -1136,6 +1212,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
