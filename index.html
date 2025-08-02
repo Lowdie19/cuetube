@@ -1185,19 +1185,23 @@ window.addEventListener("popstate", function (e) {
   history.pushState(null, document.title, location.href);
 });
 
-    function goFullscreenIfLandscape() {
-      const isLandscape = window.innerWidth > window.innerHeight;
-      const doc = document.documentElement;
-    
-      if (isLandscape && doc.requestFullscreen) {
-        doc.requestFullscreen().catch((err) => {
-          console.warn("Fullscreen request failed:", err);
-        });
-      }
+    function enterFullScreenIfLandscape() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+
+    if (isLandscape && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.warn("Fullscreen failed:", err);
+      });
+    } else if (!isLandscape && document.fullscreenElement) {
+      document.exitFullscreen().catch((err) => {
+        console.warn("Exit fullscreen failed:", err);
+      });
     }
-    
-    window.addEventListener("orientationchange", goFullscreenIfLandscape);
-    window.addEventListener("resize", goFullscreenIfLandscape);
+  }
+
+  window.addEventListener("resize", enterFullScreenIfLandscape);
+  window.addEventListener("orientationchange", enterFullScreenIfLandscape);
+  enterFullScreenIfLandscape();
     
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
@@ -1217,6 +1221,33 @@ window.addEventListener("popstate", function (e) {
         }
       });
     }
+
+  function adjustForKeyboard() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const drawer = document.getElementById('bottomDrawer');
+    const viewport = window.visualViewport;
+
+    if (!viewport || !isLandscape) {
+      drawer.style.paddingBottom = '25px'; // default
+      return;
+    }
+
+    const keyboardHeight = window.innerHeight - viewport.height - viewport.offsetTop;
+
+    if (keyboardHeight > 100) {
+      // Keyboard is visible
+      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
+    } else {
+      drawer.style.paddingBottom = '25px';
+    }
+  }
+
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", adjustForKeyboard);
+    visualViewport.addEventListener("scroll", adjustForKeyboard);
+  }
+
+  window.addEventListener("orientationchange", adjustForKeyboard);
         
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
