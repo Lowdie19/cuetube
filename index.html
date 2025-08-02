@@ -1187,7 +1187,17 @@ window.addEventListener("popstate", function (e) {
 
     function pasteFromClipboard() {
       navigator.clipboard.readText().then(text => {
-        document.getElementById("youtubeInputDrawer").value = text;
+        const input = document.getElementById("youtubeInputDrawer");
+        input.value = text;
+    
+        // Validate YouTube URL
+        const videoId = extractVideoId(text);
+        if (!videoId) {
+          input.value = ""; // Optional: clear input
+          showPopup("⚠️ Invalid YouTube URL!", "red");
+          playErrorSound();
+          return;
+        }
       });
     }
         
@@ -1195,6 +1205,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
