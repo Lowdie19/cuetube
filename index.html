@@ -290,6 +290,11 @@
       vertical-align: middle;
       text-align: center;
     }
+    
+    .url-input.glow {
+      box-shadow: 0 0 8px magenta, 0 0 16px magenta;
+      border: 1px solid magenta;
+    }
 
     .bottom-buttons {
       position: fixed;
@@ -1219,21 +1224,26 @@ window.addEventListener("popstate", function (e) {
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
 
-    function pasteFromClipboard() {
-      navigator.clipboard.readText().then(text => {
-        const input = document.getElementById("youtubeInputDrawer");
-        input.value = text;
-    
-        // Validate YouTube URL
-        const videoId = extractVideoId(text);
-        if (!videoId) {
-          input.value = ""; // Optional: clear input
-          showPopup("⚠️ Invalid YouTube URL!", "red");
-          playErrorSound();
-          return;
-        }
-      });
+  async function pasteFromClipboard() {
+  playClickSound(); // Play click sound immediately
+
+  try {
+    const text = await navigator.clipboard.readText();
+    const input = document.getElementById("youtubeInputDrawer");
+    input.value = text;
+
+    if (!extractVideoId(text)) {
+      showPopup("⚠️ Invalid YouTube URL!", "red");
+      playErrorSound();
+    } else {
+      input.dispatchEvent(new Event("input")); // Trigger glow if needed
     }
+  } catch (err) {
+    showPopup("⚠️ Failed to read clipboard!", "red");
+    playErrorSound();
+    console.error("Clipboard error:", err);
+  }
+}
 
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
@@ -1299,10 +1309,22 @@ window.addEventListener("popstate", function (e) {
     }
   });
     
+ // Glow the URL box
+const youtubeInput = document.getElementById("youtubeInputDrawer");
+
+  youtubeInput.addEventListener("input", () => {
+    if (youtubeInput.value.trim()) {
+      youtubeInput.classList.add("glow");
+    } else {
+      youtubeInput.classList.remove("glow");
+    }
+  });
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
