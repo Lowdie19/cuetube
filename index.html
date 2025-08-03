@@ -271,6 +271,7 @@
       align-items: center;
       position: relative;
       gap: 15px;
+      margin-bottom: 15px;
     }
         
     .url-input {
@@ -393,12 +394,6 @@
     .single-btn {
       width: 45%;
       max-width: 200px;
-    }
-
-    .url-container {
-      position: relative;
-      width: 100%;
-      margin-bottom: 12px;
     }
     
     .url-input {
@@ -587,18 +582,19 @@
 
   <!-- Bottom Drawer -->
   <div class="bottom-drawer" id="bottomDrawer">
-  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
-  <div class="url-container">
+    <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+    
   <div class="url-group">
-  <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-  <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
-    <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
-  </button>
-</div>
-  <div class="bottom-buttons inside">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
+    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+      <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
+        <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
+      </button>
   </div>
+    
+    <div class="bottom-buttons inside">
+      <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+      <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
+    </div>
   </div>
   
   <!-- Popup -->
@@ -1261,6 +1257,7 @@ window.addEventListener("popstate", function (e) {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
