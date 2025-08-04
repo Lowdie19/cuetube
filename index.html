@@ -270,12 +270,13 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      gap: 15px;
+      gap: 10px;
       margin-bottom: 15px;
     }
         
     .url-input {
       flex: 1;
+      min-width: 260px; /* ensures the placeholder fits */
       max-width: 420px;
       height: 36px;
       border-radius: 8px;
@@ -292,8 +293,11 @@
     }
     
     .url-input.glow {
-      box-shadow: 0 0 8px magenta, 0 0 16px magenta;
-      border: 1px solid magenta;
+      box-shadow: 
+        0 0 4px #ff00ff, 
+        0 0 8px #ff00ff, 
+        0 0 16px #ff00ff;
+      border: 1px solid #ff00ff;
     }
 
     .bottom-buttons {
@@ -1224,27 +1228,7 @@ window.addEventListener("popstate", function (e) {
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
 
-  async function pasteFromClipboard() {
-  playClickSound(); // Play click sound immediately
-
-  try {
-    const text = await navigator.clipboard.readText();
-    const input = document.getElementById("youtubeInputDrawer");
-    input.value = text;
-
-    if (!extractVideoId(text)) {
-      showPopup("⚠️ Invalid YouTube URL!", "red");
-      playErrorSound();
-    } else {
-      input.dispatchEvent(new Event("input")); // Trigger glow if needed
-    }
-  } catch (err) {
-    showPopup("⚠️ Failed to read clipboard!", "red");
-    playErrorSound();
-    console.error("Clipboard error:", err);
-  }
-}
-
+  pasteFromClipboard()
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
     const isLandscape = window.innerWidth > window.innerHeight;
@@ -1324,6 +1308,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
