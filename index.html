@@ -676,6 +676,19 @@
   </div>
 </div>
 
+<!-- Clipboard Permission Modal -->
+<div id="clipboardModalOverlay" class="overlay" style="display:none;"></div>
+<div id="clipboardModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <p style="color: white; margin: 5px 0 12px;">⚠️ Clipboard access is blocked or denied.</p>
+    <p style="color: #ccc;">You can allow clipboard access in your browser/app permissions.<br><br>
+    If not allowed, please paste the YouTube URL manually.</p>
+    <div class="modal-buttons" style="justify-content: center; margin-top: 20px;">
+      <button class="cyan-btn single-btn" onclick="hideClipboardModal()">OK</button>
+    </div>
+  </div>
+</div>
+
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="successSound" src="success.wav" preload="auto"
     ></audio>
@@ -1303,11 +1316,41 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-    
+
+    function adjustForKeyboard() {
+    const drawer = document.getElementById('bottomDrawer');
+    const isLandscape = window.innerWidth > window.innerHeight;
+
+    if (!window.visualViewport || !isLandscape) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
+      drawer.style.paddingBottom = '25px';
+      return;
+    }
+
+    const vp = window.visualViewport;
+    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
+
+    if (keyboardHeight > 100) {
+      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
+    } else {
+      drawer.style.paddingBottom = '25px';
+    }
+  }
+
+  // 🔽 Attach the event AFTER defining the function
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', adjustForKeyboard);
+  }
+
+  function isValidYouTubeUrl(url) {
+  return /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(url);
+}
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
