@@ -331,20 +331,18 @@
     
     .bottom-drawer {
       position: fixed;
-      bottom: -180px;
+      bottom: -160px;
       left: 0;
       width: 100%;
       background: rgba(40, 40, 40, 0.90);
       padding: 20px 15px 25px;
-      max-height: 80vh; /* optional, so it doesn't overflow screen */
-      overflow-y: auto; /* allow scrolling if content is tall */
-      box-sizing: border-box; /* so padding is included in height */
       box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
       transition: bottom 0.3s ease;
-      z-index: 1000;
+      z-index: 98;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 20px 15px 25px; /* bottom is 25px default */
     }
     
     .bottom-drawer.open {
@@ -733,7 +731,6 @@
 
   let startY = 0;
   const bottomDrawer = document.getElementById("bottomDrawer");
-  drawer.classList.toggle("open");
 
   function toggleBottomDrawer() {
   const isOpen = bottomDrawer.classList.toggle("open");
@@ -742,7 +739,6 @@
   if (isOpen) {
     // Close left drawer if open
     if (drawer.classList.contains("open")) {
-      adjustForKeyboard();
       drawer.classList.remove("open");
       overlay.classList.remove("visible");
       document.getElementById('drawerHandle').style.display = 'flex';
@@ -1218,7 +1214,7 @@ window.addEventListener("popstate", function (e) {
 
   try {
     const text = await navigator.clipboard.readText();
-    const input = document.getElementById("youtubeInputDrawer").classList.remove("glow-success-url");
+    const input = document.getElementById("youtubeInputDrawer");
     input.value = text;
 
     if (!extractVideoId(text)) {
@@ -1237,31 +1233,36 @@ window.addEventListener("popstate", function (e) {
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
     const isLandscape = window.innerWidth > window.innerHeight;
-  
-    if (!window.visualViewport || !drawer.classList.contains('open') || !isLandscape) {
+
+    if (!window.visualViewport || !isLandscape) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
       drawer.style.paddingBottom = '25px';
       return;
     }
-  
+
     const vp = window.visualViewport;
     const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
-  
+
     if (keyboardHeight > 100) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
       drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
     } else {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
       drawer.style.paddingBottom = '25px';
     }
   }
-  
-  // Attach listeners
+
   if (window.visualViewport) {
     visualViewport.addEventListener("resize", adjustForKeyboard);
     visualViewport.addEventListener("scroll", adjustForKeyboard);
   }
-  
+
   window.addEventListener("orientationchange", () => {
-    setTimeout(adjustForKeyboard, 200);
+    setTimeout(adjustForKeyboard, 200); // Give time for reflow
   });
+
+  // Initial call in case landscape is already active
+  window.addEventListener("DOMContentLoaded", adjustForKeyboard);
 
  // Glow the URL box
 const youtubeInput = document.getElementById("youtubeInputDrawer");
@@ -1278,22 +1279,6 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
