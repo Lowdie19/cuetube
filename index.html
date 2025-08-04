@@ -1222,6 +1222,7 @@ window.addEventListener("popstate", function (e) {
     input.value = text;
 
     if (!extractVideoId(text)) {
+      input.value = "";
       showPopup("⚠️ Invalid YouTube URL!", "red");
       playErrorSound();
     } else {
@@ -1283,6 +1284,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
