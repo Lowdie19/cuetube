@@ -270,13 +270,13 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      gap: 10px;
+      gap: 15px;
       margin-bottom: 15px;
     }
         
     .url-input {
       flex: 1;
-      min-width: 260px; /* ensures the placeholder fits */
+      min-width: 260px;
       max-width: 420px;
       height: 36px;
       border-radius: 8px;
@@ -296,7 +296,8 @@
       box-shadow: 
         0 0 4px #ff00ff, 
         0 0 8px #ff00ff, 
-        0 0 16px #ff00ff;
+        0 0 16px #ff00ff, 
+        0 0 24px #ff00ff;
       border: 1px solid #ff00ff;
     }
 
@@ -672,19 +673,6 @@
 
     <div class="modal-buttons" style="justify-content: center;">
       <button class="cyan-btn single-btn" onclick="requestClipboardPermission()">Allow Now</button>
-    </div>
-  </div>
-</div>
-
-<!-- Clipboard Permission Modal -->
-<div id="clipboardModalOverlay" class="overlay" style="display:none;"></div>
-<div id="clipboardModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <p style="color: white; margin: 5px 0 12px;">⚠️ Clipboard access is blocked or denied.</p>
-    <p style="color: #ccc;">You can allow clipboard access in your browser/app permissions.<br><br>
-    If not allowed, please paste the YouTube URL manually.</p>
-    <div class="modal-buttons" style="justify-content: center; margin-top: 20px;">
-      <button class="cyan-btn single-btn" onclick="hideClipboardModal()">OK</button>
     </div>
   </div>
 </div>
@@ -1241,7 +1229,27 @@ window.addEventListener("popstate", function (e) {
     // Optional: manual trigger on user click (some browsers require gesture)
     document.addEventListener("click", goFullscreenIfLandscape);
 
-  pasteFromClipboard()
+  async function pasteFromClipboard() {
+  playClickSound(); // Play click sound immediately
+
+  try {
+    const text = await navigator.clipboard.readText();
+    const input = document.getElementById("youtubeInputDrawer");
+    input.value = text;
+
+    if (!extractVideoId(text)) {
+      showPopup("⚠️ Invalid YouTube URL!", "red");
+      playErrorSound();
+    } else {
+      input.dispatchEvent(new Event("input")); // Trigger glow if needed
+    }
+  } catch (err) {
+    showPopup("⚠️ Failed to read clipboard!", "red");
+    playErrorSound();
+    console.error("Clipboard error:", err);
+  }
+}
+
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
     const isLandscape = window.innerWidth > window.innerHeight;
@@ -1316,43 +1324,11 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-
-    function adjustForKeyboard() {
-    const drawer = document.getElementById('bottomDrawer');
-    const isLandscape = window.innerWidth > window.innerHeight;
-
-    if (!window.visualViewport || !isLandscape) {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = '25px';
-      return;
-    }
-
-    const vp = window.visualViewport;
-    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
-
-    if (keyboardHeight > 100) {
-      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
-    } else {
-      drawer.style.paddingBottom = '25px';
-    }
-  }
-
-  // 🔽 Attach the event AFTER defining the function
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', adjustForKeyboard);
-  }
-
-  function isValidYouTubeUrl(url) {
-  return /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(url);
-}
-
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
 
 
 
