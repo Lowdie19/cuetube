@@ -1214,26 +1214,44 @@ window.addEventListener("popstate", function (e) {
     document.addEventListener("click", goFullscreenIfLandscape);
 
   async function pasteFromClipboard() {
-  playClickSound(); // Play click sound immediately
-
-  try {
-    const text = await navigator.clipboard.readText();
+    playClickSound(); // Play click sound immediately
+  
     const input = document.getElementById("youtubeInputDrawer");
-    input.value = text;
-
-    if (!extractVideoId(text)) {
-      input.value = "";
-      showPopup("⚠️ Invalid YouTube URL!", "red");
-      playErrorSound();
-    } else {
-      input.dispatchEvent(new Event("input")); // Trigger glow if needed
+  
+    try {
+      // Try clipboard read
+      if (!navigator.clipboard) throw new Error("Clipboard API not supported");
+  
+      const text = await navigator.clipboard.readText();
+      input.value = text;
+  
+      if (!extractVideoId(text)) {
+        input.value = "";
+        showPopup("⚠️ Invalid YouTube URL!", "red");
+        playErrorSound();
+      } else {
+        input.dispatchEvent(new Event("input")); // Trigger glow if needed
+      }
+  
+    } catch (err) {
+      console.warn("Clipboard failed, falling back to manual paste:", err);
+  
+      // Fallback prompt if clipboard fails
+      const manual = prompt("📋 Paste the YouTube URL manually:");
+      if (manual) {
+        input.value = manual;
+  
+        if (!extractVideoId(manual)) {
+          input.value = "";
+          showPopup("⚠️ Invalid YouTube URL!", "red");
+          playErrorSound();
+        } else {
+          input.dispatchEvent(new Event("input")); // Trigger glow if valid
+          playPasteSound?.(); // Optional: add sound when manually pasted
+        }
+      }
     }
-  } catch (err) {
-    showPopup("⚠️ Failed to read clipboard!", "red");
-    playErrorSound();
-    console.error("Clipboard error:", err);
   }
-}
 
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
@@ -1284,6 +1302,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
