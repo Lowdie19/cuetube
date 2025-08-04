@@ -661,22 +661,6 @@
   </div>
 </div>
 
-  <!-- Clipboard Permission Modal -->
-<div id="clipboardPermissionOverlay" class="overlay" style="display:none;"></div>
-<div id="clipboardPermissionModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <p style="color: white; margin: 5px 0 10px;">📋 Clipboard Access Required</p>
-    <p style="color: white; margin: 0 0 18px;">
-      To enable Paste functionality, please allow clipboard access.
-    </p>
-    <p style="color: #00ffff; margin: 5px 0 18px;">Don't worry, this is just a one-time request.</p>
-
-    <div class="modal-buttons" style="justify-content: center;">
-      <button class="cyan-btn single-btn" onclick="requestClipboardPermission()">Allow Now</button>
-    </div>
-  </div>
-</div>
-
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="successSound" src="success.wav" preload="auto"
     ></audio>
@@ -1284,36 +1268,6 @@ window.addEventListener("popstate", function (e) {
   // Initial call in case landscape is already active
   window.addEventListener("DOMContentLoaded", adjustForKeyboard);
 
-    
- // clipboardPermission
-  function showClipboardPermissionModal() {
-    document.getElementById("clipboardPermissionOverlay").style.display = "block";
-    document.getElementById("clipboardPermissionModal").style.display = "block";
-  }
-
-  function hideClipboardPermissionModal() {
-    document.getElementById("clipboardPermissionOverlay").style.display = "none";
-    document.getElementById("clipboardPermissionModal").style.display = "none";
-  }
-
-  async function requestClipboardPermission() {
-    try {
-      // Try accessing clipboard
-      await navigator.clipboard.readText();
-      hideClipboardPermissionModal();
-      showPopup("✅ Clipboard access granted!", "cyan");
-    } catch (err) {
-      showPopup("⚠️ Clipboard access denied", "red");
-    }
-  }
-
-  // Show modal on startup (once)
-  window.addEventListener("DOMContentLoaded", () => {
-    if (navigator.clipboard && navigator.clipboard.readText) {
-      showClipboardPermissionModal();
-    }
-  });
-    
  // Glow the URL box
 const youtubeInput = document.getElementById("youtubeInputDrawer");
 
@@ -1329,6 +1283,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
