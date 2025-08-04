@@ -803,7 +803,7 @@
   const videoId = extractVideoId(url);
   if (!videoId) {
     input.value = "";
-    showPopup("⚠️ Invalid YouTube URL!", "red");
+    showPopup("⚠️ Invalid\nYouTube URL!", "red");
     playErrorSound();
     return;
   }
@@ -835,7 +835,7 @@
       const data = await res.json();
       return data.title || videoId;
     } catch (err) {
-    showPopup("⚠️ Choose another Video!", "red");
+    showPopup("⚠️ Choose\nanother Video!", "red");
     playErrorSound();
     return videoId;
   }
@@ -1223,13 +1223,13 @@ window.addEventListener("popstate", function (e) {
 
     if (!extractVideoId(text)) {
       input.value = "";
-      showPopup("⚠️ Invalid YouTube URL!", "red");
+      showPopup("⚠️ Invalid\nYouTube URL!", "red");
       playErrorSound();
     } else {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
     }
   } catch (err) {
-    showPopup("⚠️ Failed to read clipboard!", "red");
+    showPopup("⚠️ Not suported!\nuse manual.", "deep orange");
     playErrorSound();
     console.error("Clipboard error:", err);
   }
@@ -1284,6 +1284,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
