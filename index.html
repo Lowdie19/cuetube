@@ -661,6 +661,23 @@
   </div>
 </div>
 
+  <!-- Paste Fallback Modal -->
+<div id="pasteFallbackOverlay" class="overlay" style="display:none;"></div>
+<div id="pasteFallbackModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <p style="color: white; margin: 5px 0 12px;">The paste function is not compatible with your phone.</p>
+    
+    <!-- Manual Input (same style as youtubeInputDrawer) -->
+    <input type="text" id="manualPasteInput" class="url-input" placeholder="Paste the YouTube URL here" style="margin-bottom: 14px; max-width: 100%;" />
+
+    <!-- Reserve Button -->
+    <div class="modal-buttons" style="justify-content: center; flex-direction: column;">
+      <button class="cyan-btn single-btn" style="margin-bottom: 10px;" onclick="reserveFromModal()">Reserve</button>
+      <button class="cyan-btn single-btn" onclick="hidePasteFallback()">Cancel</button>
+    </div>
+  </div>
+</div>
+
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="successSound" src="success.wav" preload="auto"
     ></audio>
@@ -835,10 +852,9 @@
       const data = await res.json();
       return data.title || videoId;
     } catch (err) {
-    showPopup("⚠️ Choose another Video!", "red");
-    playErrorSound();
-    return videoId;
-  }
+      console.warn("Clipboard failed, showing modal fallback:", err);
+      showPasteFallback(); // Show styled modal instead of prompt
+    }
   }
 
   function showDeleteConfirm(e, index) {
@@ -1252,6 +1268,36 @@ window.addEventListener("popstate", function (e) {
       }
     }
   }
+    function showPasteFallback() {
+      document.getElementById("pasteFallbackOverlay").style.display = "block";
+      document.getElementById("pasteFallbackModal").style.display = "block";
+      document.getElementById("manualPasteInput").value = "";
+      document.getElementById("manualPasteInput").focus();
+    }
+    
+    function hidePasteFallback() {
+      document.getElementById("pasteFallbackOverlay").style.display = "none";
+      document.getElementById("pasteFallbackModal").style.display = "none";
+    }
+    
+    async function reserveFromModal() {
+      const input = document.getElementById("manualPasteInput");
+      const url = input.value.trim();
+      const videoId = extractVideoId(url);
+    
+      if (!videoId) {
+        input.value = "";
+        showPopup("⚠️ Invalid YouTube URL!", "red");
+        playErrorSound();
+        return;
+      }
+    
+      const title = await fetchTitle(videoId);
+      addToQueue(videoId, title);
+      hidePasteFallback();
+      playSuccessSound();
+      showPopup("✅ Reserved!", "green");
+    }
 
   function adjustForKeyboard() {
     const drawer = document.getElementById('bottomDrawer');
@@ -1302,6 +1348,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
