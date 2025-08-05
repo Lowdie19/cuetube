@@ -464,43 +464,49 @@
       }
     }
     
-    #popupModal {
-      display: none;
-      position: fixed;
-      top: 35%;
-      left: 50%;
-      transform: translateX(-50%) scale(0.8);
-      font-size: 1.5em;
-      font-weight: bold;
-      text-align: center;
-      z-index: 300;
-      pointer-events: none;
-      opacity: 0;
-      color: white;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      text-shadow: 0 0 10px lime, 0 0 20px lime, 0 0 35px lime;
-    }
-      
-    #popupModal.show {
-      display: block;
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-    }
-    
     #popupOverlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 250;
-      display: none;
-      transition: opacity 0.4s ease;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: transparent !important; /* rgba(0,0,0,0.5); */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 9998;
+      font-size: 1.8em !important;
+      text-align: center !important;
     }
-
+    
     #popupOverlay.visible {
-      display: block;
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    #popupModal {
+      position: fixed;
+      top: 50%; left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      background: none !important; /* #222; */
+      border: none !important; /* 2px solid cyan; */
+      border-radius: 10px;
+      padding: 0 !important; /* 15px 25px; */
+      color: inherit; /* white; */
+      font-weight: bold;
+      text-align: center !important;
+      text-shadow: inherit;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      max-width: 90vw;
+      box-shadow: none !important; /* 0 0 20px cyan; */
+      user-select: none;
+      font-size: 1.8em !important;
+    }
+    
+    #popupModal.show {
+      opacity: 1;
+      visibility: visible;
     }
     
     #confirmDelete {
@@ -788,9 +794,30 @@
   });
 }
 
-  function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
+ function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.ENDED) {
+    const isLastVideo = currentIndex === queue.length - 1;
+    if (queue.length === 0 || isLastVideo) {
+      // Reset queue and player here
+      queue = [];
+      currentIndex = -1;
+
+      updateNowPlaying();
+      updateQueueDisplay();
+
+      player.stopVideo();
+      player.clearVideo();
+
+      // **Add this line back here:**
+      showPopup("🎵 Queue finished and reset", "magenta", true);
+    } else {
+      currentIndex++;
+      player.loadVideoById(queue[currentIndex].id);
+      updateNowPlaying();
+      updateQueueDisplay();
+    }
   }
+}
 
   function extractVideoId(url) {
     const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
@@ -798,36 +825,39 @@
   }
 
   async function reserveFromDrawer() {
-  const input = document.getElementById("youtubeInputDrawer");
-  const url = input.value.trim();
-  const videoId = extractVideoId(url);
-  if (!videoId) {
-    input.value = "";
-    showPopup("⚠️ Invalid\nYouTube URL!", "red");
-    playErrorSound();
-    return;
-  }
-
-  const title = await fetchTitle(videoId);
-  
-  // If it's the first video being added
-  if (queue.length === 0 && currentIndex === -1) {
-    queue.push({ id: videoId, title });
-    currentIndex = 0;
-    player.loadVideoById(videoId);
-    updateNowPlaying();
+    clearPersistentPopup();
     
-  } else {
-    // Add to the end of queue
-    queue.push({ id: videoId, title });
+    const input = document.getElementById("youtubeInputDrawer");
+    const url = input.value.trim();
+    const videoId = extractVideoId(url);
+    
+    if (!videoId) {
+      input.value = "";
+      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      playErrorSound();
+      return;
+    }
+  
+    const title = await fetchTitle(videoId);
+    
+    // If it's the first video being added
+    if (queue.length === 0 && currentIndex === -1) {
+      queue.push({ id: videoId, title });
+      currentIndex = 0;
+      player.loadVideoById(videoId);
+      updateNowPlaying();
+      
+    } else {
+      // Add to the end of queue
+      queue.push({ id: videoId, title });
+    }
+  
+    updateQueueDisplay();
+    input.value = "";
+    showPopup("Reserved!", "lime");
+    playSuccessSound();
+    closeBottomDrawer();
   }
-
-  updateQueueDisplay();
-  input.value = "";
-  showPopup("Reserved!", "lime");
-  playSuccessSound();
-  closeBottomDrawer();
-}
 
   async function fetchTitle(videoId) {
     try {
@@ -1002,19 +1032,44 @@
   }
 
 
-  function showPopup(text, glowColor) {
-    const popup = document.getElementById("popupModal");
-    popup.innerText = text;
-    popup.style.color = "white";
-    popup.style.textShadow = `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 35px ${glowColor}`;
+  let persistentPopupActive = false;
 
-    popupOverlay.classList.add("visible");
-    popup.classList.add("show");
+function showPopup(message, color = 'magenta', persistent = false) {
+  const popup = document.getElementById('popupModal');
+  const overlay = document.getElementById('popupOverlay');
+
+  popup.textContent = message;
+  popup.style.color = 'white';
+  popup.style.textShadow = `
+    0 0 10px ${color},
+    0 0 20px ${color},
+    0 0 35px ${color}
+  `;
+
+  overlay.classList.add('visible');
+  popup.classList.add('show');
+
+  if (persistent) {
+    persistentPopupActive = true;
+    // Don't auto-hide
+  } else {
+    persistentPopupActive = false;
     setTimeout(() => {
-      popup.classList.remove("show");
-      popupOverlay.classList.remove("visible");
-    }, 1800);
+      popup.classList.remove('show');
+      overlay.classList.remove('visible');
+    }, 3000); // Auto-hide after 3 seconds
   }
+}
+
+function clearPersistentPopup() {
+  if (persistentPopupActive) {
+    const popup = document.getElementById('popupModal');
+    const overlay = document.getElementById('popupOverlay');
+    popup.classList.remove('show');
+    overlay.classList.remove('visible');
+    persistentPopupActive = false;
+  }
+}
 
   (function enableDragScroll() {
     const box = document.querySelector('.next-box');
@@ -1059,7 +1114,8 @@
   document.getElementById("popupOverlay").onclick = () => {
     const popup = document.getElementById("popupModal");
     popup.classList.remove("show");
-    popupOverlay.classList.remove("visible");
+    document.getElementById("popupOverlay").classList.remove("visible");
+    persistentPopupActive = false;
   };
 
   document.body.addEventListener("click", () => {
@@ -1279,11 +1335,12 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-    
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
