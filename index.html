@@ -789,31 +789,26 @@
 }
 
   function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.ENDED) {
-    const isLastVideo = currentIndex === queue.length - 1;
-
-    if (isLastVideo) {
-      // Remove the last item
-      queue.splice(currentIndex, 1);
-
-      if (queue.length === 0) {
+    if (event.data === YT.PlayerState.ENDED) {
+      const current = queue[currentIndex];
+  
+      if (currentIndex === queue.length - 1) {
+        queue.pop(); // Remove last song
         currentIndex = -1;
-        document.getElementById("nowTitle").textContent = "No song playing";
-        hideNextBox();
-      } else {
-        currentIndex = queue.length - 1;
-        player.loadVideoById(queue[currentIndex].id);
+        updateNowPlaying();
+        updateQueueDisplay();
+        showPopup("🎉 End of playlist", "magenta");
+        playErrorSound();
+  
+        // Stop and clear the video
+        player.stopVideo();
+        player.clearVideo();
+        return;
       }
-
-      updateNowPlaying();
-      updateQueueDisplay();
-      showPopup("End of playlist.", "red");
-      playErrorSound();
-    } else {
+  
       playNextFromQueue();
     }
   }
-}
 
   function extractVideoId(url) {
     const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
@@ -821,36 +816,36 @@
   }
 
   async function reserveFromDrawer() {
-  const input = document.getElementById("youtubeInputDrawer");
-  const url = input.value.trim();
-  const videoId = extractVideoId(url);
-  if (!videoId) {
-    input.value = "";
-    showPopup("⚠️ Invalid\nYouTube URL!", "red");
-    playErrorSound();
-    return;
-  }
-
-  const title = await fetchTitle(videoId);
+    const input = document.getElementById("youtubeInputDrawer");
+    const url = input.value.trim();
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      input.value = "";
+      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      playErrorSound();
+      return;
+    }
   
-  // If it's the first video being added
-  if (queue.length === 0 && currentIndex === -1) {
-    queue.push({ id: videoId, title });
-    currentIndex = 0;
-    player.loadVideoById(videoId);
-    updateNowPlaying();
-    
-  } else {
-    // Add to the end of queue
-    queue.push({ id: videoId, title });
+    const title = await fetchTitle(videoId);
+  
+    // If it's the first video being added
+    if (queue.length === 0 && currentIndex === -1) {
+      queue.push({ id: videoId, title });
+      currentIndex = 0;
+      player.loadVideoById(videoId);
+      updateNowPlaying();
+      setupEndListener(); // ✅ ADD THIS LINE HERE
+    } else {
+      // Add to the end of queue
+      queue.push({ id: videoId, title });
+    }
+  
+    updateQueueDisplay();
+    input.value = "";
+    showPopup("Reserved!", "lime");
+    playSuccessSound();
+    closeBottomDrawer();
   }
-
-  updateQueueDisplay();
-  input.value = "";
-  showPopup("Reserved!", "lime");
-  playSuccessSound();
-  closeBottomDrawer();
-}
 
   async function fetchTitle(videoId) {
     try {
@@ -900,81 +895,101 @@
   updateQueueDisplay();
   showPopup("Next song!", "magenta");
 }
-
+    
+  function setupEndListener() {
+  player.addEventListener("onStateChange", function (event) {
+    if (event.data === YT.PlayerState.ENDED) {
+      // If it's the last video
+      if (currentIndex === queue.length - 1) {
+        showPopup("End of playlist.", "red");
+        document.getElementById("nowTitle").textContent = "";
+        queue = [];
+        currentIndex = -1;
+        updateQueueDisplay();
+        updateNowPlaying();
+        player.stopVideo();
+      } else {
+        playNextFromQueue();
+      }
+    }
+  });
+}
+    
+////////////////////////////////////
   function updateQueueDisplay() {
-  const list = document.getElementById("nextList");
-  const overflow = document.getElementById("overflowCounter");
-  list.innerHTML = "";
-
-  for (let i = currentIndex + 1; i < queue.length; i++) {
-    const div = document.createElement("div");
-    div.className = "title";
-    div.textContent = queue[i].title;
-    div.style.cursor = "pointer";
-
-    let longPressTimer;
-    let longPressTriggered = false;
-
-    const startHandler = (e) => {
-      e.preventDefault();
-      longPressTriggered = false;
-      div.classList.add("long-pressing");
-
-      longPressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        navigator.vibrate?.(50);
-        showDeleteConfirm(e, i);
-      }, 500);
-    };
-
-    const endHandler = () => {
-      if (!longPressTriggered) {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    list.innerHTML = "";
+  
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+      const div = document.createElement("div");
+      div.className = "title";
+      div.textContent = queue[i].title;
+      div.style.cursor = "pointer";
+  
+      let longPressTimer;
+      let longPressTriggered = false;
+  
+      const startHandler = (e) => {
+        e.preventDefault();
+        longPressTriggered = false;
+        div.classList.add("long-pressing");
+  
+        longPressTimer = setTimeout(() => {
+          longPressTriggered = true;
+          navigator.vibrate?.(50);
+          showDeleteConfirm(e, i);
+        }, 500);
+      };
+  
+      const endHandler = () => {
+        if (!longPressTriggered) {
+          clearTimeout(longPressTimer);
+          div.classList.remove("long-pressing");
+        }
+      };
+  
+      const cancelHandler = () => {
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
-      }
-    };
-
-    const cancelHandler = () => {
-      clearTimeout(longPressTimer);
-      div.classList.remove("long-pressing");
-    };
-
-    // Events for both mouse and touch
-    div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: false });
-
-    div.addEventListener("mouseup", endHandler);
-    div.addEventListener("mouseleave", cancelHandler);
-    div.addEventListener("touchend", endHandler);
-    div.addEventListener("touchcancel", cancelHandler);
-
-    // Optional: Right-click support for desktop
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      showDeleteConfirm(e, i);
-    });
-
-    list.appendChild(div);
-  }
-
-  updateOverflowCounter();
-
-  const nextBtn = document.getElementById("nextBtnDrawer");
-  const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-  nextBtn.disabled = !hasNext;
-  nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-  nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-
-  const nextBox = document.querySelector('.next-box');
-  const upcomingCount = queue.length - (currentIndex + 1);
+      };
   
-  // Hide or show next-box based on upcoming songs
-  if (upcomingCount >= 1) {
-    nextBox.classList.remove('hidden');
-  } else {
-    nextBox.classList.add('hidden');
+      // Mouse and touch events
+      div.addEventListener("mousedown", startHandler);
+      div.addEventListener("touchstart", startHandler, { passive: false });
+      div.addEventListener("mouseup", endHandler);
+      div.addEventListener("mouseleave", cancelHandler);
+      div.addEventListener("touchend", endHandler);
+      div.addEventListener("touchcancel", cancelHandler);
+  
+      // Right-click support
+      div.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        showDeleteConfirm(e, i);
+      });
+  
+      list.appendChild(div);
+    }
+  
+    updateOverflowCounter();
+  
+    // Update "Next" button
+    const nextBtn = document.getElementById("nextBtnDrawer");
+    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+    nextBtn.disabled = !hasNext;
+    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+  
+    // Show/hide next-box
+    const nextBox = document.querySelector('.next-box');
+    const upcomingCount = queue.length - (currentIndex + 1);
+    if (upcomingCount >= 1) {
+      nextBox.classList.remove('hidden');
+    } else {
+      nextBox.classList.add('hidden');
+    }
   }
-  }
+////////////////////////////////////
     
   document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
@@ -1007,14 +1022,14 @@
 
   function updateNowPlaying() {
     const nowTitleEl = document.getElementById("nowTitle");
+    const current = queue[currentIndex];
   
-    if (currentIndex < 0 || !queue[currentIndex]) {
-      nowTitleEl.textContent = "No song playing";
+    if (!current) {
+      nowTitleEl.textContent = "";
       nowTitleEl.style.textShadow = "none";
       return;
     }
   
-    const current = queue[currentIndex];
     let title = current.title || `Video ID: ${current.id}`;
     let remaining = queue.length - (currentIndex + 1);
   
@@ -1310,11 +1325,12 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-    
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
