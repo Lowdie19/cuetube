@@ -835,7 +835,7 @@
       const data = await res.json();
       return data.title || videoId;
     } catch (err) {
-    showPopup("⚠️ Choose\nanother Video!", "red");
+    showPopup("⚠️ Oops! Try choosing\nanother video.", "red");
     playErrorSound();
     return videoId;
   }
@@ -1229,7 +1229,7 @@ window.addEventListener("popstate", function (e) {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
     }
   } catch (err) {
-    showPopup("⚠️ Not suported!\nuse manual.", "deep orange");
+    showPopup("⚠️ Not supported\nplease paste it manually.", "orange");
     playErrorSound();
     console.error("Clipboard error:", err);
   }
@@ -1284,6 +1284,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
