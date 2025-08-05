@@ -468,13 +468,11 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: transparent !important; /* rgba(0,0,0,0.5); */
+      background: rgba(0, 0, 0, 0.6);  /* Dimming effect */
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease;
       z-index: 9998;
-      font-size: 1.8em !important;
-      text-align: center !important;
     }
     
     #popupOverlay.visible {
@@ -484,7 +482,7 @@
     
     #popupModal {
       position: fixed;
-      top: 50%; left: 50% !important;
+      top: 30%; left: 50% !important;
       transform: translate(-50%, -50%) !important;
       background: none !important; /* #222; */
       border: none !important; /* 2px solid cyan; */
@@ -1340,6 +1338,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
