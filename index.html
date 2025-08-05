@@ -789,8 +789,31 @@
 }
 
   function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) playNextFromQueue();
+  if (event.data === YT.PlayerState.ENDED) {
+    const isLastVideo = currentIndex === queue.length - 1;
+
+    if (isLastVideo) {
+      // Remove the last item
+      queue.splice(currentIndex, 1);
+
+      if (queue.length === 0) {
+        currentIndex = -1;
+        document.getElementById("nowTitle").textContent = "No song playing";
+        hideNextBox();
+      } else {
+        currentIndex = queue.length - 1;
+        player.loadVideoById(queue[currentIndex].id);
+      }
+
+      updateNowPlaying();
+      updateQueueDisplay();
+      showPopup("End of playlist.", "red");
+      playErrorSound();
+    } else {
+      playNextFromQueue();
+    }
   }
+}
 
   function extractVideoId(url) {
     const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
@@ -865,18 +888,18 @@
   }
 
   function playNextFromQueue() {
-    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-      showPopup("No next song.", "red");
-      playErrorSound();
-      return;
-    }
-
-    currentIndex++;
-    player.loadVideoById(queue[currentIndex].id);
-    updateNowPlaying();
-    updateQueueDisplay();
-    showPopup("Next song!", "magenta");
+  if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+    showPopup("No next song.", "red");
+    playErrorSound();
+    return;
   }
+
+  currentIndex++;
+  player.loadVideoById(queue[currentIndex].id);
+  updateNowPlaying();
+  updateQueueDisplay();
+  showPopup("Next song!", "magenta");
+}
 
   function updateQueueDisplay() {
   const list = document.getElementById("nextList");
@@ -982,12 +1005,16 @@
     }
   }
 
-   function updateNowPlaying() {
+  function updateNowPlaying() {
     const nowTitleEl = document.getElementById("nowTitle");
+  
+    if (currentIndex < 0 || !queue[currentIndex]) {
+      nowTitleEl.textContent = "No song playing";
+      nowTitleEl.style.textShadow = "none";
+      return;
+    }
+  
     const current = queue[currentIndex];
-  
-    if (!current) return;
-  
     let title = current.title || `Video ID: ${current.id}`;
     let remaining = queue.length - (currentIndex + 1);
   
@@ -1001,6 +1028,10 @@
     nowTitleEl.textContent = title;
   }
 
+  function hideNextBox() {
+    const nextBox = document.querySelector(".next-box");
+    if (nextBox) nextBox.classList.add("hidden");
+  }
 
   function showPopup(text, glowColor) {
     const popup = document.getElementById("popupModal");
@@ -1284,6 +1315,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
