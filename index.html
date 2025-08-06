@@ -807,7 +807,7 @@
       player.clearVideo();
 
       // **Add this line back here:**
-      showPopup("🎵 Queue finished and reset", "magenta", true);
+      showPopup("That's the last tune!", "magenta", true);
     } else {
       currentIndex++;
       player.loadVideoById(queue[currentIndex].id);
@@ -1283,7 +1283,7 @@ window.addEventListener("popstate", function (e) {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
     }
   } catch (err) {
-    showPopup("⚠️ Not supported\nplease paste it manually.", "orange");
+    showPopup("⚠️ Failed!\nPaste manually.", "red");
     playErrorSound();
     console.error("Clipboard error:", err);
   }
@@ -1338,6 +1338,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
