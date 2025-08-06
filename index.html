@@ -57,7 +57,6 @@
       color: cyan;
       background-color: black;
       position: relative;
-      z-index: 9999;
       animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
@@ -439,7 +438,7 @@
       .drawer {
         height: 100vh; /* Full screen height in landscape */
         justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 15px; /* Add some space at the bottom */
+        padding-bottom: 20px; /* Add some space at the bottom */
       }
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
@@ -449,16 +448,6 @@
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
         display: none !important;
-      }
-      .youtube-wrapper {
-        height: 100vh;
-        margin: 0;
-      }
-      body, html {
-        overflow: hidden;
-      }
-     #drawerHandle {
-        left: 8vw !important; /* 8% of screen width */
       }
     }
     
@@ -556,7 +545,15 @@
       border: 2px solid magenta;
     }  /* For URL box */
 
-    
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
       
   </style>
 </head>
@@ -1340,26 +1337,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-  function adjustDrawerHandleForLandscape() {
-  const handle = document.getElementById("drawerHandle");
-  if (window.innerWidth > window.innerHeight) {
-    handle.style.left = "8vw";
-  } else {
-    handle.style.left = "0";
-  }
-}
-
-window.addEventListener("resize", adjustDrawerHandleForLandscape);
-window.addEventListener("orientationchange", adjustDrawerHandleForLandscape);
-window.addEventListener("DOMContentLoaded", adjustDrawerHandleForLandscape);
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
 
 
 
