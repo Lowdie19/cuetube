@@ -57,6 +57,7 @@
       color: cyan;
       background-color: black;
       position: relative;
+      z-index: 9999;
       animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
@@ -433,24 +434,31 @@
     
     @media (orientation: landscape) {
       .youtube-wrapper {
-        height: 100vh;
+        height: 75vh;
       }
       .drawer {
         height: 100vh; /* Full screen height in landscape */
         justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
+        padding-bottom: 15px; /* Add some space at the bottom */
       }
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
-      }
-      #drawerHandle {
-        left: 8vw !important; /* 8% of screen width */
       }
     }
     
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
         display: none !important;
+      }
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+     #drawerHandle {
+        left: 8vw !important; /* 8% of screen width */
       }
     }
     
@@ -548,15 +556,7 @@
       border: 2px solid magenta;
     }  /* For URL box */
 
-    @media screen and (orientation: landscape) and (max-width: 900px) {
-      .youtube-wrapper {
-        height: 100vh;
-        margin: 0;
-      }
-      body, html {
-        overflow: hidden;
-      }
-    }
+    
       
   </style>
 </head>
@@ -1357,6 +1357,7 @@ window.addEventListener("DOMContentLoaded", adjustDrawerHandleForLandscape);
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
