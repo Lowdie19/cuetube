@@ -433,7 +433,7 @@
     
     @media (orientation: landscape) {
       .youtube-wrapper {
-        height: 75vh;
+        height: 100vh;
       }
       .drawer {
         height: 100vh; /* Full screen height in landscape */
@@ -442,6 +442,9 @@
       }
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
+      }
+      #drawerHandle {
+        left: 8vw !important; /* 8% of screen width */
       }
     }
     
@@ -1337,10 +1340,24 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+  function adjustDrawerHandleForLandscape() {
+  const handle = document.getElementById("drawerHandle");
+  if (window.innerWidth > window.innerHeight) {
+    handle.style.left = "8vw";
+  } else {
+    handle.style.left = "0";
+  }
+}
+
+window.addEventListener("resize", adjustDrawerHandleForLandscape);
+window.addEventListener("orientationchange", adjustDrawerHandleForLandscape);
+window.addEventListener("DOMContentLoaded", adjustDrawerHandleForLandscape);
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
