@@ -443,6 +443,10 @@
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
       }
+      .bottom-drawer-handle,
+      .drawer-handle {
+        display: none !important;
+      }
     }
     
     @media screen and (orientation: landscape) and (max-width: 900px) {
@@ -554,7 +558,52 @@
         overflow: hidden;
       }
     }
-      
+      #right-buttons-container {
+    position: fixed;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10000;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+    user-select: none;
+  }
+
+  /* Vertical chamfered box */
+  .vertical-chamfered-box {
+    width: 50px;
+    height: 100px;
+    background: #777; /* grey */
+    border-radius: 8px 0 0 8px; /* chamfered on left side */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+  }
+
+  /* White symbols at top and bottom */
+  .vertical-chamfered-box .top-symbol,
+  .vertical-chamfered-box .bottom-symbol {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    user-select: none;
+  }
+
+  /* Center dark grey dividing line */
+  .vertical-chamfered-box .center-line {
+    width: 30px;
+    height: 3px;
+    background: #444;
+    border-radius: 2px;
+    align-self: center;
+  }
+    
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -662,6 +711,20 @@
     <div class="modal-buttons" style="justify-content: center;">
       <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
+  </div>
+</div>
+
+  <!-- Container for the two buttons -->
+<div id="right-buttons-container">
+  <div class="vertical-chamfered-box" id="drawer-handle-right">
+    <div class="top-symbol">≡</div>
+    <div class="center-line"></div>
+    <div class="bottom-symbol">▲</div>
+  </div>
+  <div class="vertical-chamfered-box" id="bottom-drawer-handle-right">
+    <div class="top-symbol">≡</div>
+    <div class="center-line"></div>
+    <div class="bottom-symbol">▲</div>
   </div>
 </div>
 
@@ -1337,10 +1400,38 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+    const container = document.getElementById('right-buttons-container');
+  let idleTimeout;
+
+  function fadeOut() {
+    container.style.opacity = '0';
+  }
+
+  function fadeIn() {
+    container.style.opacity = '1';
+    resetIdleTimer();
+  }
+
+  function resetIdleTimer() {
+    if (idleTimeout) clearTimeout(idleTimeout);
+    idleTimeout = setTimeout(fadeOut, 4000); // 4 seconds idle
+  }
+
+  // Start idle timer on load
+  resetIdleTimer();
+
+  // Listen for any user interaction to fade back in and reset timer
+  ['mousemove', 'touchstart', 'keydown', 'click'].forEach(event => {
+    window.addEventListener(event, () => {
+      fadeIn();
+    });
+  });
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
