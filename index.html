@@ -1354,7 +1354,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
 
   function updateHandlePositions() {
     if (!window.visualViewport || !isLandscape()) {
-      // Reset to default in portrait
+      // Reset to default portrait positions
       drawerBtn.style.left = '10px';
       drawerBtn.style.top = '10px';
       bottomHandle.style.bottom = '10px';
@@ -1365,15 +1365,16 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
 
     const insetLeft = window.visualViewport.offsetLeft;
     const insetTop = window.visualViewport.offsetTop;
-    const insetBottom = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+    const insetBottom = window.innerHeight - window.visualViewport.height - insetTop;
 
-    // Adjust hamburger button
-    drawerBtn.style.left = `${10 + insetLeft}px`;
-    drawerBtn.style.top = `${10 + insetTop}px`;
+    // 🛠️ Shift drawer handle away from nav bar (left)
+    const safeLeft = insetLeft > 0 ? insetLeft + 10 : 10;
+    drawerBtn.style.left = `${safeLeft}px`;
+    drawerBtn.style.top = `${insetTop + 10}px`;
 
-    // Adjust bottom drawer handle
+    // 🛠️ Shift bottom handle away from bottom nav bar
+    bottomHandle.style.bottom = `${insetBottom + 10}px`;
     bottomHandle.style.left = `calc(50% + ${insetLeft / 2}px)`;
-    bottomHandle.style.bottom = `${10 + insetBottom}px`;
   }
 
   function showHandles() {
@@ -1395,11 +1396,12 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   }
 
-  // Attach interaction and resize listeners
+  // Attach interaction listeners
   ['touchstart', 'mousemove', 'click'].forEach(event =>
     window.addEventListener(event, resetIdleTimer)
   );
 
+  // Update on viewport changes
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
       updateHandlePositions();
@@ -1428,6 +1430,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
