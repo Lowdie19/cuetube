@@ -365,12 +365,6 @@
     .bottom-drawer-handle[style*="display: none"] {
       opacity: 0;
     }
-
-    .handle-hidden {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
     
     .bottom-buttons.inside {
       position: relative;
@@ -1343,96 +1337,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-   // FOR DRAWER HANDLES --------------------------- start //
-const drawerBtn = document.querySelector('.drawer-handle'); // ✅ fixed selector
-const bottomHandle = document.querySelector('.bottom-drawer-handle');
-let idleTimer;
-
-function isLandscape() {
-  return window.matchMedia('(orientation: landscape)').matches;
-}
-
-function updateHandlePositions() {
-  if (!window.visualViewport || !isLandscape()) {
-    // Reset to default portrait positions
-    drawerBtn.style.left = ''; // it's already positioned absolutely
-    drawerBtn.style.top = '';
-    bottomHandle.style.bottom = '10px';
-    bottomHandle.style.left = '50%';
-    bottomHandle.style.transform = 'translateX(-50%)';
-    return;
-  }
-
-  const insetLeft = window.visualViewport.offsetLeft || 0;
-  const insetTop = window.visualViewport.offsetTop || 0;
-  const insetBottom = window.innerHeight - window.visualViewport.height - insetTop;
-
-  // Shift left handle away from nav bar
-  const safeLeft = Math.max(insetLeft, 20);
-  drawerBtn.style.left = `${safeLeft}px`;
-  drawerBtn.style.top = `${insetTop + 10}px`;
-
-  // Shift bottom handle up
-  bottomHandle.style.bottom = `${insetBottom + 10}px`;
-  bottomHandle.style.left = `calc(50% + ${insetLeft / 2}px)`;
-}
-
-function showHandles() {
-  drawerBtn.classList.remove('handle-hidden');
-  bottomHandle.classList.remove('handle-hidden');
-}
-
-function hideHandles() {
-  if (!isLandscape()) return;
-  drawerBtn.classList.add('handle-hidden');
-  bottomHandle.classList.add('handle-hidden');
-}
-
-function resetIdleTimer() {
-  showHandles();
-  clearTimeout(idleTimer);
-  if (isLandscape()) {
-    idleTimer = setTimeout(hideHandles, 4000);
-  }
-}
-
-// Attach user interaction events
-['touchstart', 'mousemove', 'click'].forEach(event =>
-  window.addEventListener(event, resetIdleTimer)
-);
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    updateHandlePositions();
-    resetIdleTimer();
-  });
-  window.visualViewport.addEventListener('scroll', () => {
-    updateHandlePositions();
-    resetIdleTimer();
-  });
-}
-
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    updateHandlePositions();
-    resetIdleTimer();
-  }, 300);
-});
-
-window.addEventListener('load', () => {
-  updateHandlePositions();
-  resetIdleTimer();
-});
-// FOR DRAWER HANDLES --------------------------- end //
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
 
 
 
