@@ -1275,12 +1275,15 @@ window.addEventListener("popstate", function (e) {
     const input = document.getElementById("youtubeInputDrawer");
     input.value = text;
 
-    if (!extractVideoId(text)) {
+    const videoId = extractVideoId(text);
+
+    if (!videoId) {
       input.value = "";
       showPopup("⚠️ Invalid\nYouTube URL!", "red");
       playErrorSound();
     } else {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
+      await reserveFromDrawer(); // ✅ Auto-reserve if valid
     }
   } catch (err) {
     showPopup("⚠️ Failed!\nPaste manually.", "red");
@@ -1338,6 +1341,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
