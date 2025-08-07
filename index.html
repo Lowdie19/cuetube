@@ -331,7 +331,7 @@
     
     .bottom-drawer {
       position: fixed;
-      bottom: -165px;
+      bottom: -160px;
       left: 0;
       width: 100%;
       background: rgba(40, 40, 40, 0.90);
@@ -351,7 +351,7 @@
     
     .bottom-drawer-handle {
       position: absolute;
-      top: -75px;
+      top: -70px;
       left: 50%;
       transform: translateX(-50%);
       background: none;
@@ -432,6 +432,20 @@
       filter: drop-shadow(0 0 5px magenta);
     }
     
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+    }
+    
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
         display: none !important;
@@ -440,13 +454,12 @@
         display: none !important;
       }
       .bottom-drawer-handle {
-        display: none !important;
-      }
-      .bottom-drawer {
-        
+        display: none !important; 
+    }
+    }
     
     @media (max-height: 500px) {
-      .bottom-buttons { position: static; margin-top: 10px; }
+      .bottom-buttons { position: static; margin-top: 20px; }
     }
     
     @media (hover: hover) {
@@ -538,6 +551,16 @@
       border-color: magenta;
       border: 2px solid magenta;
     }  /* For URL box */
+
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
       
   </style>
 </head>
@@ -1325,8 +1348,6 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
