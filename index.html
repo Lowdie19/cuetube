@@ -349,7 +349,8 @@
       bottom: 0;
     }
     
-    .bottom-drawer-handle {position: absolute;
+    .bottom-drawer-handle {
+      position: absolute;
       top: -70px;
       left: 50%;
       transform: translateX(-50%);
@@ -442,6 +443,55 @@
       }
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
+      }
+          /* Show the landscape handle */
+      #drawerHandleLandscape {
+        display: block;
+        position: fixed;
+        top: 50%;              /* You can adjust this value */
+        right: 1%;
+        padding: 0.5rem 1rem;
+        background: none;       /* Match your existing styling */
+        color: magenta;
+        border-radius: 4px 0 0 4px;
+        z-index: 1001;          /* Make sure it's on top */
+        cursor: pointer;
+      }
+
+      #landscapeHandleGroup {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: fixed;
+        top: 50%;
+        right: 1%;
+        transform: translateY(-50%);
+        z-index: 1001;
+      }
+      
+      /* Shared styling for both handles */
+      #drawerHandleLandscape,
+      #bottomdrawerHandleLandscape {
+        display: block;
+        padding: 0.5rem 1rem;
+        background: none;
+        color: magenta;
+        border-radius: 4px 0 0 4px;
+        cursor: pointer;
+      }
+      
+      /* Divider between buttons */
+      .handle-divider {
+        width: 80%;
+        height: 1px;
+        background-color: magenta;
+        margin: 0.4rem 0;
+      }
+      
+      /* Hide original portrait buttons in landscape */
+      #drawerHandle,
+      #bottomdrawerHandle {
+        display: none;
       }
     }
     
@@ -554,6 +604,19 @@
         overflow: hidden;
       }
     }
+
+    #landscapeHandleGroup {
+      display: none;
+    }
+    
+    #drawerHandle {
+      display: block;
+    }
+    
+    #drawerHandleLandscape,
+    #bottomdrawerHandleLandscape {
+      display: none;
+    }
       
   </style>
 </head>
@@ -565,22 +628,33 @@
   <span class="title-text">CueTube!</span>
 </div>
   
-  <!-- Drawer -->
+ <!-- Drawer -->
 <div class="drawer" id="drawer">
+  <!-- Original drawer handle (left) -->
   <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
-      <div class="nowplaying-box">
-        <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">...</div>
-      </div>
-      <div class="next-box hidden">
-        <div class="label">NEXT</div>
-        <div id="nextList"></div>
-        <div id="overflowCounter"></div>
-      </div>
-    </div>
+
+<!-- Landscape-only handle group (drawer + bottom) -->
+<div id="landscapeHandleGroup" class="landscape-only-group">
+  <!-- Top (L drawerhandle) -->
+  <div id="drawerHandleLandscape" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+  <div class="handle-divider"></div>
+  <!-- Bottom (Bott drawerhandle) -->
+  <div id="bottomdrawerHandleLandscape" class="drawer-handle" onclick="toggleBottomDrawer()">⌄</div>
 </div>
   
+  <div>
+    <div class="nowplaying-box">
+      <div class="label">NOW PLAYING</div>
+      <div class="title" id="nowTitle">...</div>
+    </div>
+    <div class="next-box hidden">
+      <div class="label">NEXT</div>
+      <div id="nextList"></div>
+      <div id="overflowCounter"></div>
+    </div>
+  </div>
+</div>
+
   <!-- Overlays -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
@@ -715,6 +789,13 @@
 }
   document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
+
+  const bottomLandscapeHandle = document.getElementById("bottomdrawerHandleLandscape");
+  if (bottomLandscapeHandle) {
+    bottomLandscapeHandle.addEventListener("click", () => {
+      toggleBottomDrawer();
+    });
+  }
 });
 
   function closeDrawer() {
@@ -1337,10 +1418,15 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+  document.getElementById("bottomdrawerHandleLandscape")?.addEventListener("click", () => {
+    toggleBottomDrawer();
+  });
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
