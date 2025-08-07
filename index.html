@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <link rel="icon" type="image/png" href="CueTube Icon.png">
   <title>CueTube</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
@@ -432,69 +432,6 @@
       filter: drop-shadow(0 0 5px magenta);
     }
     
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 75vh;
-      }
-      .drawer {
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      .url-input, .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-          /* Show the landscape handle */
-      #drawerHandleLandscape {
-        display: block;
-        position: fixed;
-        top: 50%;              /* You can adjust this value */
-        right: 1%;
-        padding: 0.5rem 1rem;
-        background: none;       /* Match your existing styling */
-        color: magenta;
-        border-radius: 4px 0 0 4px;
-        z-index: 1001;          /* Make sure it's on top */
-        cursor: pointer;
-      }
-
-      #landscapeHandleGroup {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: fixed;
-        top: 50%;
-        right: 1%;
-        transform: translateY(-50%);
-        z-index: 1001;
-      }
-      
-      /* Shared styling for both handles */
-      #drawerHandleLandscape,
-      #bottomdrawerHandleLandscape {
-        display: block;
-        padding: 0.5rem 1rem;
-        background: none;
-        color: magenta;
-        border-radius: 4px 0 0 4px;
-        cursor: pointer;
-      }
-      
-      /* Divider between buttons */
-      .handle-divider {
-        width: 80%;
-        height: 1px;
-        background-color: magenta;
-        margin: 0.4rem 0;
-      }
-      
-      /* Hide original portrait buttons in landscape */
-      #drawerHandle,
-      #bottomdrawerHandle {
-        display: none;
-      }
-    }
-    
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
         display: none !important;
@@ -605,6 +542,61 @@
       }
     }
 
+
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+    
+      .drawer {
+        height: 100vh;
+        justify-content: space-between;
+        padding-bottom: 20px;
+      }
+    
+      .url-input,
+      .search-bar {
+        display: block;
+      }
+    
+      /* Floating group for landscape-only buttons */
+      #landscapeHandleGroup {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: fixed;
+        top: 50%;
+        right: 1%;
+        transform: translateY(-50%);
+        z-index: 1001;
+      }
+    
+      /* Button styles */
+      #drawerHandleLandscape,
+      #bottomdrawerHandleLandscape {
+        display: block;
+        padding: 0.5rem 1rem;
+        background: none;
+        color: magenta;
+        border-radius: 4px 0 0 4px;
+        cursor: pointer;
+      }
+    
+      .handle-divider {
+        width: 80%;
+        height: 1px;
+        background-color: magenta;
+        margin: 0.4rem 0;
+      }
+    
+      /* Hide portrait drawer buttons in landscape */
+      #drawerHandle,
+      #bottomdrawerHandle {
+        display: none;
+      }
+    }
+    
+   /* Default (portrait) styles */
     #landscapeHandleGroup {
       display: none;
     }
@@ -617,7 +609,7 @@
     #bottomdrawerHandleLandscape {
       display: none;
     }
-      
+          
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -787,6 +779,7 @@
   document.getElementById("confirmDelete").style.display = "none";
   playSlideSound();
 }
+    
   document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
 
@@ -1426,6 +1419,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
