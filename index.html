@@ -559,8 +559,8 @@
         display: block;
       }
     
-      /* Floating group for landscape-only buttons */
       #landscapeHandleGroup {
+        border: 1px solid red;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -571,7 +571,6 @@
         z-index: 1001;
       }
     
-      /* Button styles */
       #drawerHandleLandscape,
       #bottomdrawerHandleLandscape {
         display: block;
@@ -589,25 +588,10 @@
         margin: 0.4rem 0;
       }
     
-      /* Hide portrait drawer buttons in landscape */
       #drawerHandle,
       #bottomdrawerHandle {
         display: none;
       }
-    }
-    
-   /* Default (portrait) styles */
-    #landscapeHandleGroup {
-      display: none;
-    }
-    
-    #drawerHandle {
-      display: block;
-    }
-    
-    #drawerHandleLandscape,
-    #bottomdrawerHandleLandscape {
-      display: none;
     }
           
   </style>
@@ -620,20 +604,18 @@
   <span class="title-text">CueTube!</span>
 </div>
   
- <!-- Drawer -->
-<div class="drawer" id="drawer">
-  <!-- Original drawer handle (left) -->
+<!-- Original drawer handle (left) -->
   <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-
-<!-- Landscape-only handle group (drawer + bottom) -->
+  
+  <!-- Floating right-side handle group (only for landscape) -->
 <div id="landscapeHandleGroup" class="landscape-only-group">
-  <!-- Top (L drawerhandle) -->
   <div id="drawerHandleLandscape" class="drawer-handle" onclick="toggleDrawer()">☰</div>
   <div class="handle-divider"></div>
-  <!-- Bottom (Bott drawerhandle) -->
   <div id="bottomdrawerHandleLandscape" class="drawer-handle" onclick="toggleBottomDrawer()">⌄</div>
 </div>
   
+ <!-- Drawer -->
+<div class="drawer" id="drawer">
   <div>
     <div class="nowplaying-box">
       <div class="label">NOW PLAYING</div>
@@ -1419,6 +1401,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
