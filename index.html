@@ -567,11 +567,29 @@
         overflow: hidden;
       }
     }
+
+    .edge-swipe-zone {
+      position: fixed;
+      top: 0;
+      width: 28px; /* Make bigger if needed */
+      height: 100vh;
+      z-index: 100000; /* Above the iframe */
+      background: transparent;
+      touch-action: none;
+      pointer-events: auto;
+    }
+    
+    #left-edge { left: 0; }
+    #right-edge { right: 0; }
       
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-
+  
+<!-- Edge swipe zones for opening drawers -->
+<div id="left-edge" class="edge-swipe-zone"></div>
+<div id="right-edge" class="edge-swipe-zone"></div>
+  
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
@@ -768,6 +786,49 @@
 
   playSlideSound();
 }
+    
+    // --- EDGE SWIPE GESTURE ---
+function attachEdgeSwipe(edgeEl) {
+  const THRESHOLD = 30;
+  let startX = null;
+  let startY = null;
+
+  edgeEl.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  edgeEl.addEventListener('touchend', (e) => {
+    if (startX === null) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const dx = endX - startX;
+    const dy = endY - startY;
+
+    // Ignore if vertical movement is greater (to not conflict with bottom drawer)
+    if (Math.abs(dy) > Math.abs(dx)) {
+      startX = null;
+      return;
+    }
+
+    if (edgeEl.id === "left-edge" && dx > THRESHOLD) {
+      if (!bottomDrawer.classList.contains('open')) {
+        openDrawer();
+      }
+    }
+    if (edgeEl.id === "right-edge" && dx < -THRESHOLD) {
+      // You can add a right drawer here if you have one
+      showPopup("Right edge swipe!", "cyan"); 
+    }
+    startX = null;
+  }, { passive: true });
+}
+
+attachEdgeSwipe(document.getElementById("left-edge"));
+attachEdgeSwipe(document.getElementById("right-edge"));
+
+    
 
   document.body.addEventListener("touchstart", evt => {
     startY = evt.touches[0].clientY;
@@ -775,14 +836,22 @@
   });
 
   document.body.addEventListener("touchmove", evt => {
-    const deltaY = evt.touches[0].clientY - startY;
+  const currentX = evt.touches[0].clientX;
+  const currentY = evt.touches[0].clientY;
+  const deltaY = currentY - startY;
+  const deltaX = currentX - touchStartX;
+
+  // Only trigger up/down swipe if vertical movement is stronger than horizontal
+  if (Math.abs(deltaY) > Math.abs(deltaX)) {
     if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-      toggleBottomDrawer(); // swipe up to open only if it's not already open
-    } else if (deltaY > 40) {
-      closeBottomDrawer(); // swipe down always closes
+      toggleBottomDrawer(); // Swipe up to open
+    } else if (deltaY > 40 && bottomDrawer.classList.contains("open")) {
+      closeBottomDrawer(); // Swipe down to close
     }
-    handleTouchMove(evt);
-  });
+  }
+
+  handleTouchMove(evt);
+});
 
   document.body.addEventListener("click", handleTap);
 
@@ -1354,6 +1423,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
