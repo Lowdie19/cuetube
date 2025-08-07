@@ -433,12 +433,8 @@
     
     @media (orientation: landscape) {
       .youtube-wrapper {
-        width: 90vw;     /* Add this line */
-        height: 75vh;    /* Already there */
-        max-width: 100vw; /* Optional: prevents overflow */
-        margin: 0 auto;   /* Optional: center it horizontally */
+        height: 75vh;
       }
-    }
       .drawer {
         height: 100vh; /* Full screen height in landscape */
         justify-content: space-between; /* Keep space for top + bottom parts */
@@ -551,20 +547,13 @@
 
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .youtube-wrapper {
-        width: 96vw;       /* Add this line */
         height: 100vh;
         margin: 0;
       }
-    
-      #player {
-        width: 100%;        /* Ensure iframe fills its wrapper */
-        height: 100%;
+      body, html {
+        overflow: hidden;
       }
-
-  body, html {
-    overflow: hidden;
-  }
-}
+    }
       
   </style>
 </head>
@@ -1304,35 +1293,48 @@ window.addEventListener("popstate", function (e) {
 }
 
   function adjustForKeyboard() {
-    const drawer = document.getElementById('bottomDrawer');
-    const isLandscape = window.innerWidth > window.innerHeight;
+  const drawer = document.getElementById('bottomDrawer');
+  const youtubeWrapper = document.querySelector('.youtube-wrapper');
+  const isLandscape = window.innerWidth > window.innerHeight;
 
-    if (!window.visualViewport || !isLandscape) {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = '25px';
-      return;
+  if (!window.visualViewport || !isLandscape) {
+    drawer.style.transition = 'padding-bottom 0.25s ease';
+    drawer.style.paddingBottom = '25px';
+
+    if (youtubeWrapper) {
+      youtubeWrapper.style.height = '100vh';
     }
 
-    const vp = window.visualViewport;
-    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
+    return;
+  }
 
-    if (keyboardHeight > 100) {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
-    } else {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = '25px';
+  const vp = window.visualViewport;
+  const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
+
+  if (keyboardHeight > 100) {
+    drawer.style.transition = 'padding-bottom 0.25s ease';
+    drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
+
+    if (youtubeWrapper) {
+      youtubeWrapper.style.height = `${vp.height}px`; // Shrink to visible height
+    }
+  } else {
+    drawer.style.transition = 'padding-bottom 0.25s ease';
+    drawer.style.paddingBottom = '25px';
+
+    if (youtubeWrapper) {
+      youtubeWrapper.style.height = '100vh';
     }
   }
+}
+    if (window.visualViewport) {
+  visualViewport.addEventListener("resize", adjustForKeyboard);
+  visualViewport.addEventListener("scroll", adjustForKeyboard);
+}
 
-  if (window.visualViewport) {
-    visualViewport.addEventListener("resize", adjustForKeyboard);
-    visualViewport.addEventListener("scroll", adjustForKeyboard);
-  }
-
-  window.addEventListener("orientationchange", () => {
-    setTimeout(adjustForKeyboard, 200); // Give time for reflow
-  });
+window.addEventListener("orientationchange", () => {
+  setTimeout(adjustForKeyboard, 200); // Let reflow happen
+});
 
   // Initial call in case landscape is already active
   window.addEventListener("DOMContentLoaded", adjustForKeyboard);
@@ -1352,8 +1354,6 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
