@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="CueTube Icon.png">
   <title>CueTube</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
@@ -349,8 +349,7 @@
       bottom: 0;
     }
     
-    .bottom-drawer-handle {
-      position: absolute;
+    .bottom-drawer-handle {position: absolute;
       top: -70px;
       left: 50%;
       transform: translateX(-50%);
@@ -430,6 +429,20 @@
     
     .paste-btn-icon:active img {
       filter: drop-shadow(0 0 5px magenta);
+    }
+    
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
     }
     
     @media screen and (orientation: landscape) and (max-width: 900px) {
@@ -541,59 +554,7 @@
         overflow: hidden;
       }
     }
-
-
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 75vh;
-      }
-    
-      .drawer {
-        height: 100vh;
-        justify-content: space-between;
-        padding-bottom: 20px;
-      }
-    
-      .url-input,
-      .search-bar {
-        display: block;
-      }
-    
-      #landscapeHandleGroup {
-        border: 1px solid red;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: fixed;
-        top: 50%;
-        right: 1%;
-        transform: translateY(-50%);
-        z-index: 1001;
-      }
-    
-      #drawerHandleLandscape,
-      #bottomdrawerHandleLandscape {
-        display: block;
-        padding: 0.5rem 1rem;
-        background: none;
-        color: magenta;
-        border-radius: 4px 0 0 4px;
-        cursor: pointer;
-      }
-    
-      .handle-divider {
-        width: 80%;
-        height: 1px;
-        background-color: magenta;
-        margin: 0.4rem 0;
-      }
-    
-      #drawerHandle,
-      #bottomdrawerHandle {
-        display: none;
-      }
-    }
-          
+      
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -604,31 +565,22 @@
   <span class="title-text">CueTube!</span>
 </div>
   
-<!-- Original drawer handle (left) -->
-  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-  
-  <!-- Floating right-side handle group (only for landscape) -->
-<div id="landscapeHandleGroup" class="landscape-only-group">
-  <div id="drawerHandleLandscape" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-  <div class="handle-divider"></div>
-  <div id="bottomdrawerHandleLandscape" class="drawer-handle" onclick="toggleBottomDrawer()">⌄</div>
-</div>
-  
- <!-- Drawer -->
+  <!-- Drawer -->
 <div class="drawer" id="drawer">
-  <div>
-    <div class="nowplaying-box">
-      <div class="label">NOW PLAYING</div>
-      <div class="title" id="nowTitle">...</div>
+  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">...</div>
+      </div>
+      <div class="next-box hidden">
+        <div class="label">NEXT</div>
+        <div id="nextList"></div>
+        <div id="overflowCounter"></div>
+      </div>
     </div>
-    <div class="next-box hidden">
-      <div class="label">NEXT</div>
-      <div id="nextList"></div>
-      <div id="overflowCounter"></div>
-    </div>
-  </div>
 </div>
-
+  
   <!-- Overlays -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
@@ -761,16 +713,8 @@
   document.getElementById("confirmDelete").style.display = "none";
   playSlideSound();
 }
-    
   document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
-
-  const bottomLandscapeHandle = document.getElementById("bottomdrawerHandleLandscape");
-  if (bottomLandscapeHandle) {
-    bottomLandscapeHandle.addEventListener("click", () => {
-      toggleBottomDrawer();
-    });
-  }
 });
 
   function closeDrawer() {
@@ -1393,18 +1337,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-  document.getElementById("bottomdrawerHandleLandscape")?.addEventListener("click", () => {
-    toggleBottomDrawer();
-  });
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
 
 
 
