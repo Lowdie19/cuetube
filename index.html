@@ -554,7 +554,53 @@
         overflow: hidden;
       }
     }
-      
+
+    #landscape-buttons {
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      display: none; /* hidden by default */
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+    }
+    
+    /* Only show in landscape orientation */
+    @media (orientation: landscape) {
+      #landscape-buttons {
+        display: flex;
+      }
+    }
+    
+    /* Glowing text buttons */
+    .glow-button {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: box-shadow 0.2s, transform 0.1s;
+      user-select: none;
+      background: rgba(119, 119, 119, 0.6);
+    }
+    
+    /* Glow effect on click */
+    .glow-button:active {
+      box-shadow: 0 0 10px 2px #ffffffaa;
+      transform: scale(0.95);
+    }
+    
+    /* Divider line */
+    .divider-line {
+      width: 30px;
+      height: 3px;
+      background: #444;
+      border-radius: 2px;
+    }
+          
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -610,6 +656,13 @@
       <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
     </div>
   </div>
+
+  <!-- Landscape-only right side buttons -->
+<div id="landscape-buttons">
+  <div class="glow-button" onclick="toggleDrawer()">☰</div>
+  <div class="divider-line"></div>
+  <div class="glow-button" onclick="toggleBottomDrawer()">▲</div>
+</div>
   
   <!-- Popup -->
   <div id="popupOverlay"></div>
@@ -666,11 +719,11 @@
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
-  <audio id="successSound" src="success.wav" preload="auto"
-    ></audio>
+  <audio id="successSound" src="success.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
+
   
   <!-- JS -->
   <script>
@@ -1341,6 +1394,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
