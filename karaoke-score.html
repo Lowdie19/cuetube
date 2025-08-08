@@ -1,327 +1,153 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Futuristic Karaoke Score Modal</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-
-    body {
-      margin: 0;
-      background: #0a0a1e;
-      font-family: 'Orbitron', sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      color: #aad8ff;
-      user-select: none;
-    }
-
-    /* Modal backdrop */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 10, 30, 0.85);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    /* Modal container */
-    .modal {
-      position: relative;
-      width: 350px;
-      max-width: 95vw;
-      background: rgba(10, 10, 30, 0.9);
-      border-radius: 15px;
-      padding: 40px 30px 60px;
-      box-shadow:
-        0 0 10px #00ffff,
-        inset 0 0 40px #003366;
-      text-align: center;
-      overflow: visible;
-    }
-
-    /* Scanline overlay */
-    .modal::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.07) 0 2px,
-          transparent 2px 4px
-        );
-      pointer-events: none;
-      border-radius: 15px;
-      z-index: 1;
-    }
-
-    /* Title */
-    .modal h2 {
-      font-size: 2.5rem;
-      margin: 0 0 20px;
-      color: #00ffff;
-      text-shadow:
-        0 0 15px #66ddff,
-        0 0 25px #33aaff;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Score number with glitch animation */
-    .score {
-      font-size: 7rem;
-      font-weight: 700;
-      line-height: 1;
-      text-shadow:
-        0 0 10px #66ddff,
-        0 0 20px #33aaff;
-      animation: glitch 2s infinite;
-      position: relative;
-      z-index: 2;
-      color: #aad8ff;
-      letter-spacing: 8px;
-    }
-
-    @keyframes glitch {
-      0%, 20%, 40%, 60%, 80%, 100% {
-        text-shadow:
-          0 0 10px #66ddff,
-          0 0 20px #33aaff;
-        transform: translate(0);
-      }
-      10% {
-        text-shadow:
-          2px 0 10px #ff66cc,
-          -2px 0 10px #66ffff;
-        transform: translate(-1px, 1px);
-      }
-      30% {
-        text-shadow:
-          -2px 0 10px #ff66cc,
-          2px 0 10px #66ffff;
-        transform: translate(1px, -1px);
-      }
-      50% {
-        text-shadow:
-          2px 0 10px #ff66cc,
-          -2px 0 10px #66ffff;
-        transform: translate(-1px, 1px);
-      }
-      70% {
-        text-shadow:
-          -2px 0 10px #ff66cc,
-          2px 0 10px #66ffff;
-        transform: translate(1px, -1px);
-      }
-      90% {
-        text-shadow:
-          0 0 10px #66ddff,
-          0 0 20px #33aaff;
-        transform: translate(0);
-      }
-    }
-
-    /* Score message */
-    .score-message {
-      font-size: 1.8rem;
-      margin-top: 25px;
-      color: #ffd700;
-      text-shadow: 0 0 8px #ffd700;
-      opacity: 0;
-      animation: fadeIn 1.2s ease forwards;
-      animation-delay: 8.5s; /* After counting finishes */
-      user-select: none;
-      letter-spacing: 1px;
-      font-weight: 600;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Close button */
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 18px;
-      background: transparent;
-      border: none;
-      font-size: 2rem;
-      color: #00ffff;
-      cursor: pointer;
-      user-select: none;
-      z-index: 3;
-      transition: color 0.3s ease;
-    }
-    .close-btn:hover {
-      color: #66ffff;
-    }
-
-    /* Confetti canvas */
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 1050;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal">
-      <button class="close-btn" aria-label="Close score modal" id="closeModal">&times;</button>
-      <h2 id="modalTitle">KARAOKE SCORE</h2>
-      <div class="score" id="score">0</div>
-      <div class="score-message" id="scoreMessage"></div>
-    </div>
+<!-- karaoke-score.html -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="karaokeScoreModal" style="display:none;">
+  <div class="modal">
+    <button class="close-btn" aria-label="Close score modal" id="closeModal">&times;</button>
+    <h2 id="modalTitle">KARAOKE SCORE</h2>
+    <div class="score" id="score">0</div>
+    <div class="score-message" id="scoreMessage"></div>
   </div>
+</div>
 
-  <canvas id="confetti"></canvas>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(10, 10, 30, 0.85);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal {
+    position: relative; width: 350px; max-width: 95vw;
+    background: rgba(10, 10, 30, 0.9); border-radius: 15px;
+    padding: 40px 30px 60px;
+    box-shadow: 0 0 10px #00ffff, inset 0 0 40px #003366;
+    text-align: center; overflow: visible;
+    color: #aad8ff; font-family: 'Orbitron', sans-serif;
+  }
+  .modal::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.07) 0 2px, transparent 2px 4px);
+    pointer-events: none; border-radius: 15px; z-index: 1;
+  }
+  .modal h2 {
+    font-size: 2.5rem; margin: 0 0 20px; color: #00ffff;
+    text-shadow: 0 0 15px #66ddff, 0 0 25px #33aaff;
+    position: relative; z-index: 2;
+  }
+  .score {
+    font-size: 7rem; font-weight: 700; line-height: 1;
+    text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
+    animation: glitch 2s infinite; position: relative; z-index: 2;
+    color: #aad8ff; letter-spacing: 8px;
+  }
+  @keyframes glitch {
+    0%, 20%, 40%, 60%, 80%, 100% {
+      text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
+      transform: translate(0);
+    }
+    10% {
+      text-shadow: 2px 0 10px #ff66cc, -2px 0 10px #66ffff;
+      transform: translate(-1px, 1px);
+    }
+    30% {
+      text-shadow: -2px 0 10px #ff66cc, 2px 0 10px #66ffff;
+      transform: translate(1px, -1px);
+    }
+    50% {
+      text-shadow: 2px 0 10px #ff66cc, -2px 0 10px #66ffff;
+      transform: translate(-1px, 1px);
+    }
+    70% {
+      text-shadow: -2px 0 10px #ff66cc, 2px 0 10px #66ffff;
+      transform: translate(1px, -1px);
+    }
+    90% {
+      text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
+      transform: translate(0);
+    }
+  }
+  .score-message {
+    font-size: 1.8rem; margin-top: 25px; color: #ffd700;
+    text-shadow: 0 0 8px #ffd700; opacity: 0;
+    animation: fadeIn 1.2s ease forwards;
+    animation-delay: 8.5s; user-select: none; letter-spacing: 1px;
+    font-weight: 600; max-width: 320px; margin-left: auto; margin-right: auto;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .close-btn {
+    position: absolute; top: 15px; right: 18px;
+    background: transparent; border: none;
+    font-size: 2rem; color: #00ffff; cursor: pointer;
+    user-select: none; z-index: 3; transition: color 0.3s ease;
+  }
+  .close-btn:hover { color: #66ffff; }
+</style>
 
 <script>
-  const score = 92; // Change this score 0-100
-  const scoreEl = document.getElementById("score");
-  const messageEl = document.getElementById("scoreMessage");
-  const closeBtn = document.getElementById("closeModal");
-  const scoreBoard = document.querySelector('.modal-backdrop');
-  const duration = 8500; // milliseconds for count up animation
+  function showKaraokeScore(score) {
+    const modal = document.getElementById('karaokeScoreModal');
+    const scoreEl = modal.querySelector("#score");
+    const messageEl = modal.querySelector("#scoreMessage");
+    const closeBtn = modal.querySelector("#closeModal");
 
-  // Count-up animation for score
-  function animateScore(finalScore, duration) {
-    return new Promise(resolve => {
-      let start = 0;
-      let steps = finalScore;
-      if (steps === 0) {
-        scoreEl.textContent = "0";
-        resolve();
-        return;
-      }
-      let stepDuration = duration / steps;
-      const interval = setInterval(() => {
-        start++;
-        scoreEl.textContent = start;
-        if (start >= finalScore) {
-          clearInterval(interval);
+    modal.style.display = "flex";
+    messageEl.style.opacity = '0';
+    messageEl.textContent = "";
+    scoreEl.textContent = "0";
+
+    // Animate score function
+    function animateScore(finalScore, duration) {
+      return new Promise(resolve => {
+        let start = 0;
+        let steps = finalScore;
+        if (steps === 0) {
+          scoreEl.textContent = "0";
           resolve();
+          return;
         }
-      }, stepDuration);
+        let stepDuration = duration / steps;
+        const interval = setInterval(() => {
+          start++;
+          scoreEl.textContent = start;
+          if (start >= finalScore) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, stepDuration);
+      });
+    }
+
+    // Get message function
+    function getScoreMessage(score) {
+      if (score < 10)        return "🤬 Kupal!";
+      if (score < 20)        return "🤮 Eeew!";
+      if (score < 30)        return "🤢 Luh!!";
+      if (score < 40)        return "😒 Pwede na..";
+      if (score < 50)        return "😏 Konti nlng..";
+      if (score < 60)        return "🤞 Ayos!";
+      if (score < 70)        return "🥴 Sana all!";
+      if (score < 80)        return "👌 Petmalu!";
+      if (score < 90)        return "🫡 Lodi!";
+      if (score < 99)        return "🤩 Boom panes!";
+      if (score === 100)     return "🙌 !@#%!";
+      return "";
+    }
+
+    // Close modal event
+    closeBtn.onclick = () => {
+      modal.style.display = "none";
+    };
+
+    animateScore(score, 8500).then(() => {
+      messageEl.textContent = getScoreMessage(score);
+      messageEl.style.opacity = '1';
+      // You can add confetti launch here or call a function in your main app if you want
     });
   }
 
-  // Determine score message
-  function getScoreMessage(score) {
-    if (score < 10)        return "🤬 Kupal!";
-    if (score < 20)        return "🤮 Eeew!";
-    if (score < 30)        return "🤢 Luh!!";
-    if (score < 40)        return "😒 Pwede na..";
-    if (score < 50)        return "😏 Konti nlng..";
-    if (score < 60)        return "🤞 Ayos!";
-    if (score < 70)        return "🥴 Sana all!";
-    if (score < 80)        return "👌 Petmalu!";
-    if (score < 90)        return "🫡 Lodi!";
-    if (score < 99)        return "🤩 Boom panes!";
-    if (score === 100)     return "🙌 !@#%!";
-    return "";
-  }
-
-  // Confetti setup and animation
-  function launchConfetti() {
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const confetti = [];
-    const confettiCount = 150;
-
-    for (let i = 0; i < confettiCount; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * 5 + 2,
-        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-        tilt: Math.random() * 10 - 10,
-        tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-        tiltAngle: 0
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach(c => {
-        ctx.beginPath();
-        ctx.lineWidth = c.r;
-        ctx.strokeStyle = c.color;
-        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-        ctx.stroke();
-      });
-      update();
-    }
-
-    function update() {
-      confetti.forEach(c => {
-        c.y += Math.cos(c.d) + 2;
-        c.tiltAngle += c.tiltAngleIncrement;
-        c.tilt = Math.sin(c.tiltAngle) * 15;
-        if (c.y > canvas.height) {
-          c.y = -20;
-          c.x = Math.random() * canvas.width;
-        }
-      });
-    }
-
-    function loop() {
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    loop();
-
-    setTimeout(() => {
-      canvas.style.display = 'none';
-    }, 6000);
-  }
-
-  // Close modal
-  closeBtn.addEventListener('click', () => {
-    scoreBoard.style.display = 'none';
-  });
-
-  // Run animation and show message + confetti
-  animateScore(score, duration).then(() => {
-    messageEl.textContent = getScoreMessage(score);
-    launchConfetti();
-  });
-
-  // Handle window resize for canvas
-  window.addEventListener('resize', () => {
-    const canvas = document.getElementById('confetti');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
+  // Expose globally so main page can call it
+  window.showKaraokeScore = showKaraokeScore;
 </script>
-
-</body>
-</html>
