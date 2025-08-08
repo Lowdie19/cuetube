@@ -572,8 +572,6 @@
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
-  <div id="karaokeModalContainer"></div>
-  
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
@@ -809,16 +807,6 @@
 
  function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.ENDED) {
-    const karaokeScore = Math.floor(Math.random() * 101); // or compute your karaoke score differently
-    const tryShow = () => {
-    if (window.showKaraokeScore) {
-      window.showKaraokeScore(karaokeScore);
-    } else {
-      setTimeout(tryShow, 100);
-    }
-  }
-  tryShow();
-    
     const isLastVideo = currentIndex === queue.length - 1;
     if (queue.length === 0 || isLastVideo) {
       // Reset queue and player here
@@ -1362,20 +1350,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-  async function loadKaraokeModal() {
-  const response = await fetch('karaoke-score.html');
-  const html = await response.text();
-  document.getElementById('karaokeModalContainer').innerHTML = html;
-}
-
-loadKaraokeModal();
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
