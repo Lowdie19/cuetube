@@ -572,6 +572,14 @@
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
+  <div id="gesture-overlay" style="
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: transparent;
+  display: none;
+"></div>
+  
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
@@ -1370,26 +1378,72 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   });
       
 // swipe gesture for Landscape
-  window.addEventListener('touchend', e => {
+ (function() {
+  const overlay = document.getElementById('gesture-overlay');
+
+  function isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+  }
+  function isLandscape() {
+    return window.innerWidth > window.innerHeight;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  const swipeThreshold = 50;
+
+  function openDrawer() {
+    if (typeof window.openDrawer === 'function') window.openDrawer();
+  }
+
+  function toggleBottomDrawer() {
+    if (typeof window.toggleBottomDrawer === 'function') window.toggleBottomDrawer();
+  }
+
+  function onTouchStart(e) {
+    if (!isAndroid() || !isLandscape()) return;
+    e.preventDefault(); // try to capture touch early
+    let touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+  }
+
+  function onTouchEnd(e) {
     if (!isAndroid() || !isLandscape()) return;
     let touch = e.changedTouches[0];
     let dx = touch.clientX - startX;
     let dy = touch.clientY - startY;
 
     if (dx > swipeThreshold && Math.abs(dy) < swipeThreshold) {
-      // Swipe right → open left drawer
-      if (typeof openDrawer === 'function') openDrawer();
+      openDrawer();
     } else if (dy < -swipeThreshold && Math.abs(dx) < swipeThreshold) {
-      // Swipe up → toggle bottom drawer
-      if (typeof toggleBottomDrawer === 'function') toggleBottomDrawer();
+      toggleBottomDrawer();
     }
-  });
+  }
+
+  function updateOverlayVisibility() {
+    if (isAndroid() && isLandscape()) {
+      overlay.style.display = 'block';
+    } else {
+      overlay.style.display = 'none';
+    }
+  }
+
+  overlay.addEventListener('touchstart', onTouchStart, { passive: false });
+  overlay.addEventListener('touchend', onTouchEnd);
+
+  window.addEventListener('resize', updateOverlayVisibility);
+  window.addEventListener('orientationchange', updateOverlayVisibility);
+
+  // Initial check
+  updateOverlayVisibility();
 })();
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
