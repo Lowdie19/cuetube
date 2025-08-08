@@ -1,5 +1,866 @@
-<!-- karaoke-score.html -->
-<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="karaokeScoreModal" style="display:none;">
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="CueTube Icon.png">
+  <title>CueTube</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <style>
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2em;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+    }
+    input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #queue {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      padding-top: 10px;
+    }
+    .queue-item {
+      padding: 8px;
+      background: #222;
+      border: 1px solid #333;
+      margin-bottom: 5px;
+    }
+    
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #0a0a0a;
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .title-bar {
+      text-align: center;
+      font-size: 1.5em;
+      padding: 15px 0;
+      color: cyan;
+      background-color: black;
+      position: relative;
+      animation: neon-text 3.0s ease-in-out infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    
+    .title-icon {
+      height: 30px;
+      width: 30px;
+      animation: neon-glow 3.0s ease-in-out infinite alternate;
+    }
+    
+    /* Neon text animation */
+    @keyframes neon-text {
+      from { text-shadow: 0 0 2px cyan, 0 0 4px cyan; }
+      to { text-shadow: 0 0 8px cyan, 0 0 16px cyan; }
+    }
+    
+    /* Neon image glow using drop-shadow */
+    @keyframes neon-glow {
+      from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
+      to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
+    }
+    
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -70%; /* Default for mobile */
+      width: 70%;  /* Default for mobile */
+      height: 100%;
+      background: rgba(40, 40, 40, 0.90);
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 25px;
+    }
+    
+    /* When open, slide to visible */
+    .drawer.open {
+      left: 0;
+    }
+    
+    /* On wider screens (like PC), use 40% width */
+    @media (min-width: 768px) {
+      .drawer {
+        width: 40%;
+        left: -40%;
+      }
+    }
+    
+    .drawer-handle {
+      position: absolute;
+      top: 0%;
+      right: -45px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.0);
+      color: magenta;
+      font-size: 1.6em;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 80;
+    }
+    @media (min-width: 768px) {
+      .drawer-handle {
+        right: -40px;
+      }
+    }
+    
+    .nowplaying-box {
+      border: 2px solid cyan;
+      border-radius: 10px;
+      padding: 10px;
+      background: #121212;
+      margin-bottom: 15px;
+    }
+    
+    .nowplaying-box .label {
+      font-size: 0.7em;
+      color: #aaa;
+    }
+
+    .nowplaying-box .title {
+      font-family: Arial, sans-serif;
+      font-size: 1.1em;
+      margin: 5px 0;
+      word-wrap: break-word;
+      font-weight: bold;
+    }
+    
+    .next-box {
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.0);
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-padding-bottom: 40px;
+      touch-action: pan-y;
+      cursor: grab;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    
+    .next-box.hidden {
+      display: none !important;
+    }
+
+    .next-box:active {
+      cursor: grabbing;
+    }
+    .next-box::-webkit-scrollbar-thumb {
+      background: transparent;
+      transition: background 0.3s ease;
+    }
+    .next-box:hover::-webkit-scrollbar-thumb,
+    .next-box.dragging::-webkit-scrollbar-thumb {
+      background: cyan;
+    }
+    .drawer > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .drawer.open {
+      display: flex;
+    }
+    .next-box::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to bottom, transparent, #121212);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .next-box::-webkit-scrollbar-thumb {
+      background: cyan;
+    }
+
+    #overflowCounter {
+    text-align: center;
+    font-size: 0.7em;
+    color: #888;
+    margin-top: 5px;
+    display: none;
+    }
+    
+    .next-box .label {
+      font-size: 0.7em;
+      color: cyan;
+    }
+    
+    .next-box .title {
+      font-family: Arial, sans-serif;
+      font-size: 0.9em;
+      margin: 10px 0;
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-weight: normal;
+      padding: 5px;
+    }
+    
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+      display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+
+    .youtube-wrapper {
+      width: 100%;
+      height: 70vh;
+      border: none; /*5px solid cyan;*/
+      margin-top: 2vh;
+      margin-bottom: 5vh;
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .url-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+        
+    .url-input {
+      flex: 1;
+      min-width: 260px;
+      max-width: 420px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background-color: #1a1a1a;
+      color: white;
+      font-size: 14px;
+      padding: 0 12px;
+
+      line-height: 36px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+    }
+    
+    .url-input.glow {
+      box-shadow: 
+        0 0 4px #ff00ff, 
+        0 0 8px #ff00ff, 
+        0 0 16px #ff00ff, 
+        0 0 24px #ff00ff;
+      border: 1px solid #ff00ff;
+    }
+
+    .bottom-buttons {
+      position: fixed;
+      bottom: 15px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .cyan-btn {
+      flex: 1;
+      padding: 14px;
+      background: #121212;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .cyan-btn:hover {
+      background: cyan;
+      color: black;
+    }
+    
+    .bottom-drawer {
+      position: fixed;
+      bottom: -160px;
+      left: 0;
+      width: 100%;
+      background: rgba(40, 40, 40, 0.90);
+      padding: 20px 15px 25px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+      transition: bottom 0.3s ease;
+      z-index: 98;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 15px 25px; /* bottom is 25px default */
+    }
+    
+    .bottom-drawer.open {
+      bottom: 0;
+    }
+    
+    .bottom-drawer-handle {
+      position: absolute;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: none;
+      border: none;
+      color: magenta;
+      font-size: 1.8em;
+      cursor: pointer;
+      text-shadow: none; //* text-shadow: 0 0 6px magenta, 0 0 12px magenta; *//
+      z-index: 99;
+      transition: opacity 0.3s ease;
+    }
+    .bottom-drawer-handle[style*="display: none"] {
+      opacity: 0;
+    }
+    
+    .bottom-buttons.inside {
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid red;
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 0 20px red;
+    }
+    
+    .single-btn {
+      width: 45%;
+      max-width: 200px;
+    }
+    
+    .url-input {
+      width: 100%;
+      padding-right: 48px;
+    }
+
+    .paste-btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 11px; /* You can adjust this for hit area */
+      margin-left: 15px; /* Spacing from URL box */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .paste-icon-image {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .paste-btn-icon:active img {
+      filter: drop-shadow(0 0 5px magenta);
+    }
+    
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+    }
+    
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .title-bar {
+        display: none !important;
+      }
+      .drawer-handle {
+        display: none !important;
+      }
+      .bottom-drawer-handle {
+        display: none !important;
+      }
+      .bottom-drawer {
+        bottom: -170px !important;
+      }
+      .url-group {
+        margin-bottom: 5px !important;
+      }
+    }
+    
+    @media (max-height: 500px) {
+      .bottom-buttons { position: static; margin-top: 20px; }
+    }
+    
+    @media (hover: hover) {
+      .next-box::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+      .next-box:hover::-webkit-scrollbar-thumb {
+        background: cyan;
+      }
+    }
+    
+    #popupOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.6);  /* Dimming effect */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 9998;
+    }
+    
+    #popupOverlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    #popupModal {
+      position: fixed;
+      top: 30%; left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      background: none !important; /* #222; */
+      border: none !important; /* 2px solid cyan; */
+      border-radius: 10px;
+      padding: 0 !important; /* 15px 25px; */
+      color: inherit; /* white; */
+      font-weight: bold;
+      text-align: center !important;
+      text-shadow: inherit;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      max-width: 90vw;
+      box-shadow: none !important; /* 0 0 20px cyan; */
+      user-select: none;
+      font-size: 1.8em !important;
+    }
+    
+    #popupModal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    #confirmDelete {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    }
+    
+    #confirmDelete.show {
+      opacity: 1;
+    }
+    
+    .long-pressing {
+      background: red;
+      box-shadow: 0 0 10px red;
+    }
+
+    /* For URL box */
+    input[type="text"]::placeholder {
+      color: white;
+      opacity: .3;
+    }
+    
+    input[type="text"] {
+      border: 2px magenta;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #121212;
+      color: white;
+      box-shadow: none;
+      transition: box-shadow 0.3s ease;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 2px magenta, 0 0 8px magenta;
+      border-color: magenta;
+      border: 2px solid magenta;
+    }  /* For URL box */
+
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
+
+    
+
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+    body {
+      margin: 0;
+      background: #0a0a1e;
+      font-family: 'Orbitron', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #aad8ff;
+      user-select: none;
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 30, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    /* Modal container */
+    .modal {
+      position: relative;
+      width: 350px;
+      max-width: 95vw;
+      background: rgba(10, 10, 30, 0.9);
+      border-radius: 15px;
+      padding: 40px 30px 60px;
+      box-shadow:
+        0 0 10px #00ffff,
+        inset 0 0 40px #003366;
+      text-align: center;
+      overflow: visible;
+    }
+
+    /* Scanline overlay */
+    .modal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.07) 0 2px,
+          transparent 2px 4px
+        );
+      pointer-events: none;
+      border-radius: 15px;
+      z-index: 1;
+    }
+
+    /* Title */
+    .modal h2 {
+      font-size: 2.5rem;
+      margin: 0 0 20px;
+      color: #00ffff;
+      text-shadow:
+        0 0 15px #66ddff,
+        0 0 25px #33aaff;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Score number with glitch animation */
+    .score {
+      font-size: 7rem;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow:
+        0 0 10px #66ddff,
+        0 0 20px #33aaff;
+      animation: glitch 2s infinite;
+      position: relative;
+      z-index: 2;
+      color: #aad8ff;
+      letter-spacing: 8px;
+    }
+
+    @keyframes glitch {
+      0%, 20%, 40%, 60%, 80%, 100% {
+        text-shadow:
+          0 0 10px #66ddff,
+          0 0 20px #33aaff;
+        transform: translate(0);
+      }
+      10% {
+        text-shadow:
+          2px 0 10px #ff66cc,
+          -2px 0 10px #66ffff;
+        transform: translate(-1px, 1px);
+      }
+      30% {
+        text-shadow:
+          -2px 0 10px #ff66cc,
+          2px 0 10px #66ffff;
+        transform: translate(1px, -1px);
+      }
+      50% {
+        text-shadow:
+          2px 0 10px #ff66cc,
+          -2px 0 10px #66ffff;
+        transform: translate(-1px, 1px);
+      }
+      70% {
+        text-shadow:
+          -2px 0 10px #ff66cc,
+          2px 0 10px #66ffff;
+        transform: translate(1px, -1px);
+      }
+      90% {
+        text-shadow:
+          0 0 10px #66ddff,
+          0 0 20px #33aaff;
+        transform: translate(0);
+      }
+    }
+
+    /* Score message */
+    .score-message {
+      font-size: 1.8rem;
+      margin-top: 25px;
+      color: #ffd700;
+      text-shadow: 0 0 8px #ffd700;
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards;
+      animation-delay: 8.5s; /* After counting finishes */
+      user-select: none;
+      letter-spacing: 1px;
+      font-weight: 600;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Close button */
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 18px;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: #00ffff;
+      cursor: pointer;
+      user-select: none;
+      z-index: 3;
+      transition: color 0.3s ease;
+    }
+    .close-btn:hover {
+      color: #66ffff;
+    }
+
+    /* Confetti canvas */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1050;
+    }
+      
+  </style>
+</head>
+<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+
+  <!-- Title -->
+<div class="title-bar">
+  <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
+  <span class="title-text">CueTube!</span>
+</div>
+  
+  <!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle">...</div>
+      </div>
+      <div class="next-box hidden">
+        <div class="label">NEXT</div>
+        <div id="nextList"></div>
+        <div id="overflowCounter"></div>
+      </div>
+    </div>
+</div>
+  
+  <!-- Overlays -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+
+  <!-- YouTube Player -->
+  <div class="youtube-wrapper">
+  <iframe
+    id="player"
+    src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
+    allowfullscreen
+  ></iframe>
+</div>
+
+  <!-- Bottom Drawer -->
+  <div class="bottom-drawer" id="bottomDrawer">
+    <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+    
+  <div class="url-group">
+    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+      <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
+        <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
+      </button>
+  </div>
+    
+    <div class="bottom-buttons inside">
+      <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+      <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
+    </div>
+  </div>
+  
+  <!-- Popup -->
+  <div id="popupOverlay"></div>
+  <div id="popupModal">Reserved!</div>
+
+  <!-- Delete Confirm Box -->
+  <div id="confirmDelete" style="display:none; background: #222; position:absolute; box-shadow: 0 0 10px red; border:2px solid red; padding:10px; border-radius:6px; z-index:999; margin-top:5px;">
+    <div style="color:#ff4c4c; font-size:1em; margin-bottom:15px; text-align:center;">Delete?</div>
+    <div style="display:flex; gap:5px; margin-bottom:5px;">
+      <button id="yesBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-left: 15px;">Confirm</button>
+      <button id="noBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-right: 15px;">Cancel</button>
+    </div>
+  </div>
+  
+  <!-- Next Confirm Modal -->
+  <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
+  <div id="nextConfirmModal" style="
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  border: 2px solid cyan;
+  border-radius: 10px;
+  padding: 15px;
+  z-index: 1000;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.3);
+">
+  <div id="nextConfirmText" style="font-size: 1.1em; color: white; margin-bottom: 15px;">
+    Are you sure you want to skip to the next video?
+  </div>
+  <div style="display: flex; justify-content: space-between;">
+    <button class="cyan-btn" style="flex:1; margin-right: 5px;" onclick="confirmPlayNext()">Confirm</button>
+    <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
+  </div>
+</div>
+
+<!-- Exit Confirmation Modal -->
+<div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
+<div id="exitConfirmModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <p style="color: white; margin: 5px 0 2px;">Are you sure you want to exit?</p>
+    <p style="color: white; margin: 0 0 18px;">All reserved will be deleted.</p>
+    <p style="color: #ff4c4c; margin: 22px 0 26px;">click back button to exit</p>
+    
+    <div class="modal-buttons" style="justify-content: center;">
+      <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Karaoke Score Modal -->
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="karaokeModal" style="display:none;">
   <div class="modal">
     <button class="close-btn" aria-label="Close score modal" id="closeModal">&times;</button>
     <h2 id="modalTitle">KARAOKE SCORE</h2>
@@ -8,146 +869,821 @@
   </div>
 </div>
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-  .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(10, 10, 30, 0.85);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000; padding: 20px;
-  }
-  .modal {
-    position: relative; width: 350px; max-width: 95vw;
-    background: rgba(10, 10, 30, 0.9); border-radius: 15px;
-    padding: 40px 30px 60px;
-    box-shadow: 0 0 10px #00ffff, inset 0 0 40px #003366;
-    text-align: center; overflow: visible;
-    color: #aad8ff; font-family: 'Orbitron', sans-serif;
-  }
-  .modal::before {
-    content: "";
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.07) 0 2px, transparent 2px 4px);
-    pointer-events: none; border-radius: 15px; z-index: 1;
-  }
-  .modal h2 {
-    font-size: 2.5rem; margin: 0 0 20px; color: #00ffff;
-    text-shadow: 0 0 15px #66ddff, 0 0 25px #33aaff;
-    position: relative; z-index: 2;
-  }
-  .score {
-    font-size: 7rem; font-weight: 700; line-height: 1;
-    text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
-    animation: glitch 2s infinite; position: relative; z-index: 2;
-    color: #aad8ff; letter-spacing: 8px;
-  }
-  @keyframes glitch {
-    0%, 20%, 40%, 60%, 80%, 100% {
-      text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
-      transform: translate(0);
-    }
-    10% {
-      text-shadow: 2px 0 10px #ff66cc, -2px 0 10px #66ffff;
-      transform: translate(-1px, 1px);
-    }
-    30% {
-      text-shadow: -2px 0 10px #ff66cc, 2px 0 10px #66ffff;
-      transform: translate(1px, -1px);
-    }
-    50% {
-      text-shadow: 2px 0 10px #ff66cc, -2px 0 10px #66ffff;
-      transform: translate(-1px, 1px);
-    }
-    70% {
-      text-shadow: -2px 0 10px #ff66cc, 2px 0 10px #66ffff;
-      transform: translate(1px, -1px);
-    }
-    90% {
-      text-shadow: 0 0 10px #66ddff, 0 0 20px #33aaff;
-      transform: translate(0);
-    }
-  }
-  .score-message {
-    font-size: 1.8rem; margin-top: 25px; color: #ffd700;
-    text-shadow: 0 0 8px #ffd700; opacity: 0;
-    animation: fadeIn 1.2s ease forwards;
-    animation-delay: 8.5s; user-select: none; letter-spacing: 1px;
-    font-weight: 600; max-width: 320px; margin-left: auto; margin-right: auto;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .close-btn {
-    position: absolute; top: 15px; right: 18px;
-    background: transparent; border: none;
-    font-size: 2rem; color: #00ffff; cursor: pointer;
-    user-select: none; z-index: 3; transition: color 0.3s ease;
-  }
-  .close-btn:hover { color: #66ffff; }
-</style>
+<canvas id="confetti"></canvas>
 
-<script>
-  function showKaraokeScore(score) {
-    const modal = document.getElementById('karaokeScoreModal');
-    const scoreEl = modal.querySelector("#score");
-    const messageEl = modal.querySelector("#scoreMessage");
-    const closeBtn = modal.querySelector("#closeModal");
+  <audio id="clickSound" src="click.wav" preload="auto"></audio>
+  <audio id="successSound" src="success.wav" preload="auto"
+    ></audio>
+  <audio id="errorSound" src="error.wav" preload="auto"></audio>
+  <audio id="trashSound" src="trash.wav" preload="auto"></audio>
+  <audio id="slideSound" src="slide.wav" preload="auto"></audio>
+  
+  <!-- JS -->
+  <script>
+  let touchStartX = 0;
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const popupOverlay = document.getElementById("popupOverlay");
 
-    modal.style.display = "flex";
-    messageEl.style.opacity = '0';
-    messageEl.textContent = "";
-    scoreEl.textContent = "0";
+  function handleTouchStart(evt) {
+    touchStartX = evt.touches[0].clientX;
+  }
 
-    // Animate score function
-    function animateScore(finalScore, duration) {
-      return new Promise(resolve => {
-        let start = 0;
-        let steps = finalScore;
-        if (steps === 0) {
-          scoreEl.textContent = "0";
-          resolve();
-          return;
-        }
-        let stepDuration = duration / steps;
-        const interval = setInterval(() => {
-          start++;
-          scoreEl.textContent = start;
-          if (start >= finalScore) {
-            clearInterval(interval);
-            resolve();
-          }
-        }, stepDuration);
-      });
+  function handleTouchMove(evt) {
+    const deltaX = evt.touches[0].clientX - touchStartX;
+    if (deltaX > 50) openDrawer();
+    else if (deltaX < -50) closeDrawer();
+  }
+
+  function handleTap(evt) {
+    if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+      closeDrawer();
+    }
+  }
+
+  function toggleDrawer() {
+    if (drawer.classList.contains("open")) closeDrawer();
+    else openDrawer();
+  }
+
+  function openDrawer() {
+  // Close bottom drawer if open
+  if (bottomDrawer.classList.contains("open")) {
+    bottomDrawer.classList.remove("open");
+    document.querySelector(".bottom-drawer-handle").style.display = "flex";
+  }
+
+  drawer.classList.add('open');
+  overlay.classList.add('visible');
+  document.getElementById('drawerHandle').style.display = 'none';
+  document.getElementById("confirmDelete").style.display = "none";
+  playSlideSound();
+}
+  document.addEventListener("DOMContentLoaded", () => {
+  updateQueueDisplay();
+});
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
+    document.getElementById('drawerHandle').style.display = 'flex';
+    document.getElementById("confirmDelete").style.display = "none";
+    playSlideSound();
+  }
+
+  function closeBottomDrawer() {
+    if (bottomDrawer.classList.contains("open")) {
+      bottomDrawer.classList.remove("open");
+      document.querySelector(".bottom-drawer-handle").style.display = "flex";
+      playSlideSound();
+    }
+  }
+
+  let startY = 0;
+  const bottomDrawer = document.getElementById("bottomDrawer");
+
+  function toggleBottomDrawer() {
+  const isOpen = bottomDrawer.classList.toggle("open");
+  document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+
+  if (isOpen) {
+    // Close left drawer if open
+    if (drawer.classList.contains("open")) {
+      drawer.classList.remove("open");
+      overlay.classList.remove("visible");
+      document.getElementById('drawerHandle').style.display = 'flex';
+      document.getElementById("confirmDelete").style.display = "none";
     }
 
-    // Get message function
-    function getScoreMessage(score) {
-      if (score < 10)        return "🤬 Kupal!";
-      if (score < 20)        return "🤮 Eeew!";
-      if (score < 30)        return "🤢 Luh!!";
-      if (score < 40)        return "😒 Pwede na..";
-      if (score < 50)        return "😏 Konti nlng..";
-      if (score < 60)        return "🤞 Ayos!";
-      if (score < 70)        return "🥴 Sana all!";
-      if (score < 80)        return "👌 Petmalu!";
-      if (score < 90)        return "🫡 Lodi!";
-      if (score < 99)        return "🤩 Boom panes!";
-      if (score === 100)     return "🙌 !@#%!";
-      return "";
-    }
+    const input = document.getElementById("youtubeInputDrawer");
+    setTimeout(() => input.focus(), 50);
+  }
 
-    // Close modal event
-    closeBtn.onclick = () => {
-      modal.style.display = "none";
+  playSlideSound();
+}
+
+  document.body.addEventListener("touchstart", evt => {
+    startY = evt.touches[0].clientY;
+    handleTouchStart(evt);
+  });
+
+  document.body.addEventListener("touchmove", evt => {
+    const deltaY = evt.touches[0].clientY - startY;
+    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+      toggleBottomDrawer(); // swipe up to open only if it's not already open
+    } else if (deltaY > 40) {
+      closeBottomDrawer(); // swipe down always closes
+    }
+    handleTouchMove(evt);
+  });
+
+  document.body.addEventListener("click", handleTap);
+
+  let player;
+  let queue = [];
+  let currentIndex = -1;
+
+  if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+    events: {
+      onReady: () => console.log("Player Ready"),
+      onStateChange: onPlayerStateChange
+    },
+    origin: window.location.origin
+  });
+}
+
+ function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.ENDED) {
+    const isLastVideo = currentIndex === queue.length - 1;
+    if (queue.length === 0 || isLastVideo) {
+      // Reset queue and player here
+      queue = [];
+      currentIndex = -1;
+
+      updateNowPlaying();
+      updateQueueDisplay();
+
+      player.stopVideo();
+      player.clearVideo();
+
+      // **Add this line back here:**
+      showPopup("That's the last tune!", "magenta", true);
+    } else {
+      currentIndex++;
+      player.loadVideoById(queue[currentIndex].id);
+      updateNowPlaying();
+      updateQueueDisplay();
+    }
+  }
+}
+
+  function extractVideoId(url) {
+    const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
+    return match ? match[1] : null;
+  }
+
+  async function reserveFromDrawer() {
+    clearPersistentPopup();
+    
+    const input = document.getElementById("youtubeInputDrawer");
+    const url = input.value.trim();
+    const videoId = extractVideoId(url);
+    
+    if (!videoId) {
+      input.value = "";
+      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      playErrorSound();
+      return;
+    }
+  
+    const title = await fetchTitle(videoId);
+    
+    // If it's the first video being added
+    if (queue.length === 0 && currentIndex === -1) {
+      queue.push({ id: videoId, title });
+      currentIndex = 0;
+      player.loadVideoById(videoId);
+      updateNowPlaying();
+      
+    } else {
+      // Add to the end of queue
+      queue.push({ id: videoId, title });
+    }
+  
+    updateQueueDisplay();
+    input.value = "";
+    showPopup("Reserved!", "lime");
+    playSuccessSound();
+    closeBottomDrawer();
+  }
+
+  async function fetchTitle(videoId) {
+    try {
+      const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      const data = await res.json();
+      return data.title || videoId;
+    } catch (err) {
+    showPopup("⚠️ Oops! Try choosing\nanother video.", "red");
+    playErrorSound();
+    return videoId;
+  }
+  }
+
+  function showDeleteConfirm(e, index) {
+    const confirmBox = document.getElementById("confirmDelete");
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    confirmBox.style.left = `${x + 10}px`;
+    confirmBox.style.top = `${y}px`;
+    confirmBox.style.display = "block";
+
+    const yes = document.getElementById("yesBtn");
+    const no = document.getElementById("noBtn");
+
+    yes.onclick = () => {
+      queue.splice(index, 1);
+      confirmBox.style.display = "none";
+      updateQueueDisplay();
+      playTrashSound();
     };
 
-    animateScore(score, 8500).then(() => {
-      messageEl.textContent = getScoreMessage(score);
-      messageEl.style.opacity = '1';
-      // You can add confetti launch here or call a function in your main app if you want
+    no.onclick = () => {
+      confirmBox.style.display = "none";
+    };
+  }
+
+  function playNextFromQueue() {
+    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+      showPopup("No next song.", "red");
+      playErrorSound();
+      return;
+    }
+
+    currentIndex++;
+    player.loadVideoById(queue[currentIndex].id);
+    updateNowPlaying();
+    updateQueueDisplay();
+    showPopup("Next song!", "magenta");
+  }
+
+  function updateQueueDisplay() {
+  const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
+  list.innerHTML = "";
+
+  for (let i = currentIndex + 1; i < queue.length; i++) {
+    const div = document.createElement("div");
+    div.className = "title";
+    div.textContent = queue[i].title;
+    div.style.cursor = "pointer";
+
+    let longPressTimer;
+    let longPressTriggered = false;
+
+    const startHandler = (e) => {
+      e.preventDefault();
+      longPressTriggered = false;
+      div.classList.add("long-pressing");
+
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        navigator.vibrate?.(50);
+        showDeleteConfirm(e, i);
+      }, 500);
+    };
+
+    const endHandler = () => {
+      if (!longPressTriggered) {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
+      }
+    };
+
+    const cancelHandler = () => {
+      clearTimeout(longPressTimer);
+      div.classList.remove("long-pressing");
+    };
+
+    // Events for both mouse and touch
+    div.addEventListener("mousedown", startHandler);
+    div.addEventListener("touchstart", startHandler, { passive: false });
+
+    div.addEventListener("mouseup", endHandler);
+    div.addEventListener("mouseleave", cancelHandler);
+    div.addEventListener("touchend", endHandler);
+    div.addEventListener("touchcancel", cancelHandler);
+
+    // Optional: Right-click support for desktop
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      showDeleteConfirm(e, i);
+    });
+
+    list.appendChild(div);
+  }
+
+  updateOverflowCounter();
+
+  const nextBtn = document.getElementById("nextBtnDrawer");
+  const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+  nextBtn.disabled = !hasNext;
+  nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+  nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+  const nextBox = document.querySelector('.next-box');
+  const upcomingCount = queue.length - (currentIndex + 1);
+  
+  // Hide or show next-box based on upcoming songs
+  if (upcomingCount >= 1) {
+    nextBox.classList.remove('hidden');
+  } else {
+    nextBox.classList.add('hidden');
+  }
+  }
+    
+  document.addEventListener("DOMContentLoaded", () => {
+  updateQueueDisplay();
+});
+
+  function updateOverflowCounter() {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    if (!list || !overflow) return;
+
+    const totalHeight = list.scrollHeight;
+    const visibleHeight = list.clientHeight;
+    const scrollable = totalHeight > visibleHeight;
+
+    if (scrollable) {
+      const items = list.children;
+      let shown = 0;
+      let accHeight = 0;
+      for (let i = 0; i < items.length; i++) {
+        accHeight += items[i].offsetHeight;
+        if (accHeight < visibleHeight) shown++;
+      }
+      const remainingCount = items.length - shown;
+      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+      overflow.style.display = "block";
+    } else {
+      overflow.style.display = "none";
+    }
+  }
+
+   function updateNowPlaying() {
+    const nowTitleEl = document.getElementById("nowTitle");
+    const current = queue[currentIndex];
+  
+    if (!current) return;
+  
+    let title = current.title || `Video ID: ${current.id}`;
+    let remaining = queue.length - (currentIndex + 1);
+  
+    if (remaining === 0) {
+      title += " (no songs next)";
+      nowTitleEl.style.textShadow = "0 0 8px magenta, 0 0 16px magenta";
+    } else {
+      nowTitleEl.style.textShadow = "none";
+    }
+  
+    nowTitleEl.textContent = title;
+  }
+
+
+  let persistentPopupActive = false;
+
+function showPopup(message, color = 'magenta', persistent = false) {
+  const popup = document.getElementById('popupModal');
+  const overlay = document.getElementById('popupOverlay');
+
+  popup.textContent = message;
+  popup.style.color = 'white';
+  popup.style.textShadow = `
+    0 0 10px ${color},
+    0 0 20px ${color},
+    0 0 35px ${color}
+  `;
+
+  overlay.classList.add('visible');
+  popup.classList.add('show');
+
+  if (persistent) {
+    persistentPopupActive = true;
+    // Don't auto-hide
+  } else {
+    persistentPopupActive = false;
+    setTimeout(() => {
+      popup.classList.remove('show');
+      overlay.classList.remove('visible');
+    }, 3000); // Auto-hide after 3 seconds
+  }
+}
+
+function clearPersistentPopup() {
+  if (persistentPopupActive) {
+    const popup = document.getElementById('popupModal');
+    const overlay = document.getElementById('popupOverlay');
+    popup.classList.remove('show');
+    overlay.classList.remove('visible');
+    persistentPopupActive = false;
+  }
+}
+
+  (function enableDragScroll() {
+    const box = document.querySelector('.next-box');
+    let isDown = false;
+    let startY, scrollTop;
+
+    box.addEventListener('mousedown', (e) => {
+      isDown = true;
+      box.classList.add('dragging');
+      startY = e.pageY - box.offsetTop;
+      scrollTop = box.scrollTop;
+    });
+    box.addEventListener('mouseleave', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mouseup', () => {
+      isDown = false;
+      box.classList.remove('dragging');
+    });
+    box.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const y = e.pageY - box.offsetTop;
+      const walk = (y - startY);
+      box.scrollTop = scrollTop - walk;
+    });
+
+    let startYTouch = 0, scrollTopTouch = 0;
+    box.addEventListener("touchstart", e => {
+      startYTouch = e.touches[0].clientY;
+      scrollTopTouch = box.scrollTop;
+    }, { passive: true });
+
+    box.addEventListener("touchmove", e => {
+      const y = e.touches[0].clientY;
+      const walk = y - startYTouch;
+      box.scrollTop = scrollTopTouch - walk;
+    }, { passive: true });
+  })();
+
+  document.getElementById("popupOverlay").onclick = () => {
+    const popup = document.getElementById("popupModal");
+    popup.classList.remove("show");
+    document.getElementById("popupOverlay").classList.remove("visible");
+    persistentPopupActive = false;
+  };
+
+  document.body.addEventListener("click", () => {
+    const confirm = document.getElementById("confirmDelete");
+    if (confirm.style.display !== "none") {
+      confirm.style.display = "none";
+    }
+  });
+
+    function showNextConfirm() {
+    const messages = [
+      "Ready to jump to the next song?",
+      "Skip this one and move on?",
+      "Next up? Let's go!",
+      "Want to move to the next jam?",
+      "Time to switch it up?"
+    ];
+    const random = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById("nextConfirmText").innerText = random;
+  
+    document.getElementById("nextConfirmOverlay").style.display = "block";
+    document.getElementById("nextConfirmModal").style.display = "block";
+  }
+
+  function hideNextConfirm() {
+    document.getElementById("nextConfirmOverlay").style.display = "none";
+    document.getElementById("nextConfirmModal").style.display = "none";
+  }
+
+  function confirmPlayNext() {
+    hideNextConfirm();
+    playNextFromQueue();
+  }
+
+// Show Exit Modal
+  function showExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "block";
+    document.getElementById("exitConfirmModal").style.display = "block";
+    playErrorSound();
+  }
+
+  // Hide Exit Modal
+  function hideExitConfirm() {
+    document.getElementById("exitConfirmOverlay").style.display = "none";
+    document.getElementById("exitConfirmModal").style.display = "none";
+  }
+
+  // Android/WebView Back Button Handler
+  window.addEventListener("load", () => {
+    history.pushState(null, document.title, location.href);
+  });
+
+  window.addEventListener("popstate", function (e) {
+    showExitConfirm();
+    history.pushState(null, document.title, location.href);
+  });
+
+  // PC/Browser close confirmation
+  window.addEventListener("beforeunload", function (e) {
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
+    
+
+  // Play click sound
+function playClickSound() {
+  const click = document.getElementById("clickSound");
+  if (click) {
+    click.currentTime = 0;
+    click.play().catch((e) => console.log("Click sound blocked", e));
+  }
+}
+
+// Play success sound
+function playSuccessSound() {
+  const success = document.getElementById("successSound");
+  if (success) {
+    success.currentTime = 0;
+    success.play().catch((e) => console.log("Success sound blocked", e));
+  }
+}
+
+// Play error sound
+function playErrorSound() {
+  const error = document.getElementById("errorSound");
+  if (error) {
+    error.currentTime = 0;
+    error.play().catch((e) => console.log("Error sound blocked", e));
+  }
+}
+    
+// Play trash sound
+function playTrashSound() {
+  const trash = document.getElementById("trashSound");
+  if (trash) {
+    trash.currentTime = 0;
+    trash.play().catch((e) => console.log("trash sound blocked", e));
+  }
+}
+
+// Play slide sound
+function playSlideSound() {
+  const slide = document.getElementById("slideSound");
+  if (slide) {
+    slide.currentTime = 0;
+    slide.play().catch((e) => console.log("slide sound blocked", e));
+  }
+}
+
+  document.querySelectorAll('.cyan-btn').forEach(btn => {
+    btn.addEventListener('click', playClickSound);
+  });
+    
+  window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+// Intercept Android back button using history
+window.addEventListener("load", () => {
+// Push dummy history state to trap the back button
+  history.pushState(null, document.title, location.href);
+});
+    
+window.addEventListener("popstate", function (e) {
+// Show confirmation instead of exiting
+  showExitConfirm();
+// Re-push the dummy state so user must confirm before exiting
+  history.pushState(null, document.title, location.href);
+});
+
+    function enterFullScreenIfLandscape() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+
+    if (isLandscape && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.warn("Fullscreen failed:", err);
+      });
+    } else if (!isLandscape && document.fullscreenElement) {
+      document.exitFullscreen().catch((err) => {
+        console.warn("Exit fullscreen failed:", err);
+      });
+    }
+  }
+
+  window.addEventListener("resize", enterFullScreenIfLandscape);
+  window.addEventListener("orientationchange", enterFullScreenIfLandscape);
+  enterFullScreenIfLandscape();
+    
+    // Optional: manual trigger on user click (some browsers require gesture)
+    document.addEventListener("click", goFullscreenIfLandscape);
+
+  async function pasteFromClipboard() {
+  playClickSound(); // Play click sound immediately
+
+  try {
+    const text = await navigator.clipboard.readText();
+    const input = document.getElementById("youtubeInputDrawer");
+    input.value = text;
+
+    const videoId = extractVideoId(text);
+
+    if (!videoId) {
+      input.value = "";
+      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      playErrorSound();
+    } else {
+      input.dispatchEvent(new Event("input")); // Trigger glow if needed
+      await reserveFromDrawer(); // ✅ Auto-reserve if valid
+    }
+  } catch (err) {
+    showPopup("⚠️ Failed!\nPaste manually.", "red");
+    playErrorSound();
+    console.error("Clipboard error:", err);
+  }
+}
+
+  function adjustForKeyboard() {
+    const drawer = document.getElementById('bottomDrawer');
+    const isLandscape = window.innerWidth > window.innerHeight;
+
+    if (!window.visualViewport || !isLandscape) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
+      drawer.style.paddingBottom = '25px';
+      return;
+    }
+
+    const vp = window.visualViewport;
+    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
+
+    if (keyboardHeight > 100) {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
+      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
+    } else {
+      drawer.style.transition = 'padding-bottom 0.25s ease';
+      drawer.style.paddingBottom = '25px';
+    }
+  }
+
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", adjustForKeyboard);
+    visualViewport.addEventListener("scroll", adjustForKeyboard);
+  }
+
+  window.addEventListener("orientationchange", () => {
+    setTimeout(adjustForKeyboard, 200); // Give time for reflow
+  });
+
+  // Initial call in case landscape is already active
+  window.addEventListener("DOMContentLoaded", adjustForKeyboard);
+
+ // Glow the URL box
+const youtubeInput = document.getElementById("youtubeInputDrawer");
+
+  youtubeInput.addEventListener("input", () => {
+    if (youtubeInput.value.trim()) {
+      youtubeInput.classList.add("glow");
+    } else {
+      youtubeInput.classList.remove("glow");
+    }
+  });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+  const score = 92; // Set the karaoke score here or dynamically
+  const scoreEl = document.getElementById("score");
+  const messageEl = document.getElementById("scoreMessage");
+  const closeBtn = document.getElementById("closeModal");
+  const scoreBoard = document.getElementById("karaokeModal");
+  const duration = 8500; // milliseconds for count up animation
+
+  const video = document.getElementById("videoPlayer"); // Your video element
+
+  function animateScore(finalScore, duration) {
+    return new Promise(resolve => {
+      let start = 0;
+      let steps = finalScore;
+      if (steps === 0) {
+        scoreEl.textContent = "0";
+        resolve();
+        return;
+      }
+      let stepDuration = duration / steps;
+      const interval = setInterval(() => {
+        start++;
+        scoreEl.textContent = start;
+        if (start >= finalScore) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, stepDuration);
     });
   }
 
-  // Expose globally so main page can call it
-  window.showKaraokeScore = showKaraokeScore;
-</script>
+  function getScoreMessage(score) {
+    if (score < 10)        return "🤬 Kupal!";
+    if (score < 20)        return "🤮 Eeew!";
+    if (score < 30)        return "🤢 Luh!!";
+    if (score < 40)        return "😒 Pwede na..";
+    if (score < 50)        return "😏 Konti nlng..";
+    if (score < 60)        return "🤞 Ayos!";
+    if (score < 70)        return "🥴 Sana all!";
+    if (score < 80)        return "👌 Petmalu!";
+    if (score < 90)        return "🫡 Lodi!";
+    if (score < 99)        return "🤩 Boom panes!";
+    if (score === 100)     return "🙌 !@#%!";
+    return "";
+  }
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confetti = [];
+    const confettiCount = 150;
+
+    for (let i = 0; i < confettiCount; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 5 + 2,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+        tiltAngle: 0
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+        ctx.stroke();
+      });
+      update();
+    }
+
+    function update() {
+      confetti.forEach(c => {
+        c.y += Math.cos(c.d) + 2;
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+        if (c.y > canvas.height) {
+          c.y = -20;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function loop() {
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    setTimeout(() => {
+      canvas.style.display = 'none';
+    }, 6000);
+  }
+
+  closeBtn.addEventListener('click', () => {
+    scoreBoard.style.display = 'none';
+  });
+
+  // Listen for video end event to show score modal
+  video.addEventListener('ended', () => {
+    scoreBoard.style.display = 'flex';
+    scoreEl.textContent = '0';
+    messageEl.textContent = '';
+    animateScore(score, duration).then(() => {
+      messageEl.textContent = getScoreMessage(score);
+      launchConfetti();
+    });
+  });
+
+  // Handle window resize for confetti canvas
+  window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confetti');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+});
+
+  </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
