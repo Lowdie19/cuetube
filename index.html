@@ -1350,10 +1350,47 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+    (function() {
+  function isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+  }
+  function isLandscape() {
+    return window.innerWidth > window.innerHeight;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  const swipeThreshold = 50;
+
+  window.addEventListener('touchstart', e => {
+    if (!isAndroid() || !isLandscape()) return;
+    let touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+  });
+      
+// swipe gesture for Landscape
+  window.addEventListener('touchend', e => {
+    if (!isAndroid() || !isLandscape()) return;
+    let touch = e.changedTouches[0];
+    let dx = touch.clientX - startX;
+    let dy = touch.clientY - startY;
+
+    if (dx > swipeThreshold && Math.abs(dy) < swipeThreshold) {
+      // Swipe right → open left drawer
+      if (typeof openDrawer === 'function') openDrawer();
+    } else if (dy < -swipeThreshold && Math.abs(dx) < swipeThreshold) {
+      // Swipe up → toggle bottom drawer
+      if (typeof toggleBottomDrawer === 'function') toggleBottomDrawer();
+    }
+  });
+})();
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
