@@ -432,7 +432,7 @@
       filter: drop-shadow(0 0 5px magenta);
     }
     
-  /*  @media (orientation: landscape) {
+    @media (orientation: landscape) {
       .youtube-wrapper {
         height: 75vh;
       }
@@ -444,7 +444,7 @@
       .url-input, .search-bar {
         display: block;
       }
-    } */
+    }
     
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
@@ -1350,10 +1350,29 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+    
+  window.addEventListener('touchend', e => {
+  if (!isAndroid() || !isLandscape()) return;
+
+  let touch = e.changedTouches[0];
+  let dx = touch.clientX - touchStartX;
+  let dy = touch.clientY - touchStartY;
+
+  // Swipe from anywhere left to right (open left drawer)
+  if (dx > threshold && Math.abs(dy) < threshold) {
+    openDrawer();
+  }
+  // Swipe from anywhere bottom to top (open bottom drawer)
+  else if (dy < -threshold && Math.abs(dx) < threshold) {
+    toggleBottomDrawer();
+  }
+});
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
