@@ -600,12 +600,11 @@
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
-    <iframe id="player" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
- <!-- <iframe
+  <iframe
     id="player"
     src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
     allowfullscreen
-  ></iframe> -->
+  ></iframe>
 </div>
 
   <!-- Bottom Drawer -->
@@ -1351,43 +1350,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-    function loadVideo(videoId) {
-  const player = document.getElementById('player');
-  const embedURL = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-  const normalURL = `https://www.youtube.com/watch?v=${videoId}`;
-
-  // Load embed first (ad-lite)
-  player.src = embedURL;
-
-  // Try to detect embed restrictions after it loads
-  player.onload = () => {
-    try {
-      // Attempt to access the iframe content
-      const iframeDoc = player.contentDocument || player.contentWindow.document;
-      const iframeText = iframeDoc.body ? iframeDoc.body.innerText : "";
-
-      // YouTube shows this text when embeds are blocked
-      if (iframeText.includes("Playback on other websites has been disabled")) {
-        console.log("Embed blocked — switching to normal watch mode");
-        player.src = normalURL; // fallback to ads if needed
-      }
-    } catch (err) {
-      // If we can't access iframe content (due to cross-origin),
-      // we assume it's restricted and fallback
-      console.warn("Cross-origin access blocked — switching to normal watch mode");
-      player.src = normalURL;
-    }
-  };
-}
-
-// Example usage (replace with your reservation logic)
-loadVideo("dQw4w9WgXcQ");
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
 
 
 
