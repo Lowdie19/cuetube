@@ -684,8 +684,11 @@
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
+
+
+
   
-  <!-- JS -->
+  <!-- JS ----------------------------------------------------------------------------------------->
   <script>
   let touchStartX = 0;
     const drawer = document.getElementById('drawer');
@@ -1349,11 +1352,79 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFfVQa400YWvN_FNnDiEItcrNndZFrpoVYm2vZcTzzp4z-zn7a8jHXCJnTvQb4_GlmbL5bglqd2jGk/pub?output=csv"; // paste your CSV link here
+
+// Fetch playlist from Google Sheet
+function loadPlaylist() {
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.split("\n").slice(1); // skip header
+      const videos = rows.map(row => {
+        const cols = row.split(",");
+        return { id: cols[0], title: cols[1], addedBy: cols[2] };
+      });
+      displayPlaylist(videos);
+    });
+}
+
+// Display playlist in console for now
+function displayPlaylist(videos) {
+  console.clear();
+  console.log("Current Playlist:", videos);
+  // TODO: Add code to your existing video queue logic here
+}
+
+// Refresh every 5 seconds
+setInterval(loadPlaylist, 5000);
+loadPlaylist();
+</script>
+<style>
+.score-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: gold;
+  background: rgba(0,0,0,0.7);
+  padding: 20px 40px;
+  border-radius: 15px;
+  animation: popFade 2s ease-out;
+  z-index: 9999;
+}
+@keyframes popFade {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+}
+</style>
+
+<script>
+function showScorePopup(points) {
+  const popup = document.createElement("div");
+  popup.className = "score-popup";
+  popup.innerText = `🎉 ${points} Points! 🎤`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 2000);
+}
+
+// Example trigger when song ends:
+// Replace "onSongEnd()" with your actual end-of-song function
+function onSongEnd() {
+  const randomScore = Math.floor(Math.random() * 10000);
+  showScorePopup(randomScore);
+}
+</script>
 </body>
 </html>
+
 
 
 
