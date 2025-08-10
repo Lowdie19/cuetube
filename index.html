@@ -567,26 +567,6 @@
         overflow: hidden;
       }
     }
-
-    .score-popup {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 3rem;
-      color: gold;
-      background: rgba(0,0,0,0.7);
-      padding: 20px 40px;
-      border-radius: 15px;
-      animation: popFade 2s ease-out;
-      z-index: 9999;
-    }
-    @keyframes popFade {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      50% { transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    }
       
   </style>
 </head>
@@ -1370,73 +1350,97 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+    
+////////////////
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
   const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv";
-  const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
+const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
 
-  function showScorePopup(points) {
-    const popup = document.createElement("div");
-    popup.className = "score-popup";
-    popup.innerText = `🎉 ${points} Points! 🎤`;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.remove(), 2000);
+// Score popup styling
+const scoreStyle = document.createElement("style");
+scoreStyle.textContent = `
+  .score-popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    color: gold;
+    background: rgba(0,0,0,0.7);
+    padding: 20px 40px;
+    border-radius: 15px;
+    animation: popFade 2s ease-out;
+    z-index: 9999;
   }
-
-  let player, playlistVideos = [];
-
-  function onYouTubeIframeAPIReady() {
-    loadPlaylist();
+  @keyframes popFade {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
   }
+`;
+document.head.appendChild(scoreStyle);
 
-  function createPlayer(videoId) {
-    if (player) {
-      player.loadVideoById(videoId);
-    } else {
-      player = new YT.Player("player", {
-        events: { onStateChange: onPlayerStateChange }
+function showScorePopup(points) {
+  const popup = document.createElement("div");
+  popup.className = "score-popup";
+  popup.innerText = `🎉 ${points} Points! 🎤`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 2000);
+}
+
+// Load playlist from Google Sheet into existing queue[]
+function loadPlaylistFromSheet() {
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.trim().split("\n").slice(1);
+      queue.length = 0; // clear existing queue
+
+      rows.forEach((row, idx) => {
+        const [id, title] = row.split(",").map(s => s.trim());
+        if (id) queue.push({ id, title: title || id });
       });
-    }
-  }
 
-  function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-      onSongEnd();
-    }
-  }
+      if (queue.length > 0) {
+        currentIndex = 0;
+        player.loadVideoById(queue[0].id);
+        updateNowPlaying();
+        updateQueueDisplay();
+      }
+    })
+    .catch(err => console.error("Error loading playlist:", err));
+}
 
-  function loadPlaylist() {
-    fetch(sheetURL)
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split("\n").slice(1);
-        playlistVideos = rows.map(row => {
-          const [id, title, addedBy] = row.split(",").map(s => s.trim());
-          return { id, title, addedBy };
-        });
-        console.log("Loaded playlist:", playlistVideos);
-        if (playlistVideos.length) {
-          createPlayer(playlistVideos[0].id);
-        } else {
-          console.log("Playlist is empty!");
-        }
-      })
-      .catch(err => console.error("Error loading playlist:", err));
-  }
-
-  function onSongEnd() {
+// Hook into your existing player state change
+const originalOnPlayerStateChange = onPlayerStateChange;
+onPlayerStateChange = function(event) {
+  if (event.data === YT.PlayerState.ENDED) {
+    // Show score popup
     showScorePopup(Math.floor(Math.random() * 10000));
+
+    // Remove first song from Google Sheet
     fetch(removeURL)
-      .then(res => res.text())
-      .then(data => {
-        console.log("Removed song:", data);
-        setTimeout(loadPlaylist, 1000);
+      .then(() => {
+        console.log("Removed song from sheet");
+        setTimeout(() => loadPlaylistFromSheet(), 500);
       })
       .catch(err => console.error("Error removing song:", err));
   }
+
+  // Call your original logic
+  if (typeof originalOnPlayerStateChange === "function") {
+    originalOnPlayerStateChange(event);
+  }
+};
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", loadPlaylistFromSheet);
 </script>
 </body>
 </html>
+
 
 
 
