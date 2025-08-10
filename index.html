@@ -1370,92 +1370,74 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-    // ==== CONFIG ====
-// Your published Google Sheet CSV link:
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv";
-// Your Apps Script URL to remove the first song:
-const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv";
+  const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
 
-// ==== SCORE POPUP ====
-function showScorePopup(points) {
-  const popup = document.createElement("div");
-  popup.className = "score-popup";
-  popup.innerText = `🎉 ${points} Points! 🎤`;
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 2000);
-}
-
-// ==== YT Player Setup ====
-let player;
-let playlistVideos = [];
-
-function onYouTubeIframeAPIReady() {
-  loadPlaylist();
-}
-
-function createPlayer(videoId) {
-  if (player) {
-    player.loadVideoById(videoId);
-  } else {
-    player = new YT.Player("player", {
-      height: "390",
-      width: "640",
-      videoId: videoId,
-      events: {
-        onStateChange: onPlayerStateChange
-      }
-    });
+  function showScorePopup(points) {
+    const popup = document.createElement("div");
+    popup.className = "score-popup";
+    popup.innerText = `🎉 ${points} Points! 🎤`;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 2000);
   }
-}
 
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.ENDED) {
-    onSongEnd();
+  let player, playlistVideos = [];
+
+  function onYouTubeIframeAPIReady() {
+    loadPlaylist();
   }
-}
 
-// ==== PLAYLIST LOADER ====
-function loadPlaylist() {
-  fetch(sheetURL)
-    .then(res => res.text())
-    .then(csv => {
-      const rows = csv.trim().split("\n").slice(1); // skip header
-      playlistVideos = rows.map(row => {
-        const cols = row.split(",");
-        return { id: cols[0].trim(), title: cols[1]?.trim(), addedBy: cols[2]?.trim() };
+  function createPlayer(videoId) {
+    if (player) {
+      player.loadVideoById(videoId);
+    } else {
+      player = new YT.Player("player", {
+        events: { onStateChange: onPlayerStateChange }
       });
-      console.log("Current Playlist:", playlistVideos);
+    }
+  }
 
-      if (playlistVideos.length > 0) {
-        createPlayer(playlistVideos[0].id);
-      } else {
-        console.log("No songs left in playlist.");
-      }
-    })
-    .catch(err => console.error("Failed to load playlist:", err));
-}
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+      onSongEnd();
+    }
+  }
 
-// ==== SONG END HANDLER ====
-function onSongEnd() {
-  // Show random score
-  const randomScore = Math.floor(Math.random() * 10000);
-  showScorePopup(randomScore);
+  function loadPlaylist() {
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.trim().split("\n").slice(1);
+        playlistVideos = rows.map(row => {
+          const [id, title, addedBy] = row.split(",").map(s => s.trim());
+          return { id, title, addedBy };
+        });
+        console.log("Loaded playlist:", playlistVideos);
+        if (playlistVideos.length) {
+          createPlayer(playlistVideos[0].id);
+        } else {
+          console.log("Playlist is empty!");
+        }
+      })
+      .catch(err => console.error("Error loading playlist:", err));
+  }
 
-  // Remove first song from Google Sheet
-  fetch(removeURL)
-    .then(res => res.text())
-    .then(data => {
-      console.log("Song removed:", data);
-      // Reload playlist after short delay
-      setTimeout(loadPlaylist, 1500);
-    })
-    .catch(err => console.error("Failed to remove song:", err));
-}
-
-  </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
+  function onSongEnd() {
+    showScorePopup(Math.floor(Math.random() * 10000));
+    fetch(removeURL)
+      .then(res => res.text())
+      .then(data => {
+        console.log("Removed song:", data);
+        setTimeout(loadPlaylist, 1000);
+      })
+      .catch(err => console.error("Error removing song:", err));
+  }
+</script>
 </body>
 </html>
+
 
 
 
