@@ -1402,30 +1402,43 @@ function displayPlaylist(videos) {
 setInterval(loadPlaylist, 5000);
 loadPlaylist();
 
+function showScorePopup(points) {
+  const popup = document.createElement("div");
+  popup.className = "score-popup";
+  popup.innerText = `🎉 ${points} Points! 🎤`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 2000);
+}
 
-    
-    function onSongEnd() {
+// Example trigger when song ends:
+// Replace "onSongEnd()" with your actual end-of-song function
+function onPlayerStateChange(event) {
+  const randomScore = Math.floor(Math.random() * 10000);
+  showScorePopup(randomScore);
+}
+    ---------------
+    function onPlayerStateChange(event) {
   // Show the score popup (optional)
   const randomScore = Math.floor(Math.random() * 10000);
   showScorePopup(randomScore);
 
   // Call the Google Apps Script to remove the first song
-  fetch("YOUR_WEB_APP_URL_HERE")
+  fetch(https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec)
     .then(response => response.text())
     .then(data => {
-      console.log("https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec:", data);
+      console.log("Remove song response:", data);
       // Reload the playlist so the UI updates
       loadPlaylist();
     })
     .catch(err => console.error("Failed to remove song:", err));
 }
-
     
     </script>
       <script src="https://www.youtube.com/iframe_api"></script>
 </script>
 </body>
 </html>
+
 
 
 
