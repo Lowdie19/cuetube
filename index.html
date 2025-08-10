@@ -567,26 +567,6 @@
         overflow: hidden;
       }
     }
-
-    .score-popup {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 3rem;
-      color: gold;
-      background: rgba(0,0,0,0.7);
-      padding: 20px 40px;
-      border-radius: 15px;
-      animation: popFade 2s ease-out;
-      z-index: 9999;
-    }
-    @keyframes popFade {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      50% { transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    }
       
   </style>
 </head>
@@ -601,7 +581,7 @@
   <!-- Drawer -->
 <div class="drawer" id="drawer">
   <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    </div>
+    <div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
         <div class="title" id="nowTitle">...</div>
@@ -1370,180 +1350,17 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-    // ==== CONFIG ====
-// Your published Google Sheet CSV link:
-
-////////////////
-// (Replaced block) Google Sheet integration (merged with existing player safely)
-
-<script>
-(function(){
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv";
-const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
-
-// Add score popup styles
-const scoreStyle = document.createElement("style");
-scoreStyle.id = "cue-score-style";
-scoreStyle.textContent = `
-  .score-popup {
-    position: fixed;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    color: gold;
-    background: rgba(0,0,0,0.7);
-    padding: 20px 40px;
-    border-radius: 15px;
-    animation: popFade 2s ease-out;
-    z-index: 9999;
-  }
-  @keyframes popFade {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-    20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-    50% { transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  }
-`;
-if (!document.getElementById("cue-score-style")) document.head.appendChild(scoreStyle);
-
-function showScorePopup(points) {
-  const popup = document.createElement("div");
-  popup.className = "score-popup";
-  popup.innerText = `🎉 ${points} Points! 🎤`;
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 2000);
-}
-
-// Safe CSV row parsing: split only on first comma so titles with commas are handled
-function parseRow(row) {
-  const parts = row.split(/,(.+)/); // splits into [id, restOfLine]
-  const id = (parts[0] || "").trim();
-  const title = (parts[1] || "").trim();
-  return { id, title: title || id };
-}
-
-let waitingForPlayerInterval = null;
-
-// Load playlist from sheet into your existing `queue` array (keeps UI/drawers intact)
-function loadPlaylistFromSheet() {
-  fetch(sheetURL)
-    .then(res => res.text())
-    .then(csv => {
-      if (!csv) {
-        console.warn("Sheet returned empty response");
-        showPopup("⚠️ No songs in queue!", "red", true);
-        return;
-      }
-      const lines = csv.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-      const rows = lines.slice(1); // skip header
-      // clear existing queue but keep object reference
-      queue.length = 0;
-      rows.forEach(row => {
-        const item = parseRow(row);
-        if (item.id) queue.push(item);
-      });
-
-      // update UI
-      updateQueueDisplay();
-
-      if (queue.length > 0) {
-        // clear any persistent "no songs" popup
-        clearPersistentPopup();
-
-        // set current to first item and start playback when player ready
-        currentIndex = 0;
-        updateNowPlaying();
-        startPlaybackIfReady();
-      } else {
-        // empty sheet
-        showPopup("⚠️ No songs in queue!", "red", true);
-        try { if (player && typeof player.stopVideo === "function") player.stopVideo(); } catch(e){}
-        currentIndex = -1;
-        updateNowPlaying();
-      }
-    })
-    .catch(err => {
-      console.error("Error loading playlist from sheet:", err);
-      showPopup("⚠️ Failed to load playlist", "red", true);
-    });
-}
-
-function startPlaybackIfReady() {
-  if (window.player && typeof player.loadVideoById === "function") {
-    try {
-      if (queue.length > 0 && queue[0].id) {
-        player.loadVideoById(queue[0].id);
-      }
-    } catch (e) {
-      console.warn("player.loadVideoById threw:", e);
-    }
-  } else {
-    // wait until YT player is ready (poll)
-    if (waitingForPlayerInterval) return;
-    waitingForPlayerInterval = setInterval(() => {
-      if (window.player && typeof player.loadVideoById === "function") {
-        clearInterval(waitingForPlayerInterval);
-        waitingForPlayerInterval = null;
-        try { if (queue.length > 0) player.loadVideoById(queue[0].id); } catch(e){ console.error(e); }
-      }
-    }, 200);
-  }
-}
-
-// Override player's state-change handler only for ENDED state
-const originalOnPlayerStateChange = window.onPlayerStateChange;
-window.onPlayerStateChange = function(event) {
-  // If YT API not available, fallback to original
-  if (typeof YT === "undefined") {
-    if (typeof originalOnPlayerStateChange === "function") originalOnPlayerStateChange(event);
-    return;
-  }
-
-  if (event && event.data === YT.PlayerState.ENDED) {
-    // show fun score popup
-    try { showScorePopup(Math.floor(Math.random() * 10000)); } catch(e){}
-
-    // remove first song from sheet, then reload playlist (sheet-driven flow)
-    fetch(removeURL)
-      .then(res => {
-        console.log("Requested removal of first song from sheet:", res && res.status);
-        // small delay to allow Apps Script to update the published CSV
-        setTimeout(loadPlaylistFromSheet, 700);
-      })
-      .catch(err => {
-        console.error("Failed to call removeURL:", err);
-        // still try to reload in case of transient error
-        setTimeout(loadPlaylistFromSheet, 1000);
-      });
-
-    // do NOT call originalOnPlayerStateChange for ENDED to avoid double-advancing the queue
-    return;
-  }
-
-  // For other events, preserve original behavior
-  if (typeof originalOnPlayerStateChange === "function") {
-    originalOnPlayerStateChange(event);
-  }
-};
-
-// Initial load when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  // remove any duplicate explicit YT API <script> tags at bottom that might break parsing
-  // (we only dynamically inject earlier in the file; duplicates can cause issues)
-  document.querySelectorAll('script[src="https://www.youtube.com/iframe_api"]').forEach((el, idx) => {
-    // keep the first one, remove extras
-    if (idx > 0) el.parentNode.removeChild(el);
-  });
-  loadPlaylistFromSheet();
-});
-
-// Optional: poll sheet every 6 seconds for external updates (collaboration)
-let sheetPollInterval = setInterval(loadPlaylistFromSheet, 6000);
-
-})(); // end IIFE
-</script>
-<!-- END replaced block -->
-
+  </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
