@@ -567,8 +567,7 @@
         overflow: hidden;
       }
     }
-    
-    /* ---------- */
+
     .score-popup {
       position: fixed;
       top: 40%;
@@ -591,7 +590,6 @@
       
   </style>
 </head>
-  
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
@@ -603,7 +601,7 @@
   <!-- Drawer -->
 <div class="drawer" id="drawer">
   <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
+    </div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
         <div class="title" id="nowTitle">...</div>
@@ -706,11 +704,8 @@
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
-
-
-
   
-  <!-- JS ----------------------------------------------------------------------------------------->
+  <!-- JS -->
   <script>
   let touchStartX = 0;
     const drawer = document.getElementById('drawer');
@@ -1374,35 +1369,14 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-    
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv"; // paste your CSV link here
 
-// Fetch playlist from Google Sheet
-function loadPlaylist() {
-  fetch(sheetURL)
-    .then(res => res.text())
-    .then(csv => {
-      const rows = csv.split("\n").slice(1); // skip header
-      const videos = rows.map(row => {
-        const cols = row.split(",");
-        return { id: cols[0], title: cols[1], addedBy: cols[2] };
-      });
-      displayPlaylist(videos);
-    });
-}
+    // ==== CONFIG ====
+// Your published Google Sheet CSV link:
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv";
+// Your Apps Script URL to remove the first song:
+const removeURL = "https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec";
 
-// Display playlist in console for now
-function displayPlaylist(videos) {
-  console.clear();
-  console.log("Current Playlist:", videos);
-  // TODO: Add code to your existing video queue logic here
-}
-
-// Refresh every 5 seconds
-setInterval(loadPlaylist, 5000);
-loadPlaylist();
-
+// ==== SCORE POPUP ====
 function showScorePopup(points) {
   const popup = document.createElement("div");
   popup.className = "score-popup";
@@ -1411,42 +1385,77 @@ function showScorePopup(points) {
   setTimeout(() => popup.remove(), 2000);
 }
 
-// Example trigger when song ends:
-// Replace "onSongEnd()" with your actual end-of-song function
-function onPlayerStateChange(event) {
-  const randomScore = Math.floor(Math.random() * 10000);
-  showScorePopup(randomScore);
+// ==== YT Player Setup ====
+let player;
+let playlistVideos = [];
+
+function onYouTubeIframeAPIReady() {
+  loadPlaylist();
 }
-    
+
+function createPlayer(videoId) {
+  if (player) {
+    player.loadVideoById(videoId);
+  } else {
+    player = new YT.Player("player", {
+      height: "390",
+      width: "640",
+      videoId: videoId,
+      events: {
+        onStateChange: onPlayerStateChange
+      }
+    });
+  }
+}
+
 function onPlayerStateChange(event) {
-  // Show the score popup (optional)
+  if (event.data === YT.PlayerState.ENDED) {
+    onSongEnd();
+  }
+}
+
+// ==== PLAYLIST LOADER ====
+function loadPlaylist() {
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.trim().split("\n").slice(1); // skip header
+      playlistVideos = rows.map(row => {
+        const cols = row.split(",");
+        return { id: cols[0].trim(), title: cols[1]?.trim(), addedBy: cols[2]?.trim() };
+      });
+      console.log("Current Playlist:", playlistVideos);
+
+      if (playlistVideos.length > 0) {
+        createPlayer(playlistVideos[0].id);
+      } else {
+        console.log("No songs left in playlist.");
+      }
+    })
+    .catch(err => console.error("Failed to load playlist:", err));
+}
+
+// ==== SONG END HANDLER ====
+function onSongEnd() {
+  // Show random score
   const randomScore = Math.floor(Math.random() * 10000);
   showScorePopup(randomScore);
 
-  // Call the Google Apps Script to remove the first song
-  fetch(https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec)
-    .then(response => response.text())
+  // Remove first song from Google Sheet
+  fetch(removeURL)
+    .then(res => res.text())
     .then(data => {
-      console.log("Remove song response:", data);
-      // Reload the playlist so the UI updates
-      loadPlaylist();
+      console.log("Song removed:", data);
+      // Reload playlist after short delay
+      setTimeout(loadPlaylist, 1500);
     })
     .catch(err => console.error("Failed to remove song:", err));
 }
-    
-    </script>
-      <script src="https://www.youtube.com/iframe_api"></script>
-    </script>
+
   </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
