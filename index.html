@@ -567,6 +567,27 @@
         overflow: hidden;
       }
     }
+    
+    /* ---------- */
+    .score-popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: gold;
+      background: rgba(0,0,0,0.7);
+      padding: 20px 40px;
+      border-radius: 15px;
+      animation: popFade 2s ease-out;
+      z-index: 9999;
+    }
+    @keyframes popFade {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    }
       
   </style>
 </head>
@@ -1352,29 +1373,8 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
-
-    function onSongEnd() {
-  // Show the score popup (optional)
-  const randomScore = Math.floor(Math.random() * 10000);
-  showScorePopup(randomScore);
-
-  // Call the Google Apps Script to remove the first song
-  fetch("YOUR_WEB_APP_URL_HERE")
-    .then(response => response.text())
-    .then(data => {
-      console.log("https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec:", data);
-      // Reload the playlist so the UI updates
-      loadPlaylist();
-    })
-    .catch(err => console.error("Failed to remove song:", err));
-}
-
     
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
-
-  <script>
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv"; // paste your CSV link here
 
 // Fetch playlist from Google Sheet
@@ -1401,47 +1401,32 @@ function displayPlaylist(videos) {
 // Refresh every 5 seconds
 setInterval(loadPlaylist, 5000);
 loadPlaylist();
-</script>
-<style>
-.score-popup {
-  position: fixed;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3rem;
-  color: gold;
-  background: rgba(0,0,0,0.7);
-  padding: 20px 40px;
-  border-radius: 15px;
-  animation: popFade 2s ease-out;
-  z-index: 9999;
-}
-@keyframes popFade {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  50% { transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-}
-</style>
 
-<script>
-function showScorePopup(points) {
-  const popup = document.createElement("div");
-  popup.className = "score-popup";
-  popup.innerText = `🎉 ${points} Points! 🎤`;
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 2000);
-}
 
-// Example trigger when song ends:
-// Replace "onSongEnd()" with your actual end-of-song function
-function onSongEnd() {
+    
+    function onSongEnd() {
+  // Show the score popup (optional)
   const randomScore = Math.floor(Math.random() * 10000);
   showScorePopup(randomScore);
+
+  // Call the Google Apps Script to remove the first song
+  fetch("YOUR_WEB_APP_URL_HERE")
+    .then(response => response.text())
+    .then(data => {
+      console.log("https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec:", data);
+      // Reload the playlist so the UI updates
+      loadPlaylist();
+    })
+    .catch(err => console.error("Failed to remove song:", err));
 }
+
+    
+    </script>
+      <script src="https://www.youtube.com/iframe_api"></script>
 </script>
 </body>
 </html>
+
 
 
 
