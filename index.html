@@ -1352,12 +1352,30 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
+
+    function onSongEnd() {
+  // Show the score popup (optional)
+  const randomScore = Math.floor(Math.random() * 10000);
+  showScorePopup(randomScore);
+
+  // Call the Google Apps Script to remove the first song
+  fetch("YOUR_WEB_APP_URL_HERE")
+    .then(response => response.text())
+    .then(data => {
+      console.log("https://script.google.com/macros/s/AKfycbyGpvkAdzD_ibuptBYMtEDMQ2XWdPRFWND71lfoOl17rj_z_bfGc6kTGsKHaIEnPA11/exec:", data);
+      // Reload the playlist so the UI updates
+      loadPlaylist();
+    })
+    .catch(err => console.error("Failed to remove song:", err));
+}
+
+    
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFfVQa400YWvN_FNnDiEItcrNndZFrpoVYm2vZcTzzp4z-zn7a8jHXCJnTvQb4_GlmbL5bglqd2jGk/pub?output=csv"; // paste your CSV link here
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLnlk_oGi9s2i2YodjkKy2GntijKZYInrttPqkXGim_4_gwrl5hdjAfYIC1HnTLCr3ljGTaqutwx7N/pub?output=csv"; // paste your CSV link here
 
 // Fetch playlist from Google Sheet
 function loadPlaylist() {
@@ -1424,6 +1442,7 @@ function onSongEnd() {
 </script>
 </body>
 </html>
+
 
 
 
