@@ -603,7 +603,34 @@
         overflow: hidden;
       }
     }
-      
+    .nextConfirmModal {
+      /* only one display here */
+      display: inline-block;  /* size to content */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      padding: 20px 30px;
+      z-index: 1000;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,255,255,0.5), 0 0 20px rgba(0,255,255,0.3);
+      white-space: nowrap;
+    }
+    
+    .nextConfirmOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+        
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -674,30 +701,16 @@
   </div>
   
   <!-- Next Confirmation Modal -->
-  <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
-  <div id="nextConfirmModal" style="
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #222;
-  border: 2px solid cyan;
-  border-radius: 10px;
-  padding: 15px 30px;  /* extra horizontal padding */
-  z-index: 1000;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0,255,255,0.3);
-  white-space: nowrap;  /* prevent line breaks, width based on single line text */
-  display: inline-block; /* size box to content */
-">
-  <div id="nextConfirmText" style="font-size: 1.0em; color: white; margin-bottom: 25px;">""</div>
-  <div style="display: flex; justify-content: space-between;">
-    <button class="cyan-btn" style="flex:1; margin-right: 5px;" onclick="confirmPlayNext()">Confirm</button>
-    <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
+  <div class="nextConfirmOverlay" id="nextConfirmOverlay" style="display:none;">
+  <div class="nextConfirmModal" id="nextConfirmModal" style="display:none;">
+    <div id="nextConfirmText" style="font-size: 1.0em; color: white; margin-bottom: 25px;"></div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button class="cyan-btn" style="flex: none; min-width: 100px;" onclick="confirmPlayNext()">Confirm</button>
+      <button class="cyan-btn" style="flex: none; min-width: 100px;" onclick="hideNextConfirm()">Cancel</button>
+    </div>
   </div>
 </div>
-
+    
 <!-- Exit Confirmation Modal -->
 <div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
 <div id="exitConfirmModal" class="modal" style="display:none;">
@@ -1186,31 +1199,39 @@ function clearPersistentPopup() {
       confirm.style.display = "none";
     }
   });
-
-    function showNextConfirm() {
-    const messages = [
-      "Ready to jump to the next song?",
-      "Skip this one and move on?",
-      "Next up? Let's go!",
-      "Want to move to the next jam?",
-      "Time to switch it up?"
-    ];
-    const random = messages[Math.floor(Math.random() * messages.length)];
-    document.getElementById("nextConfirmText").innerText = random;
-  
-    document.getElementById("nextConfirmOverlay").style.display = "block";
-    document.getElementById("nextConfirmModal").style.display = "block";
-  }
-
-  function hideNextConfirm() {
-    document.getElementById("nextConfirmOverlay").style.display = "none";
-    document.getElementById("nextConfirmModal").style.display = "none";
-  }
-
-  function confirmPlayNext() {
+    
+  window.onload = () => {
     hideNextConfirm();
-    playNextFromQueue();
-  }
+  };
+    
+  function showNextConfirm() {
+  const messages = [
+    "Ready to jump to the next song?",
+    "Skip this one and move on?",
+    "Next up? Let's go!",
+    "Want to move to the next jam?",
+    "Time to switch it up?"
+  ];
+  const random = messages[Math.floor(Math.random() * messages.length)];
+
+  const textEl = document.getElementById("nextConfirmText");
+  const overlay = document.getElementById("nextConfirmOverlay");
+  const modal = document.getElementById("nextConfirmModal");
+
+  textEl.innerText = random;
+  overlay.style.display = "block";
+  modal.style.display = "inline-block";  // show modal sized to content
+}
+
+function hideNextConfirm() {
+  document.getElementById("nextConfirmOverlay").style.display = "none";
+  document.getElementById("nextConfirmModal").style.display = "none";
+}
+
+function confirmPlayNext() {
+  hideNextConfirm();
+  playNextFromQueue();
+}
 
 // Show Exit Modal
   function showExitConfirm() {
