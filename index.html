@@ -910,7 +910,7 @@
       // Add to the end of queue
       queue.push({ id: videoId, title });
     }
-  
+    updateNowPlaying();
     updateQueueDisplay();
     input.value = "";
     showPopup("Reserved!", "lime", false, "lime");
@@ -1071,25 +1071,26 @@
     }
   }
 
-   function updateNowPlaying() {
-    const nowTitleEl = document.getElementById("nowTitle");
-    const current = queue[currentIndex];
-  
-    if (!current) return;
-  
-    let title = current.title || `Video ID: ${current.id}`;
-    let remaining = queue.length - (currentIndex + 1);
-  
-    if (remaining === 0) {
-      title += " (no songs next)";
-      nowTitleEl.style.textShadow = "0 0 8px magenta, 0 0 16px magenta";
-    } else {
-      nowTitleEl.style.textShadow = "none";
-    }
-  
-    nowTitleEl.textContent = title;
-  }
+  function updateNowPlaying() {
+  const nowTitleEl = document.getElementById("nowTitle");
+  const current = queue[currentIndex];
 
+  if (!current) return;
+
+  let title = current.title || `Video ID: ${current.id}`;
+  let remaining = queue.length - (currentIndex + 1);
+
+  if (remaining === 0) {
+    // title with glow
+    // no upcoming message in red without glow
+    nowTitleEl.innerHTML = `
+  <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
+  <div style="color: red; font-family: 'Orbitron', sans-serif; opacity: 0.5; text-shadow: 0 0 4px #500000, 0 0 8px #500000; margin-top: 10px; font-size: 0.8em;">⚠️ No upcoming song.</div>`;
+  } else {
+    // just glowing title, no extra text
+    nowTitleEl.innerHTML = `<span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>`;
+  }
+}
 
   let persistentPopupActive = false;
 
@@ -1416,6 +1417,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
