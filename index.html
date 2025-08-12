@@ -366,6 +366,18 @@
     .bottom-drawer-handle[style*="display: none"] {
       opacity: 0;
     }
+
+    .bot-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: invisible;
+      z-index: 90;
+      display: none;
+    }
+    .bot-drawer-overlay.visible { display: block; }
     
     .bottom-buttons.inside {
       position: relative;
@@ -596,7 +608,7 @@
   
   <!-- Overlays -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <div class="drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+  <div class="bot-drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
 
   <!-- YouTube Player -->
   <div class="youtube-wrapper">
@@ -733,18 +745,20 @@
   function closeDrawer() {
     drawer.classList.remove('open');
     overlay.classList.remove('visible');
+    bottomDrawerOverlay.classList.remove("visible");
     document.getElementById('drawerHandle').style.display = 'flex';
     document.getElementById("confirmDelete").style.display = "none";
     playSlideSound();
   }
 
   function closeBottomDrawer() {
-    if (bottomDrawer.classList.contains("open")) {
-      bottomDrawer.classList.remove("open");
-      document.querySelector(".bottom-drawer-handle").style.display = "flex";
-      playSlideSound();
-    }
+  if (bottomDrawer.classList.contains("open")) {
+    bottomDrawer.classList.remove("open");
+    document.querySelector(".bottom-drawer-handle").style.display = "flex";
+    bottomDrawerOverlay.classList.remove("visible"); // hide overlay here
+    playSlideSound();
   }
+}
 
   let startY = 0;
   const bottomDrawer = document.getElementById("bottomDrawer");
@@ -752,22 +766,30 @@
   function toggleBottomDrawer() {
   const isOpen = bottomDrawer.classList.toggle("open");
   document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+  bottomDrawerOverlay.classList.toggle("visible", isOpen);
 
   if (isOpen) {
     // Close left drawer if open
     if (drawer.classList.contains("open")) {
       drawer.classList.remove("open");
-      overlay.classList.remove("visible");
+      drawerOverlay.classList.remove("visible");
       document.getElementById('drawerHandle').style.display = 'flex';
       document.getElementById("confirmDelete").style.display = "none";
     }
-
-    const input = document.getElementById("youtubeInputDrawer");
-    setTimeout(() => input.focus(), 50);
+  } else {
+    bottomDrawerOverlay.classList.remove("visible"); // hide when closing
   }
-
-  playSlideSound();
+    playSlideSound();
 }
+    bottomDrawerOverlay.onclick = function() {
+  if (drawer.classList.contains("open")) {
+    closeDrawer();
+  }
+  if (bottomDrawer.classList.contains("open")) {
+    closeBottomDrawer();
+  }
+};
+
 
   document.body.addEventListener("touchstart", evt => {
     startY = evt.touches[0].clientY;
@@ -1354,6 +1376,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
