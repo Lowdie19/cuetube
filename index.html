@@ -673,7 +673,7 @@
     </div>
   </div>
   
-  <!-- Next Confirm Modal -->
+  <!-- Next Confirmation Modal -->
   <div id="nextConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999;"></div>
   <div id="nextConfirmModal" style="
   display: none;
@@ -684,16 +684,14 @@
   background: #222;
   border: 2px solid cyan;
   border-radius: 10px;
-  padding: 15px;
+  padding: 15px 30px;  /* extra horizontal padding */
   z-index: 1000;
   text-align: center;
-  width: 90%;
-  max-width: 320px;
   box-shadow: 0 0 20px rgba(0,255,255,0.3);
+  white-space: nowrap;  /* prevent line breaks, width based on single line text */
+  display: inline-block; /* size box to content */
 ">
-  <div id="nextConfirmText" style="font-size: 1.1em; color: white; margin-bottom: 15px;">
-    Are you sure you want to skip to the next video?
-  </div>
+  <div id="nextConfirmText" style="font-size: 1.0em; color: white; margin-bottom: 25px;">""</div>
   <div style="display: flex; justify-content: space-between;">
     <button class="cyan-btn" style="flex:1; margin-right: 5px;" onclick="confirmPlayNext()">Confirm</button>
     <button class="cyan-btn" style="flex:1; margin-left: 5px;" onclick="hideNextConfirm()">Cancel</button>
