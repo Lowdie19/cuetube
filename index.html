@@ -624,20 +624,20 @@
 
     @keyframes breathingFade {
       0%, 100% {
-        opacity: 0.2;
+        opacity: 0.3;
       }
       50% {
-        opacity: 0.5;
+        opacity: .9;
       }
     }
 
     .breathing-warning {
-      color: red;
+      color: white;
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.0em;
+      font-size: 1.2em;
       text-align: center;
-      text-shadow: 0 0 8px red, 0 0 16px red;
-      animation: breathingFade 4s ease-in-out infinite;
+      text-shadow: 0 0 4px magenta, 0 0 10px magenta;
+      animation: breathingFade 6s ease-in-out infinite;
     }
         
   </style>
@@ -836,22 +836,22 @@
 };
 
 
-//  document.body.addEventListener("touchstart", evt => {
-//  startY = evt.touches[0].clientY;
-//   handleTouchStart(evt);
-//  });
+  document.body.addEventListener("touchstart", evt => {
+    startY = evt.touches[0].clientY;
+    handleTouchStart(evt);
+  });
 
-//  document.body.addEventListener("touchmove", evt => {
-//    const deltaY = evt.touches[0].clientY - startY;
-//   if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-//   toggleBottomDrawer(); // swipe up to open only if it's not already open
-//   } else if (deltaY > 40) {
-//     closeBottomDrawer(); // swipe down always closes
-//  }
-//  handleTouchMove(evt);
-// });
+  document.body.addEventListener("touchmove", evt => {
+    const deltaY = evt.touches[0].clientY - startY;
+    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+      toggleBottomDrawer(); // swipe up to open only if it's not already open
+    } else if (deltaY > 40) {
+      closeBottomDrawer(); // swipe down always closes
+    }
+    handleTouchMove(evt);
+  });
 
-// document.body.addEventListener("click", handleTap);
+  document.body.addEventListener("click", handleTap);
 
   let player;
   let queue = [];
@@ -1103,18 +1103,18 @@
   let remaining = queue.length - (currentIndex + 1);
 
   if (remaining === 0) {
-    // Left drawer: title + warning
+    // Left drawer: title + warning        //>>backup: text-shadow: 0 0 4px #500000, 0 0 8px #500000; //
     nowTitleEl.innerHTML = `
       <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
-      <div style="color: red; font-family: 'Orbitron', sans-serif; opacity: 0.5; text-shadow: 0 0 4px #500000, 0 0 8px #500000; margin-top: 10px; font-size: 0.8em;">
-        ⚠️ No upcoming song...
+      <div style="color: magenta; font-family: 'Orbitron', sans-serif; opacity: 0.5; margin-top: 10px; font-size: 0.8em;">
+      No upcoming song . . .
       </div>
     `;
 
     // Copy below YouTube: only warning, centered
     nowCopyEl.innerHTML = `
       <div class="breathing-warning">
-        ⚠️ No upcoming song...
+      No upcoming song . . .
       </div>
     `;
   } else {
@@ -1448,76 +1448,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-    
-  // for Fullscreen swipe
-    const bottomReservedHeight = 100; // Adjust ito kung gusto mo
-
-    function isFullscreen() {
-      return !!document.fullscreenElement;
-    }
-    
-    document.body.addEventListener("touchstart", evt => {
-      if (!isFullscreen()) {
-        startY = evt.touches[0].clientY;
-        handleTouchStart(evt);
-        return;
-      }
-    
-      const touchY = evt.touches[0].clientY;
-      const windowHeight = window.innerHeight;
-    
-      if (touchY < windowHeight - bottomReservedHeight) {
-        startY = touchY;
-        handleTouchStart(evt);
-      }
-    });
-    
-    document.body.addEventListener("touchmove", evt => {
-      if (!isFullscreen()) {
-        const deltaY = evt.touches[0].clientY - startY;
-        if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-          toggleBottomDrawer();
-        } else if (deltaY > 40) {
-          closeBottomDrawer();
-        }
-        handleTouchMove(evt);
-        return;
-      }
-    
-      const touchY = evt.touches[0].clientY;
-      const windowHeight = window.innerHeight;
-    
-      if (touchY < windowHeight - bottomReservedHeight) {
-        const deltaY = evt.touches[0].clientY - startY;
-        if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-          toggleBottomDrawer();
-        } else if (deltaY > 40) {
-          closeBottomDrawer();
-        }
-        handleTouchMove(evt);
-      }
-    });
-    
-    document.body.addEventListener("click", evt => {
-      if (!isFullscreen()) {
-        handleTap(evt);
-        return;
-      }
-    
-      const clickY = evt.clientY;
-      const windowHeight = window.innerHeight;
-    
-      if (clickY < windowHeight - bottomReservedHeight) {
-        handleTap(evt);
-      }
-    });
-
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
