@@ -502,7 +502,7 @@
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
     }
-    
+
     #popupOverlay {
       position: fixed;
       top: 0; left: 0;
@@ -639,6 +639,27 @@
       text-shadow: 0 0 4px magenta, 0 0 10px magenta;
       animation: breathingFade 6s ease-in-out infinite;
     }
+
+    /* for bottom drawer Landscape mode */
+    @media screen and (orientation: landscape) {
+      #bottomDrawerContent {
+        display: flex;
+        flex-direction: row; /* Arrange in one line */
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+    
+      #youtubeInputDrawer {
+        flex: 1;
+        min-width: 100px;
+      }
+    
+      .drawer-button {
+        flex: none;
+      }
+    }/* for bottom drawer Landscape mode */
+        
         
   </style>
 </head>
@@ -1452,6 +1473,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
