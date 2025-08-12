@@ -81,6 +81,30 @@
       from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
       to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
     }
+
+    
+    /* Neon glow for popups */
+    @keyframes pulseGlow {
+      from {
+        filter: drop-shadow(0 0 1px var(--glow-color))
+                drop-shadow(0 0 2px var(--glow-color));
+      }
+      to {
+        filter: drop-shadow(0 0 4px var(--glow-color))
+                drop-shadow(0 0 8px var(--glow-color));
+      }
+    }
+    
+    .glow-text {
+      animation: pulseGlow 1.5s infinite alternate;
+    }
+    
+    .static-glow {
+      filter:
+        drop-shadow(0 0 4px var(--glow-color))
+        drop-shadow(0 0 8px var(--glow-color));
+    }
+
     
     .drawer {
       position: fixed;
@@ -841,8 +865,9 @@
       player.stopVideo();
       player.clearVideo();
 
-      // **Add this line back here:**
-      showPopup("That's the last tune!", "magenta", true);
+/*    Notes: ("That's the last tune!", "magenta", true, "magenta")                  */
+/*         = (the message text, glow color, persistent popup, glow color  */
+      showPopup("That's the last tune!", "magenta", true, true);
     } else {
       currentIndex++;
       player.loadVideoById(queue[currentIndex].id);
@@ -866,7 +891,7 @@
     
     if (!videoId) {
       input.value = "";
-      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
       return;
     }
@@ -887,7 +912,7 @@
   
     updateQueueDisplay();
     input.value = "";
-    showPopup("Reserved!", "lime");
+    showPopup("Reserved!", "lime", false, "lime");
     playSuccessSound();
     closeBottomDrawer();
   }
@@ -898,7 +923,7 @@
       const data = await res.json();
       return data.title || videoId;
     } catch (err) {
-    showPopup("⚠️ Oops! Try choosing\nanother video.", "red");
+    showPopup("⚠️ Oops! Try choosing\nanother video.", "red", false, "red");
     playErrorSound();
     return videoId;
   }
@@ -929,7 +954,7 @@
 
   function playNextFromQueue() {
     if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-      showPopup("No next song.", "red");
+      showPopup("No next song.", "red", true, true);
       playErrorSound();
       return;
     }
@@ -938,7 +963,7 @@
     player.loadVideoById(queue[currentIndex].id);
     updateNowPlaying();
     updateQueueDisplay();
-    showPopup("Next song!", "magenta");
+    showPopup("Next song!", "magenta", false, "magenta");
   }
 
   function updateQueueDisplay() {
@@ -1067,30 +1092,35 @@
 
   let persistentPopupActive = false;
 
-function showPopup(message, color = 'magenta', persistent = false) {
+function showPopup(message, color = 'magenta', persistent = false, glow = false) {
   const popup = document.getElementById('popupModal');
   const overlay = document.getElementById('popupOverlay');
 
   popup.textContent = message;
   popup.style.color = 'white';
-  popup.style.textShadow = `
-    0 0 10px ${color},
-    0 0 20px ${color},
-    0 0 35px ${color}
-  `;
+  popup.classList.remove('glow-text', 'static-glow');
+
+  if (typeof glow === 'string') {
+    // Static glow with glow color = glow parameter
+    popup.style.setProperty('--glow-color', glow);
+    popup.classList.add('static-glow');
+  } else if (glow === true) {
+    // Animated glow with glow color = 'color' parameter
+    popup.style.setProperty('--glow-color', color);
+    popup.classList.add('glow-text');
+  }
 
   overlay.classList.add('visible');
   popup.classList.add('show');
 
   if (persistent) {
     persistentPopupActive = true;
-    // Don't auto-hide
   } else {
     persistentPopupActive = false;
     setTimeout(() => {
       popup.classList.remove('show');
       overlay.classList.remove('visible');
-    }, 3000); // Auto-hide after 3 seconds
+    }, 3000);
   }
 }
 
@@ -1100,6 +1130,7 @@ function clearPersistentPopup() {
     const overlay = document.getElementById('popupOverlay');
     popup.classList.remove('show');
     overlay.classList.remove('visible');
+    popup.classList.remove('glow-text'); // remove glow when clearing
     persistentPopupActive = false;
   }
 }
@@ -1314,14 +1345,14 @@ window.addEventListener("popstate", function (e) {
 
     if (!videoId) {
       input.value = "";
-      showPopup("⚠️ Invalid\nYouTube URL!", "red");
+      showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
     } else {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
       await reserveFromDrawer(); // ✅ Auto-reserve if valid
     }
   } catch (err) {
-    showPopup("⚠️ Failed!\nPaste manually.", "red");
+    showPopup("⚠️ Failed!\nPaste manually.", "red", true, "red");
     playErrorSound();
     console.error("Clipboard error:", err);
   }
@@ -1376,6 +1407,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
