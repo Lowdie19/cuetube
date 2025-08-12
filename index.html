@@ -620,6 +620,25 @@
       background: rgba(0,0,0,0.5);
       z-index: 999;
     }
+
+
+    @keyframes breathingFade {
+      0%, 100% {
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .breathing-warning {
+      color: red;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.0em;
+      text-align: center;
+      text-shadow: 0 0 8px red, 0 0 16px red;
+      animation: breathingFade 4s ease-in-out infinite;
+    }
         
   </style>
 </head>
@@ -658,6 +677,7 @@
     src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
     allowfullscreen
   ></iframe>
+    <div id="nowPlayingCopy" style="margin-top: 15px; text-align: center;"></div>
 </div>
 
   <!-- Bottom Drawer -->
@@ -1071,8 +1091,10 @@
     }
   }
 
+    
   function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
+  const nowCopyEl = document.getElementById("nowPlayingCopy");
   const current = queue[currentIndex];
 
   if (!current) return;
@@ -1081,17 +1103,30 @@
   let remaining = queue.length - (currentIndex + 1);
 
   if (remaining === 0) {
-    // title with glow
-    // no upcoming message in red without glow
+    // Left drawer: title + warning
     nowTitleEl.innerHTML = `
-  <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
-  <div style="color: red; font-family: 'Orbitron', sans-serif; opacity: 0.5; text-shadow: 0 0 4px #500000, 0 0 8px #500000; margin-top: 10px; font-size: 0.8em;">⚠️ No upcoming song.</div>`;
+      <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
+      <div style="color: red; font-family: 'Orbitron', sans-serif; opacity: 0.5; text-shadow: 0 0 4px #500000, 0 0 8px #500000; margin-top: 10px; font-size: 0.8em;">
+        ⚠️ No upcoming song...
+      </div>
+    `;
+
+    // Copy below YouTube: only warning, centered
+    nowCopyEl.innerHTML = `
+      <div class="breathing-warning">
+        ⚠️ No upcoming song...
+      </div>
+    `;
   } else {
-    // just glowing title, no extra text
+    // Left drawer: only title glowing
     nowTitleEl.innerHTML = `<span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>`;
+
+    // Copy below YouTube: empty (no warning)
+    nowCopyEl.innerHTML = "";
   }
 }
 
+    
   let persistentPopupActive = false;
 
 function showPopup(message, color = 'magenta', persistent = false, glow = false) {
@@ -1417,6 +1452,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
