@@ -547,13 +547,10 @@
     }
     
     #confirmDelete {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    /* add any other styling you want */
-  }
-      
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    }
+    
     #confirmDelete.show {
       opacity: 1;
     }
@@ -641,58 +638,6 @@
       text-align: center;
       text-shadow: 0 0 4px magenta, 0 0 10px magenta;
       animation: breathingFade 6s ease-in-out infinite;
-    }
-
-
-/* -------------*/
-   .song-item {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #121212;
-      color: white;
-      padding: 12px 18px;
-      margin-bottom: 5px;
-      border-radius: 12px;
-      transition: transform 0.4s ease, opacity 0.4s ease;
-      touch-action: pan-y;
-    }
-    
-    .song-item.sliding-out {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    
-    .delete-btn {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 0 8px;
-    }
-    
-    /* Confirm modal */
-    #confirmDelete {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 12px;
-      color: white;
-      display: none;
-      z-index: 999;
-    }
-    
-    #confirmDelete button {
-      margin: 10px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
     }
         
   </style>
@@ -1034,13 +979,11 @@
 
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
-
-      confirmBox.style.position = "fixed";
-      confirmBox.style.top = "50%";
-      confirmBox.style.left = "50%";
-      confirmBox.style.transform = "translate(-50%, -50%)";
-    
-      confirmBox.style.display = "block";
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+    confirmBox.style.left = `${x + 10}px`;
+    confirmBox.style.top = `${y}px`;
+    confirmBox.style.display = "block";
 
     const yes = document.getElementById("yesBtn");
     const no = document.getElementById("noBtn");
@@ -1532,95 +1475,10 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
-
-    
-// -------
-const confirmModal = document.getElementById('confirmDelete');
-let songToDelete = null;
-
-function removeSong(songItem) {
-  const index = Array.from(nextBox.children).indexOf(songItem);
-
-  if (index > -1) queue.splice(index, 1);
-
-  if (index <= currentIndex && currentIndex > 0) {
-    currentIndex--;
-  }
-
-  songItem.remove();
-  updateQueueDisplay();
-  updateNowPlaying();
-}
-
-// Show confirm modal
-function showConfirm(songItem) {
-  songToDelete = songItem;
-  confirmModal.style.display = 'block';
-}
-
-// Updated button event listeners
-document.getElementById('yesBtn').addEventListener('click', () => {
-  if (songToDelete) {
-    songToDelete.classList.add('sliding-out');
-    songToDelete.addEventListener('transitionend', () => removeSong(songToDelete), { once: true });
-    songToDelete = null;
-  }
-  confirmModal.style.display = 'none';
-});
-
-document.getElementById('noBtn').addEventListener('click', () => {
-  songToDelete = null;
-  confirmModal.style.display = 'none';
-});
-
-// Desktop: click delete button
-nextBox.addEventListener('click', function(e) {
-  if (e.target.classList.contains('delete-btn')) {
-    const songItem = e.target.closest('.song-item');
-    showConfirm(songItem);
-  }
-});
-
-// Swipe (Windows + Mobile)
-nextBox.querySelectorAll('.song-item').forEach(songItem => {
-  let startX = 0;
-  let currentX = 0;
-  let dragging = false;
-
-  songItem.addEventListener('pointerdown', e => {
-    startX = e.clientX;
-    dragging = true;
-  });
-
-  songItem.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    currentX = e.clientX - startX;
-    if (currentX < 0) { // left swipe
-      songItem.style.transform = `translateX(${currentX}px)`;
-    }
-  });
-
-  songItem.addEventListener('pointerup', e => {
-    dragging = false;
-    if (currentX < -100) { // swipe threshold
-      songItem.style.transform = ''; // reset
-      showConfirm(songItem);
-    } else {
-      songItem.style.transform = ''; // reset if not deleted
-    }
-  });
-
-  songItem.addEventListener('pointercancel', () => {
-    dragging = false;
-    songItem.style.transform = '';
-  });
-});
-    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
 
 
 
