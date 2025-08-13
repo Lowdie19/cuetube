@@ -555,9 +555,9 @@
       opacity: 1;
     }
     
-    .long-pressing {
-      background: red;
-      box-shadow: 0 0 10px red;
+    .title.selected-for-delete {
+      background-color: red !important;
+      color: white !important;
     }
 
     /* For URL box */
@@ -642,7 +642,7 @@
         
   </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+<body ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
 
   <!-- Title -->
 <div class="title-bar">
@@ -753,6 +753,7 @@
     
 
   function handleTouchStart(evt) {
+    if (evt.target.closest('#nextList')) return;
     touchStartX = evt.touches[0].clientX;
   }
 
@@ -1024,48 +1025,6 @@
     div.className = "title";
     div.textContent = queue[i].title;
     div.style.cursor = "pointer";
-
-    let longPressTimer;
-    let longPressTriggered = false;
-
-    const startHandler = (e) => {
-      e.preventDefault();
-      longPressTriggered = false;
-      div.classList.add("long-pressing");
-
-      longPressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        navigator.vibrate?.(50);
-        showDeleteConfirm(e, i);
-      }, 500);
-    };
-
-    const endHandler = () => {
-      if (!longPressTriggered) {
-        clearTimeout(longPressTimer);
-        div.classList.remove("long-pressing");
-      }
-    };
-
-    const cancelHandler = () => {
-      clearTimeout(longPressTimer);
-      div.classList.remove("long-pressing");
-    };
-
-    // Events for both mouse and touch
-    div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: false });
-
-    div.addEventListener("mouseup", endHandler);
-    div.addEventListener("mouseleave", cancelHandler);
-    div.addEventListener("touchend", endHandler);
-    div.addEventListener("touchcancel", cancelHandler);
-
-    // Optional: Right-click support for desktop
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      showDeleteConfirm(e, i);
-    });
 
     list.appendChild(div);
   }
@@ -1475,8 +1434,85 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+/* --- New Delete Logic for Windows + Android (Hold & Swipe) --- */
+let selectedSongIndex = null;
+let selectedSongEl = null;
+
+function steadyClickToDelete(songElement, index) {
+  selectedSongIndex = index;
+  selectedSongEl = songElement;
+
+  songElement.classList.add("selected-for-delete");
+
+  const confirmBox = document.getElementById("confirmDelete");
+  confirmBox.style.left = "50%";
+  confirmBox.style.top = "50%";
+  confirmBox.style.transform = "translate(-50%, -50%)";
+  confirmBox.style.display = "block";
+}
+
+document.getElementById("yesBtn").onclick = () => {
+  if (selectedSongIndex !== null) {
+    queue.splice(selectedSongIndex, 1);
+    playTrashSound();
+    updateQueueDisplay();
+  }
+  closeDeleteModal();
+};
+
+document.getElementById("noBtn").onclick = () => {
+  closeDeleteModal();
+};
+
+function closeDeleteModal() {
+  document.getElementById("confirmDelete").style.display = "none";
+  document.querySelectorAll(".selected-for-delete").forEach(el => {
+    el.classList.remove("selected-for-delete");
+  });
+  selectedSongIndex = null;
+  selectedSongEl = null;
+}
+
+const originalUpdateQueueDisplay = updateQueueDisplay;
+updateQueueDisplay = function() {
+  // Run the original function to rebuild the queue list
+  originalUpdateQueueDisplay();
+
+  // Attach listeners to the freshly created .title elements
+  document.querySelectorAll("#nextList .title").forEach((song, idx) => {
+    let holdTimer, startX = 0;
+
+    // Mouse hold (PC)
+    song.addEventListener("mousedown", e => {
+      holdTimer = setTimeout(() => steadyClickToDelete(song, idx + currentIndex + 1), 600);
+    });
+    song.addEventListener("mouseup", () => clearTimeout(holdTimer));
+    song.addEventListener("mouseleave", () => clearTimeout(holdTimer));
+
+    // Touch hold (Android)
+    song.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+      holdTimer = setTimeout(() => steadyClickToDelete(song, idx + currentIndex + 1), 600);
+    }, { passive: false });
+    song.addEventListener("touchend", () => clearTimeout(holdTimer), { passive: false });
+
+    // Swipe left to delete (Android)
+    song.addEventListener("touchmove", e => {
+      let distX = e.touches[0].clientX - startX;
+      if (distX < -80) {
+        clearTimeout(holdTimer);
+        steadyClickToDelete(song, idx + currentIndex + 1);
+      } else {
+        clearTimeout(holdTimer);
+      }
+    }, { passive: false });
+  });
+};
+
+
   </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://www.youtube.com/iframe_api">
+</script>
 </body>
 </html>
 
