@@ -563,7 +563,7 @@
       box-shadow: 0 0 10px red;
     }
 
-    /* For URL box --s */
+    /* For URL box */
     input[type="text"]::placeholder {
       color: white;
       opacity: .3;
@@ -585,7 +585,7 @@
       box-shadow: 0 0 2px magenta, 0 0 8px magenta;
       border-color: magenta;
       border: 2px solid magenta;
-    }  /* For URL box --e */
+    }  /* For URL box */
 
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .youtube-wrapper {
@@ -597,6 +597,7 @@
       }
     }
     .nextConfirmModal {
+      /* only one display here */
       display: inline-block;  /* size to content */
       position: fixed;
       top: 50%;
@@ -641,50 +642,58 @@
       text-shadow: 0 0 4px magenta, 0 0 10px magenta;
       animation: breathingFade 6s ease-in-out infinite;
     }
-    
-    /* For Swipe delete songs --s */
-    .title-wrapper {
+
+
+/* -------------*/
+   .song-item {
       position: relative;
-      overflow: hidden;
-      touch-action: pan-y;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      background: #121212;
+      color: white;
+      padding: 12px 18px;
+      margin-bottom: 5px;
+      border-radius: 12px;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      touch-action: pan-y;
     }
     
-    .title {
-      transition: transform 0.3s ease;
-      padding-left: 50px; /* space for left delete button */
-      user-select: none;
-      flex: 1;
+    .song-item.sliding-out {
+      transform: translateX(-100%);
+      opacity: 0;
     }
     
     .delete-btn {
-      position: absolute;
-      left: 0; /* Move to left side */
-      top: 0;
-      bottom: 0;
-      width: 40px;
-      background-color: red;
-      color: white;
+      background: none;
       border: none;
-      outline: none;
+      color: white;
       cursor: pointer;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      font-size: 1.3em;
+      font-size: 18px;
+      padding: 0 8px;
     }
     
-    .title-wrapper.swiped .title {
-      transform: translateX(45px); /* Push text right when swiped */
+    /* Confirm modal */
+    #confirmDelete {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      display: none;
+      z-index: 999;
     }
     
-    .title-wrapper.swiped .delete-btn {
-      transform: translateX(0);
+    #confirmDelete button {
+      margin: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
     }
-    
-    .title-wrapper.selected {
-      background-color: rgba(128, 128, 128, 0.3); /* gray background */
-    }  /* For Swipe delete songs --e */
         
   </style>
 </head>
@@ -1064,58 +1073,58 @@
 
   function updateQueueDisplay() {
   const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
   list.innerHTML = "";
 
   for (let i = currentIndex + 1; i < queue.length; i++) {
-    // Create wrapper div
-    const wrapper = document.createElement("div");
-    wrapper.className = "title-wrapper";
+    const div = document.createElement("div");
+    div.className = "title";
+    div.textContent = queue[i].title;
+    div.style.cursor = "pointer";
 
-    // Create delete button (LEFT side now)
-    const delBtn = document.createElement("button");
-    delBtn.className = "delete-btn";
-    delBtn.setAttribute("aria-label", "Delete song");
-    delBtn.textContent = "✕";
+    let longPressTimer;
+    let longPressTriggered = false;
 
-    // Create title div
-    const titleDiv = document.createElement("div");
-    titleDiv.className = "title";
-    titleDiv.textContent = queue[i].title;
+    const startHandler = (e) => {
+      e.preventDefault();
+      longPressTriggered = false;
+      div.classList.add("long-pressing");
 
-    wrapper.appendChild(delBtn);
-    wrapper.appendChild(titleDiv);
+      longPressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        navigator.vibrate?.(50);
+        showDeleteConfirm(e, i);
+      }, 500);
+    };
 
-    // Swipe detection
-    let startX = 0;
-    let swiped = false;
-
-    wrapper.addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-    }, { passive: true });
-
-    wrapper.addEventListener("touchmove", (e) => {
-      const currentX = e.touches[0].clientX;
-      const deltaX = currentX - startX;
-
-      // Swipe right to reveal delete button
-      if (deltaX > 30 && !swiped) {
-        wrapper.classList.add("swiped", "selected");
-        swiped = true;
-      } 
-      // Swipe left to hide delete button
-      else if (deltaX < -30 && swiped) {
-        wrapper.classList.remove("swiped", "selected");
-        swiped = false;
+    const endHandler = () => {
+      if (!longPressTriggered) {
+        clearTimeout(longPressTimer);
+        div.classList.remove("long-pressing");
       }
-    }, { passive: true });
+    };
 
-    // Delete button click shows confirm modal
-    delBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
+    const cancelHandler = () => {
+      clearTimeout(longPressTimer);
+      div.classList.remove("long-pressing");
+    };
+
+    // Events for both mouse and touch
+    div.addEventListener("mousedown", startHandler);
+    div.addEventListener("touchstart", startHandler, { passive: false });
+
+    div.addEventListener("mouseup", endHandler);
+    div.addEventListener("mouseleave", cancelHandler);
+    div.addEventListener("touchend", endHandler);
+    div.addEventListener("touchcancel", cancelHandler);
+
+    // Optional: Right-click support for desktop
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
       showDeleteConfirm(e, i);
     });
 
-    list.appendChild(wrapper);
+    list.appendChild(div);
   }
 
   updateOverflowCounter();
@@ -1512,8 +1521,8 @@ window.addEventListener("popstate", function (e) {
   // Initial call in case landscape is already active
   window.addEventListener("DOMContentLoaded", adjustForKeyboard);
 
-   // Glow the URL box
-  const youtubeInput = document.getElementById("youtubeInputDrawer");
+ // Glow the URL box
+const youtubeInput = document.getElementById("youtubeInputDrawer");
 
   youtubeInput.addEventListener("input", () => {
     if (youtubeInput.value.trim()) {
@@ -1523,42 +1532,94 @@ window.addEventListener("popstate", function (e) {
     }
   });
 
-  // For Swipe delete songs --s // 
-  wrapper.addEventListener("touchstart", (e) => {
-  wrapper.startX = e.touches[0].clientX;
-  wrapper.swiped = false;
+
+    
+// -------
+const confirmModal = document.getElementById('confirmDelete');
+let songToDelete = null;
+
+function removeSong(songItem) {
+  const index = Array.from(nextBox.children).indexOf(songItem);
+
+  if (index > -1) queue.splice(index, 1);
+
+  if (index <= currentIndex && currentIndex > 0) {
+    currentIndex--;
+  }
+
+  songItem.remove();
+  updateQueueDisplay();
+  updateNowPlaying();
+}
+
+// Show confirm modal
+function showConfirm(songItem) {
+  songToDelete = songItem;
+  confirmModal.style.display = 'block';
+}
+
+// Updated button event listeners
+document.getElementById('yesBtn').addEventListener('click', () => {
+  if (songToDelete) {
+    songToDelete.classList.add('sliding-out');
+    songToDelete.addEventListener('transitionend', () => removeSong(songToDelete), { once: true });
+    songToDelete = null;
+  }
+  confirmModal.style.display = 'none';
 });
 
-wrapper.addEventListener("touchmove", (e) => {
-  const currentX = e.touches[0].clientX;
-  const diffX = currentX - wrapper.startX;
+document.getElementById('noBtn').addEventListener('click', () => {
+  songToDelete = null;
+  confirmModal.style.display = 'none';
+});
 
-  if (diffX > 30) { // swipe right threshold
-    wrapper.classList.add("swiped");
-    wrapper.swiped = true;
-  } else if (diffX < -10 && wrapper.swiped) {
-    // swipe left to cancel
-    wrapper.classList.remove("swiped");
-    wrapper.swiped = false;
+// Desktop: click delete button
+nextBox.addEventListener('click', function(e) {
+  if (e.target.classList.contains('delete-btn')) {
+    const songItem = e.target.closest('.song-item');
+    showConfirm(songItem);
   }
-}); 
-    
-    
-  delBtn.addEventListener("click", (e) => {
-  e.stopPropagation(); // prevent other clicks
+});
 
-  showDeleteConfirm(e, i); // pass the index
-}); // For Swipe delete songs --e //
+// Swipe (Windows + Mobile)
+nextBox.querySelectorAll('.song-item').forEach(songItem => {
+  let startX = 0;
+  let currentX = 0;
+  let dragging = false;
 
+  songItem.addEventListener('pointerdown', e => {
+    startX = e.clientX;
+    dragging = true;
+  });
+
+  songItem.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    currentX = e.clientX - startX;
+    if (currentX < 0) { // left swipe
+      songItem.style.transform = `translateX(${currentX}px)`;
+    }
+  });
+
+  songItem.addEventListener('pointerup', e => {
+    dragging = false;
+    if (currentX < -100) { // swipe threshold
+      songItem.style.transform = ''; // reset
+      showConfirm(songItem);
+    } else {
+      songItem.style.transform = ''; // reset if not deleted
+    }
+  });
+
+  songItem.addEventListener('pointercancel', () => {
+    dragging = false;
+    songItem.style.transform = '';
+  });
+});
+    
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
-
 
 
 
