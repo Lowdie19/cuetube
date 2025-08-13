@@ -744,6 +744,8 @@
   
   <!-- JS -->
   <script>
+  let overlayTouchStartX = 0;
+  let isLeftOverlayOpen = false;
   let touchStartX = 0;
     const drawer = document.getElementById('drawer');
     const overlay = document.getElementById('drawerOverlay');
@@ -780,6 +782,7 @@
 
   drawer.classList.add('open');
   overlay.classList.add('visible');
+  isLeftOverlayOpen = true;
   document.getElementById('drawerHandle').style.display = 'none';
   document.getElementById("confirmDelete").style.display = "none";
   playSlideSound();
@@ -791,6 +794,7 @@
   function closeDrawer() {
     drawer.classList.remove('open');
     overlay.classList.remove('visible');
+    isLeftOverlayOpen = false;
     bottomDrawerOverlay.classList.remove("visible");
     document.getElementById('drawerHandle').style.display = 'flex';
     document.getElementById("confirmDelete").style.display = "none";
@@ -807,8 +811,6 @@
 }
 
   // For swipe close of left drawer --s//
-  let overlayTouchStartX = 0;
-
   overlay.addEventListener('touchstart', (e) => {
     overlayTouchStartX = e.touches[0].clientX;
   });
@@ -862,6 +864,12 @@
 
   document.body.addEventListener("touchmove", evt => {
     const deltaY = evt.touches[0].clientY - startY;
+    
+    if (isLeftOverlayOpen) {
+    // Left drawer overlay visible, disable bottom drawer open swipe
+    if (deltaY > 40) closeBottomDrawer(); // allow close bottom drawer if open
+    return; // do not open bottom drawer while overlay visible
+  }
     if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
       toggleBottomDrawer(); // swipe up to open only if it's not already open
     } else if (deltaY > 40) {
@@ -1471,6 +1479,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
