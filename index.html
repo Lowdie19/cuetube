@@ -563,7 +563,7 @@
       box-shadow: 0 0 10px red;
     }
 
-    /* For URL box */
+    /* For URL box --s */
     input[type="text"]::placeholder {
       color: white;
       opacity: .3;
@@ -585,7 +585,7 @@
       box-shadow: 0 0 2px magenta, 0 0 8px magenta;
       border-color: magenta;
       border: 2px solid magenta;
-    }  /* For URL box */
+    }  /* For URL box --e */
 
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .youtube-wrapper {
@@ -597,7 +597,6 @@
       }
     }
     .nextConfirmModal {
-      /* only one display here */
       display: inline-block;  /* size to content */
       position: fixed;
       top: 50%;
@@ -642,6 +641,43 @@
       text-shadow: 0 0 4px magenta, 0 0 10px magenta;
       animation: breathingFade 6s ease-in-out infinite;
     }
+    
+/* For Swipe delete songs --s */
+.title-wrapper {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y; /* allow vertical scroll, prevent horizontal scroll */
+}
+
+.title {
+  transition: transform 0.3s ease;
+  padding-right: 50px; /* space for delete button */
+  user-select: none;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background-color: red;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  font-size: 1.3em;
+}
+
+.title-wrapper.swiped .title {
+  transform: translateX(-45px);
+}
+
+.title-wrapper.swiped .delete-btn {
+  transform: translateX(0);
+}/* For Swipe delete songs --e */
         
   </style>
 </head>
@@ -712,6 +748,11 @@
       <button id="noBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-right: 15px;">Cancel</button>
     </div>
   </div>
+
+<div class="title-wrapper">
+  <div class="title">Song title here</div>
+  <button class="delete-btn" aria-label="Delete song">✕</button>
+</div>
   
   <!-- Next Confirmation Modal -->
   <div class="nextConfirmOverlay" id="nextConfirmOverlay" style="display:none;">
@@ -1020,57 +1061,27 @@
   }
 
   function updateQueueDisplay() {
-  const list = document.getElementById("nextList");
-  const overflow = document.getElementById("overflowCounter");
-  list.innerHTML = "";
-
-  for (let i = currentIndex + 1; i < queue.length; i++) {
+    const list = document.getElementById("nextList");
+    const overflow = document.getElementById("overflowCounter");
+    list.innerHTML = "";
+  
+    for (let i = currentIndex + 1; i < queue.length; i++) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "title-wrapper";
+    
     const div = document.createElement("div");
     div.className = "title";
     div.textContent = queue[i].title;
     div.style.cursor = "pointer";
-
-    let longPressTimer;
-    let longPressTriggered = false;
-
-    const startHandler = (e) => {
-      e.preventDefault();
-      longPressTriggered = false;
-      div.classList.add("long-pressing");
-
-      longPressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        navigator.vibrate?.(50);
-        showDeleteConfirm(e, i);
-      }, 500);
-    };
-
-    const endHandler = () => {
-      if (!longPressTriggered) {
-        clearTimeout(longPressTimer);
-        div.classList.remove("long-pressing");
-      }
-    };
-
-    const cancelHandler = () => {
-      clearTimeout(longPressTimer);
-      div.classList.remove("long-pressing");
-    };
-
-    // Events for both mouse and touch
-    div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: false });
-
-    div.addEventListener("mouseup", endHandler);
-    div.addEventListener("mouseleave", cancelHandler);
-    div.addEventListener("touchend", endHandler);
-    div.addEventListener("touchcancel", cancelHandler);
-
-    // Optional: Right-click support for desktop
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      showDeleteConfirm(e, i);
-    });
+    
+    const delBtn = document.createElement("button");
+    delBtn.className = "delete-btn";
+    delBtn.textContent = "✕";
+    delBtn.setAttribute("aria-label", "Delete song");
+    
+    // Append children
+    wrapper.appendChild(div);
+    wrapper.appendChild(delBtn);
 
     list.appendChild(div);
   }
@@ -1469,8 +1480,8 @@ window.addEventListener("popstate", function (e) {
   // Initial call in case landscape is already active
   window.addEventListener("DOMContentLoaded", adjustForKeyboard);
 
- // Glow the URL box
-const youtubeInput = document.getElementById("youtubeInputDrawer");
+   // Glow the URL box
+  const youtubeInput = document.getElementById("youtubeInputDrawer");
 
   youtubeInput.addEventListener("input", () => {
     if (youtubeInput.value.trim()) {
@@ -1480,10 +1491,38 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+  // For Swipe delete songs --s // 
+  wrapper.addEventListener("touchstart", (e) => {
+  wrapper.startX = e.touches[0].clientX;
+  wrapper.swiped = false;
+});
+
+wrapper.addEventListener("touchmove", (e) => {
+  const currentX = e.touches[0].clientX;
+  const diffX = currentX - wrapper.startX;
+
+  if (diffX > 30) { // swipe right threshold
+    wrapper.classList.add("swiped");
+    wrapper.swiped = true;
+  } else if (diffX < -10 && wrapper.swiped) {
+    // swipe left to cancel
+    wrapper.classList.remove("swiped");
+    wrapper.swiped = false;
+  }
+}); 
+    
+    
+  delBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // prevent other clicks
+
+  showDeleteConfirm(e, i); // pass the index
+}); // For Swipe delete songs --e //
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
