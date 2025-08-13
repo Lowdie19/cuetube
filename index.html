@@ -547,10 +547,13 @@
     }
     
     #confirmDelete {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-    }
-    
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* add any other styling you want */
+  }
+      
     #confirmDelete.show {
       opacity: 1;
     }
@@ -979,11 +982,13 @@
 
   function showDeleteConfirm(e, index) {
     const confirmBox = document.getElementById("confirmDelete");
-    const x = e.clientX || (e.touches && e.touches[0].clientX);
-    const y = e.clientY || (e.touches && e.touches[0].clientY);
-    confirmBox.style.left = `${x + 10}px`;
-    confirmBox.style.top = `${y}px`;
-    confirmBox.style.display = "block";
+
+      confirmBox.style.position = "fixed";
+      confirmBox.style.top = "50%";
+      confirmBox.style.left = "50%";
+      confirmBox.style.transform = "translate(-50%, -50%)";
+    
+      confirmBox.style.display = "block";
 
     const yes = document.getElementById("yesBtn");
     const no = document.getElementById("noBtn");
@@ -1479,6 +1484,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
