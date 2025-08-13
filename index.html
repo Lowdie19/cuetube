@@ -642,42 +642,49 @@
       animation: breathingFade 6s ease-in-out infinite;
     }
     
-/* For Swipe delete songs --s */
-.title-wrapper {
-  position: relative;
-  overflow: hidden;
-  touch-action: pan-y; /* allow vertical scroll, prevent horizontal scroll */
-}
-
-.title {
-  transition: transform 0.3s ease;
-  padding-right: 50px; /* space for delete button */
-  user-select: none;
-}
-
-.delete-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  background-color: red;
-  color: white;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  font-size: 1.3em;
-}
-
-.title-wrapper.swiped .title {
-  transform: translateX(-45px);
-}
-
-.title-wrapper.swiped .delete-btn {
-  transform: translateX(0);
-}/* For Swipe delete songs --e */
+    /* For Swipe delete songs --s */
+    .title-wrapper {
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+      display: flex;
+      align-items: center;
+    }
+    
+    .title {
+      transition: transform 0.3s ease;
+      padding-left: 50px; /* space for left delete button */
+      user-select: none;
+      flex: 1;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      left: 0; /* Move to left side */
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      background-color: red;
+      color: white;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      font-size: 1.3em;
+    }
+    
+    .title-wrapper.swiped .title {
+      transform: translateX(45px); /* Push text right when swiped */
+    }
+    
+    .title-wrapper.swiped .delete-btn {
+      transform: translateX(0);
+    }
+    
+    .title-wrapper.selected {
+      background-color: rgba(128, 128, 128, 0.3); /* gray background */
+    }  /* For Swipe delete songs --e */
         
   </style>
 </head>
@@ -748,11 +755,6 @@
       <button id="noBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-right: 15px;">Cancel</button>
     </div>
   </div>
-
-<div class="title-wrapper">
-  <div class="title">Song title here</div>
-  <button class="delete-btn" aria-label="Delete song">✕</button>
-</div>
   
   <!-- Next Confirmation Modal -->
   <div class="nextConfirmOverlay" id="nextConfirmOverlay" style="display:none;">
@@ -1061,60 +1063,63 @@
   }
 
   function updateQueueDisplay() {
-    const list = document.getElementById("nextList");
-    list.innerHTML = "";
-  
-    for (let i = currentIndex + 1; i < queue.length; i++) {
-      // Create wrapper div
-      const wrapper = document.createElement("div");
-      wrapper.className = "title-wrapper";
-  
-      // Create title div inside wrapper
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "title";
-      titleDiv.textContent = queue[i].title;
-  
-      // Create delete button inside wrapper
-      const delBtn = document.createElement("button");
-      delBtn.className = "delete-btn";
-      delBtn.setAttribute("aria-label", "Delete song");
-      delBtn.textContent = "✕";
-  
-      wrapper.appendChild(titleDiv);
-      wrapper.appendChild(delBtn);
-  
-      // Add swipe handlers to wrapper only (simple left swipe to reveal)
-      let startX = 0;
-      let swiped = false;
-  
-      wrapper.addEventListener("touchstart", (e) => {
-        startX = e.touches[0].clientX;
-      }, { passive: true });
-  
-      wrapper.addEventListener("touchmove", (e) => {
-        const currentX = e.touches[0].clientX;
-        const deltaX = currentX - startX;
-  
-        if (deltaX < -30 && !swiped) {
-          wrapper.classList.add("swiped");
-          swiped = true;
-        } else if (deltaX > 30 && swiped) {
-          wrapper.classList.remove("swiped");
-          swiped = false;
-        }
-      }, { passive: true });
-  
-      // Delete button click shows confirm modal
-      delBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        showDeleteConfirm(e, i);
-      });
-  
-      // Append wrapper to list
-      list.appendChild(wrapper);
-    }
-  
-    updateOverflowCounter();
+  const list = document.getElementById("nextList");
+  list.innerHTML = "";
+
+  for (let i = currentIndex + 1; i < queue.length; i++) {
+    // Create wrapper div
+    const wrapper = document.createElement("div");
+    wrapper.className = "title-wrapper";
+
+    // Create delete button (LEFT side now)
+    const delBtn = document.createElement("button");
+    delBtn.className = "delete-btn";
+    delBtn.setAttribute("aria-label", "Delete song");
+    delBtn.textContent = "✕";
+
+    // Create title div
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "title";
+    titleDiv.textContent = queue[i].title;
+
+    wrapper.appendChild(delBtn);
+    wrapper.appendChild(titleDiv);
+
+    // Swipe detection
+    let startX = 0;
+    let swiped = false;
+
+    wrapper.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    wrapper.addEventListener("touchmove", (e) => {
+      const currentX = e.touches[0].clientX;
+      const deltaX = currentX - startX;
+
+      // Swipe right to reveal delete button
+      if (deltaX > 30 && !swiped) {
+        wrapper.classList.add("swiped", "selected");
+        swiped = true;
+      } 
+      // Swipe left to hide delete button
+      else if (deltaX < -30 && swiped) {
+        wrapper.classList.remove("swiped", "selected");
+        swiped = false;
+      }
+    }, { passive: true });
+
+    // Delete button click shows confirm modal
+    delBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showDeleteConfirm(e, i);
+    });
+
+    list.appendChild(wrapper);
+  }
+
+  updateOverflowCounter();
+}
 
   const nextBtn = document.getElementById("nextBtnDrawer");
   const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
@@ -1550,6 +1555,7 @@ wrapper.addEventListener("touchmove", (e) => {
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
