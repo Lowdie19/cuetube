@@ -842,14 +842,16 @@
   });
 
   document.body.addEventListener("touchmove", evt => {
-    const deltaY = evt.touches[0].clientY - startY;
-    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-      toggleBottomDrawer(); // swipe up to open only if it's not already open
-    } else if (deltaY > 40) {
-      closeBottomDrawer(); // swipe down always closes
-    }
-    handleTouchMove(evt);
-  });
+  if (isScrollingNextBox) return; // ignore drawer toggle if scrolling nextBox
+
+  const deltaY = evt.touches[0].clientY - startY;
+  if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+    toggleBottomDrawer();
+  } else if (deltaY > 40) {
+    closeBottomDrawer();
+  }
+  handleTouchMove(evt);
+});
 
   document.body.addEventListener("click", handleTap);
 
@@ -1053,6 +1055,8 @@
 
   const nextBox = document.querySelector('.next-box');
   const upcomingCount = queue.length - (currentIndex + 1);
+  let isScrollingNextBox = false;
+
   
   // Hide or show next-box based on upcoming songs
   if (upcomingCount >= 1) {
@@ -1448,10 +1452,34 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
     }
   });
 
+    
+  // For scrolling on android
+  let isScrollingNextBox = false;
+
+nextBox.addEventListener('touchstart', () => {
+  isScrollingNextBox = true;
+});
+
+nextBox.addEventListener('touchmove', (e) => {
+  if (isScrollingNextBox) {
+    e.stopPropagation(); // Prevent drawer swipe from triggering
+  }
+});
+
+nextBox.addEventListener('touchend', () => {
+  isScrollingNextBox = false;
+});
+nextBox.addEventListener('touchcancel', () => {
+  isScrollingNextBox = false;
+});
+
+    
+
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
