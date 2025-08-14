@@ -661,8 +661,8 @@
       color: white;
       opacity: 0;
       transform: translateX(-100%);
-      animation: slideOut 1.5s forwards;
-      animation-delay: 1s;
+      animation: slideOut 0.8s forwards;
+      animation-delay: 0.5s;
       margin-left: 15px;
       white-space: nowrap;
       position: relative;
@@ -680,28 +680,31 @@
       }
     }
     
-    /* Hide animations (reverse) */
+    /* Hide animations */
     @keyframes fadeOut {
+      from { opacity: 1; }
       to { opacity: 0; }
     }
     
     @keyframes slideIn {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
       to {
         opacity: 0;
         transform: translateX(-100%);
       }
     }
     
-    /* Apply this to trigger reverse animation */
     .Notify.hide .line {
       animation: fadeOut 1.5s forwards;
     }
     
     .Notify.hide .text {
-      animation: slideIn 1.5s forwards;
-      animation-delay: 0s;
+      animation: slideIn 1.2s forwards;
     }
-    /* Notify text / line --e */
+    /* Notify text-line --e */
         
   </style>
 </head>
@@ -1208,7 +1211,7 @@
     nowCopyEl.innerHTML = `
     <div class="Notify">
       <div class="line"></div>
-      <div class="text">No upcoming song . . .</div>
+      <div class="text">No upcoming song</div>
     </div>
   `;
   } else {
@@ -1224,10 +1227,10 @@
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    notifyEl.classList.add('hide'); // triggers reverse animation
+    notifyEl.classList.add('hide'); // triggers fadeOut + slideIn
     setTimeout(() => {
-      notifyEl.remove(); // only remove after animation finishes
-    }, 1500); // matches animation duration
+      notifyEl.remove();
+    }, 1500); // matches the longest hide animation duration
   }
 } // Notify animation --e //
     
@@ -1556,6 +1559,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
