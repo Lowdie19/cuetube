@@ -1187,10 +1187,12 @@
     }
   }
 
-  // Notify animation to --s //
-  function updateNowPlaying() {
+  // --- Notify animation to ---s //
+let progressChecker = null;
+let nextSongNotifyShown = false;
+
+function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
-  const nowCopyEl = document.getElementById("nowPlayingCopy");
   const current = queue[currentIndex];
 
   if (!current) return;
@@ -1199,40 +1201,144 @@
   let remaining = queue.length - (currentIndex + 1);
 
   if (remaining === 0) {
-    // Left drawer: title + warning        //>>backup: text-shadow: 0 0 4px #500000, 0 0 8px #500000; //
+    // Show in title area
     nowTitleEl.innerHTML = `
       <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
       <div style="color: rgba(91, 24, 194, 1); font-family: 'Orbitron', sans-serif; opacity: 0.5; margin-top: 10px; font-size: 0.8em;">
-      No upcoming song . . .
+        No upcoming song . . .
       </div>
     `;
-
-    // Copy above YouTube: only warning, centered
-    nowCopyEl.innerHTML = `
-    <div class="Notify">
-      <div class="line"></div>
-      <div class="text">No upcoming song</div>
-    </div>
-  `;
+    // Show Notify
+    showNotify("No upcoming song");
+    stopProgressChecker();
   } else {
-    // Hide Notify with animation
-    hideNotify();
-  
-    // Update the title
+    // Update the title only
     nowTitleEl.innerHTML = `<span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>`;
+    hideNotify();
+    startProgressChecker();
   }
 }
 
-    
+// --- Notify helper functions ---
+function showNotify(message) {
+  hideNotify();
+  document.getElementById("nowPlayingCopy").innerHTML = `
+    <div class="Notify">
+      <div class="line"></div>
+      <div class="text">${message}</div>
+    </div>
+  `;
+}
+
+function showTempNotify(message) {
+  showNotify(message);
+  setTimeout(() => hideNotify(), 5000); // auto-hide after 5s
+}
+
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    notifyEl.classList.add('hide'); // triggers fadeOut + slideIn
-    setTimeout(() => {
-      notifyEl.remove();
-    }, 1500); // matches the longest hide animation duration
+    notifyEl.classList.add('hide'); 
+    setTimeout(() => notifyEl.remove(), 1500); // match CSS animation
   }
-} // Notify animation --e //
+}
+
+// --- Progress checking for "Up next" ---
+function startProgressChecker() {
+  if (progressChecker) return; // already running
+  nextSongNotifyShown = false;
+  progressChecker = setInterval(() => {
+    const currentTime = player.getCurrentTime();
+    const duration = player.getDuration();
+
+    if (!nextSongNotifyShown) {
+      const shown = scheduleNextSongNotify(duration, currentTime);
+      if (shown) nextSongNotifyShown = true;
+    }
+  }, 1000);
+}
+
+function stopProgressChecker() {
+  clearInterval(progressChecker);
+  progressChecker = null;
+}
+
+function scheduleNextSongNotify(duration, currentTime) {
+  const secondsBeforeEnd = 10; // show "Up next" this many seconds before end
+  const timeRemaining = duration - currentTime;
+
+  if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
+    const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
+    showTempNotify(`Up next: ${nextSongTitle}`);
+    return true;
+  }
+  return false;
+}
+
+// --- Hook into YouTube state change ---
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    startProgressChecker();
+  } else {
+    stopProgressChecker();
+  }
+}
+ // --- Notify animation ---e //
+
+
+    
+// Show Notify with vertical line + text ---s //
+function showNotify(message) {
+  // Remove any existing Notify first
+  hideNotify();
+
+  // Create Notify element (same style)
+  const notifyHTML = `
+    <div class="Notify">
+      <div class="line"></div>
+      <div class="text">${message}</div>
+    </div>
+  `;
+  document.getElementById("nowPlayingCopy").innerHTML = notifyHTML;
+}   
+// Show temporary Notify for 5s
+function showTempNotify(message) {
+  showNotify(message);
+  setTimeout(() => {
+    hideNotify();
+  }, 5000);
+}
+
+// Trigger next-song alert before current ends
+function scheduleNextSongNotify(duration, currentTime) {
+  const secondsBeforeEnd = 15; // show "Up next" this many seconds before end
+  const timeRemaining = duration - currentTime;
+
+  if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
+    const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
+
+    // "Up next:" above title, smaller, purple, with gap
+    const messageHTML = `
+      <div style="display: flex; flex-direction: column;">
+        <span style="
+          font-size: 0.7em; 
+          opacity: 0.9; 
+          color: rgba(91, 24, 194, 1); 
+          margin-bottom: 3px;
+          font-family: 'Orbitron', sans-serif;
+        ">Up next:</span>
+        <span>${nextSongTitle}</span>
+      </div>
+    `;
+
+    showTempNotify(messageHTML);
+    return true;
+  }
+  return false;
+}
+// --- Show Notify with vertical line + text ---e //
+
+
     
   let persistentPopupActive = false;
 
@@ -1559,6 +1665,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
