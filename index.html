@@ -664,8 +664,11 @@
       animation: slideOut 0.8s forwards;
       animation-delay: 0.5s;
       margin-left: 15px;
-      white-space: nowrap;
       position: relative;
+      white-space: normal;   /* allow wrapping */
+      word-wrap: break-word; /* break long words if needed */
+      padding-left: 4px;     /* keep alignment with vertical line */
+      box-sizing: border-box;
     }
     
     /* Show animations */
@@ -1187,7 +1190,8 @@
     }
   }
 
-  // --- Notify animation to ---s //
+    
+// ---- Notify Animation ----s //
 let progressChecker = null;
 let nextSongNotifyShown = false;
 
@@ -1219,7 +1223,7 @@ function updateNowPlaying() {
   }
 }
 
-// --- Notify helper functions ---
+// Notify helper functions
 function showNotify(message) {
   hideNotify();
   document.getElementById("nowPlayingCopy").innerHTML = `
@@ -1232,7 +1236,7 @@ function showNotify(message) {
 
 function showTempNotify(message) {
   showNotify(message);
-  setTimeout(() => hideNotify(), 5000); // auto-hide after 5s
+  setTimeout(() => hideNotify(), 10000); // auto-hide after 10s
 }
 
 function hideNotify() {
@@ -1243,7 +1247,7 @@ function hideNotify() {
   }
 }
 
-// --- Progress checking for "Up next" ---
+// Progress checking for "Up next"
 function startProgressChecker() {
   if (progressChecker) return; // already running
   nextSongNotifyShown = false;
@@ -1264,70 +1268,27 @@ function stopProgressChecker() {
 }
 
 function scheduleNextSongNotify(duration, currentTime) {
-  const secondsBeforeEnd = 10; // show "Up next" this many seconds before end
-  const timeRemaining = duration - currentTime;
-
-  if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
-    const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
-    showTempNotify(`Up next: ${nextSongTitle}`);
-    return true;
-  }
-  return false;
-}
-
-// --- Hook into YouTube state change ---
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    startProgressChecker();
-  } else {
-    stopProgressChecker();
-  }
-}
- // --- Notify animation ---e //
-
-
-    
-// Show Notify with vertical line + text ---s //
-function showNotify(message) {
-  // Remove any existing Notify first
-  hideNotify();
-
-  // Create Notify element (same style)
-  const notifyHTML = `
-    <div class="Notify">
-      <div class="line"></div>
-      <div class="text">${message}</div>
-    </div>
-  `;
-  document.getElementById("nowPlayingCopy").innerHTML = notifyHTML;
-}   
-// Show temporary Notify for 5s
-function showTempNotify(message) {
-  showNotify(message);
-  setTimeout(() => {
-    hideNotify();
-  }, 5000);
-}
-
-// Trigger next-song alert before current ends
-function scheduleNextSongNotify(duration, currentTime) {
-  const secondsBeforeEnd = 15; // show "Up next" this many seconds before end
+  const secondsBeforeEnd = 20; // how early to show upnext
   const timeRemaining = duration - currentTime;
 
   if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
     const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
 
-    // "Up next:" above title, smaller, purple, with gap
     const messageHTML = `
-      <div style="display: flex; flex-direction: column;">
+      <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
         <span style="
+          font-family: Arial, sans-serif;
+          font-weight: normal;
           font-size: 0.7em; 
-          opacity: 0.9; 
-          color: rgba(91, 24, 194, 1); 
-          margin-bottom: 3px;
-          font-family: 'Orbitron', sans-serif;
+          color: grey; 
+          margin-bottom: 4px;
         ">Up next:</span>
-        <span>${nextSongTitle}</span>
+        <span style="
+          font-family: Arial, sans-serif;
+          font-weight: bold;
+          font-size: 0.9em;
+          word-wrap: break-word;
+        ">${nextSongTitle}</span>
       </div>
     `;
 
@@ -1336,7 +1297,16 @@ function scheduleNextSongNotify(duration, currentTime) {
   }
   return false;
 }
-// --- Show Notify with vertical line + text ---e //
+
+// Hook into YouTube state change
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    startProgressChecker();
+  } else {
+    stopProgressChecker();
+  }
+}
+// ---- Notify Animation ----e //
 
 
     
