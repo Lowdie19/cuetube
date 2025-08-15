@@ -854,7 +854,7 @@
   isLeftOverlayOpen = true;
   document.getElementById('drawerHandle').style.display = 'none';
   document.getElementById("confirmDelete").style.display = "none";
-  playSlideSound();
+  // playSlideSound();
 }
   document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
@@ -867,7 +867,7 @@
     bottomDrawerOverlay.classList.remove("visible");
     document.getElementById('drawerHandle').style.display = 'flex';
     document.getElementById("confirmDelete").style.display = "none";
-    playSlideSound();
+   // playSlideSound();
   }
 
   function closeBottomDrawer() {
@@ -875,7 +875,7 @@
     bottomDrawer.classList.remove("open");
     document.querySelector(".bottom-drawer-handle").style.display = "flex";
     bottomDrawerOverlay.classList.remove("visible"); // hide overlay here
-    playSlideSound();
+   // playSlideSound();
   }
 }
 
@@ -914,7 +914,7 @@
   } else {
     bottomDrawerOverlay.classList.remove("visible"); // hide when closing
   }
-    playSlideSound();
+   // playSlideSound();
 }
     bottomDrawerOverlay.onclick = function() {
   if (drawer.classList.contains("open")) {
@@ -972,7 +972,7 @@
   if (event.data === YT.PlayerState.ENDED) {
     const isLastVideo = currentIndex === queue.length - 1;
     if (queue.length === 0 || isLastVideo) {
-      // Reset queue and player here
+      hideNotify(); // 🔊 hides "No upcoming song" and plays sound
       queue = [];
       currentIndex = -1;
 
@@ -982,8 +982,6 @@
       player.stopVideo();
       player.clearVideo();
 
-/*    Notes: ("That's the last tune!", "magenta", true, "magenta")                  */
-/*         = (the message text, glow color, persistent popup, glow color  */
       showPopup("That's the last tune!", "magenta", true, true);
     } else {
       currentIndex++;
@@ -991,6 +989,10 @@
       updateNowPlaying();
       updateQueueDisplay();
     }
+  } else if (event.data === YT.PlayerState.PLAYING) {
+    startProgressChecker();
+  } else {
+    stopProgressChecker();
   }
 }
 
@@ -1222,7 +1224,8 @@ function updateNowPlaying() {
 
 // Notify helper functions
 function showNotify(message) {
-  hideNotify();
+  hideNotify(); // remove any existing notify first
+  playSlideSound(); // 🔊 play sound on show
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
@@ -1239,8 +1242,9 @@ function showTempNotify(message) {
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    notifyEl.classList.add('hide'); 
-    setTimeout(() => notifyEl.remove(), 1500); // match CSS animation
+    playSlideSound(); // 🔊 play sound on hide
+    notifyEl.classList.add('hide');
+    setTimeout(() => notifyEl.remove(), 1500);
   }
 }
 
@@ -1293,15 +1297,6 @@ function scheduleNextSongNotify(duration, currentTime) {
     return true;
   }
   return false;
-}
-
-// Hook into YouTube state change
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    startProgressChecker();
-  } else {
-    stopProgressChecker();
-  }
 }
 // ---- Notify Animation ----e //
 
@@ -1632,6 +1627,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
