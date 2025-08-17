@@ -112,7 +112,11 @@
       left: -70%; /* Default for mobile */
       width: 70%;  /* Default for mobile */
       height: 100%;
-      background: rgba(40, 40, 40, 0.90);
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
       z-index: 99;
@@ -121,6 +125,22 @@
       flex-direction: column;
       justify-content: flex-start;
       gap: 25px;
+    }
+    .drawer::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%; /* adjust as needed */
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.6) 60%,  
+        #000000 100%                
+      );
+      z-index: 10;
+      pointer-events: none; /* let clicks/scroll pass through */
     }
     
     /* When open, slide to visible */
@@ -153,6 +173,7 @@
       cursor: pointer;
       z-index: 80;
     }
+   
     @media (min-width: 768px) {
       .drawer-handle {
         right: -40px;
@@ -163,7 +184,7 @@
       border: 2px solid cyan;
       border-radius: 10px;
       padding: 10px;
-      background: #121212;
+      background: black;
       margin-bottom: 15px;
     }
     
@@ -213,20 +234,7 @@
     .next-box.dragging {
       cursor: grabbing;
     }
-   .next-box::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 40%; /* adjust as needed */
-      pointer-events: none;
-      background: linear-gradient(to bottom, rgba(40, 40, 40, 0.0), rgba(40, 40, 40, 0.50));
-      backdrop-filter: blur(.05px);
-      -webkit-backdrop-filter: blur(.05px); /* Safari support */
-      z-index: 10;
-    }
-    
+   
     .drawer > div {
       flex: 1;
       display: flex;
@@ -340,7 +348,7 @@
     .cyan-btn {
       flex: 1;
       padding: 14px;
-      background: #121212;
+      background: black;/*#121212;*/
       border: 2px solid cyan;
       border-radius: 10px;
       color: white;
@@ -359,7 +367,11 @@
       bottom: -160px;
       left: 0;
       width: 100%;
-      background: rgba(40, 40, 40, 0.90);
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
       padding: 20px 15px 25px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
       transition: bottom 0.3s ease;
@@ -562,7 +574,7 @@
       box-shadow: 0 0 10px red;
     }
 
-    /* For URL box */
+    /* For URL box ---s */
     input[type="text"]::placeholder {
       color: white;
       opacity: .3;
@@ -573,7 +585,7 @@
       border-radius: 8px;
       padding: 10px;
       font-size: 16px;
-      background-color: #121212;
+      background-color: black; /*#121212;*/
       color: white;
       box-shadow: none;
       transition: box-shadow 0.3s ease;
@@ -581,10 +593,10 @@
     
     input[type="text"]:focus {
       outline: none;
-      box-shadow: 0 0 2px magenta, 0 0 8px magenta;
+      box-shadow: 0 0 2px magenta, 0 0 9px magenta;
       border-color: magenta;
       border: 2px solid magenta;
-    }  /* For URL box */
+    }  /* For URL box ---e */
 
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .youtube-wrapper {
@@ -1644,6 +1656,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
