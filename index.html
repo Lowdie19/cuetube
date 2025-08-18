@@ -1264,7 +1264,12 @@ function updateNowPlaying() {
 // Notify helper functions
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
-  playSlideSound(); // 🔊 play sound on show
+
+  // delay sound by 2 seconds
+  setTimeout(() => {
+    playSlideSound(); // 🔊 play sound on show
+  }, 2000);
+
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
@@ -1281,7 +1286,7 @@ function showTempNotify(message) {
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    playSlideSound(); // 🔊 play sound on hide
+    // playSlideSound(); // 🔊 play sound on hide
     notifyEl.classList.add('hide');
     setTimeout(() => notifyEl.remove(), 1500);
   }
@@ -1666,6 +1671,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
