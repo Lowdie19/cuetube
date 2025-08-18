@@ -1517,15 +1517,49 @@ function playClickSound() {
     click.play().catch((e) => console.log("Click sound blocked", e));
   }
 }
-
+// note: Success and Trash with no delay ---s // 
 // Play success sound
+// function playSuccessSound() {
+//  const success = document.getElementById("successSound");
+//  if (success) {
+//    success.currentTime = 0;
+//    success.play().catch((e) => console.log("Success sound blocked", e));
+//  }
+//}
+
+// Play trash sound
+//function playTrashSound() {
+//  const trash = document.getElementById("trashSound");
+//  if (trash) {
+//    trash.currentTime = 0;
+//   trash.play().catch((e) => console.log("trash sound blocked", e));
+//  }
+//}
+// note: Success and Trash with no delay ---e // 
+
+
+// Play success sound with 1.5s delay
 function playSuccessSound() {
   const success = document.getElementById("successSound");
   if (success) {
     success.currentTime = 0;
-    success.play().catch((e) => console.log("Success sound blocked", e));
+    setTimeout(() => {
+      success.play().catch((e) => console.log("Success sound blocked", e));
+    }, 1500); // ⏳ 1.5-second delay
   }
 }
+    
+// Play trash sound with 1.5s delay
+function playTrashSound() {
+  const trash = document.getElementById("trashSound");
+  if (trash) {
+    setTimeout(() => {
+      trash.currentTime = 0;
+      trash.play().catch((e) => console.log("trash sound blocked", e));
+    }, 1500); // ⏳ 1.5-second delay
+  }
+}
+
 
 // Play error sound
 function playErrorSound() {
@@ -1533,15 +1567,6 @@ function playErrorSound() {
   if (error) {
     error.currentTime = 0;
     error.play().catch((e) => console.log("Error sound blocked", e));
-  }
-}
-    
-// Play trash sound
-function playTrashSound() {
-  const trash = document.getElementById("trashSound");
-  if (trash) {
-    trash.currentTime = 0;
-    trash.play().catch((e) => console.log("trash sound blocked", e));
   }
 }
 
@@ -1671,6 +1696,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
 
 
