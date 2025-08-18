@@ -431,7 +431,12 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.5) 60%,  
+        #000000 100%                
+      );
       z-index: 999;
     }
     
@@ -520,8 +525,13 @@
     #popupOverlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.6);  /* Dimming effect */
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.4) 0%,
+        #000000 80%
+      );  /* Dimming effect */
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease;
@@ -535,7 +545,7 @@
     
     #popupModal {
       position: fixed;
-      top: 30%; left: 50% !important;
+      top: 75%; left: 50% !important;
       transform: translate(-50%, -50%) !important;
       background: none !important; /* #222; */
       border: none !important; /* 2px solid cyan; */
