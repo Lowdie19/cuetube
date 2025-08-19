@@ -1,546 +1,259 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CueTube — Remake (with Karaoke Score)</title>
-  <!--
-    NOTE TO BENJO:
-    • This is a single-file remake that keeps your original structure & function names where possible,
-      while cleaning up logic and adding an optional karaoke score shown at the end of each track.
-    • Replace sound file sources below with your GitHub raw file URLs if you like.
-    • Colors are driven by CSS variables so you can keep your exact theme easily.
-    • The queue and player logic preserves: next-box list, auto-next, success/trash/slide sounds,
-      popup for "That's the last tune", notif show/hide behavior, and a notif-volume control (vol1/2/3).
-  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Futuristic Drawer</title>
   <style>
-    :root {
-      /* Set these to your original colors to keep the same look */
-      --bg: #0f1115;
-      --panel: #161a22;
-      --accent: #5cff9a; /* your accent color */
-      --accent-2: #28c76f;
-      --text: #e8eef5;
-      --muted: #8f9bb3;
-      --danger: #ff4d4f;
-      --warning: #ffd166;
-      --shadow: rgba(0,0,0,.25);
-      --ring: rgba(92,255,154,.45);
-    }* { box-sizing: border-box; }
-html, body { height: 100%; }
-body {
-  margin: 0;
-  background: linear-gradient(180deg, rgba(15,17,21,.98), rgba(15,17,21,.98)), var(--bg);
-  color: var(--text);
-  font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial;
-}
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+    }
 
-.app {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 16px;
-  display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 16px;
-}
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.active { opacity: 1; pointer-events: auto; }
 
-header {
-  grid-column: 1 / -1;
+    /* Drawers */
+    .drawer {
+      position: fixed;
+      background: #111;
+      color: #0ff;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 500;
+      box-shadow: none; /* default no glow */
+    }
+    .drawer.open {
+      box-shadow: 0 0 20px #0ff; /* glow only when open */
+    }
+
+    .drawer-left {
+      top: 0; bottom: 0; left: 0;
+      width: 250px;
+      transform: translateX(-100%);
+    }
+    .drawer-left.open { transform: translateX(0); }
+
+    .drawer-bottom {
+      left: 0; right: 0; bottom: 0;
+      height: 200px;
+      transform: translateY(100%);
+    }
+    .drawer-bottom.open { transform: translateY(0); }
+
+    .drawer .content {
+      padding: 60px 20px 20px;
+    }
+
+    /* Handles */
+    .handle {
+      position: absolute;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* LEFT handle (attached sa drawer, upper-left corner) */
+    .handle-left {
+      top: 15px; right: -50px;
+    }
+    .handle-left span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      margin: 6px 0;
+      background: #0ff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .handle-left.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .handle-left.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .handle-left.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* Bottom drawer handle (single line → X) */
+    .handle-bottom {
+      top: -45px; left: 50%;
+      transform: translateX(-50%);
+      width: 30px; height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .handle-bottom span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #0ff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      position: absolute;
+    }
+    .handle-bottom.active span:nth-child(1) {
+      transform: rotate(45deg);
+    }
+    .handle-bottom.active span:nth-child(2) {
+      transform: rotate(-45deg);
+      opacity: 1;
+    }
+    .handle-bottom span:nth-child(2) {
+      opacity: 0;
+    }
+
+/* Wrapper centers everything */
+.yt-wrapper {
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: var(--panel);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px var(--shadow);
-  position: sticky;
-  top: 8px;
-  z-index: 5;
-  outline: 1px solid rgba(255,255,255,.06);
+  height: 100vh;   /* full screen height */
+  width: 100vw;    /* full screen width */
+  background: #000; /* optional background */
 }
 
-.brand {
-  display: flex; gap: 12px; align-items: center;
-  font-weight: 700; letter-spacing: .3px;
-}
-.brand .dot { width: 10px; height: 10px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 6px var(--ring); }
-
-.search {
-  display: flex; gap: 8px; width: 52%;
-}
-.search input {
-  flex: 1;
-  background: #0d1016;
-  border: 1px solid rgba(255,255,255,.08);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  outline: none;
-}
-.search button { background: var(--accent-2); color: #09100c; font-weight: 700; border: none; padding: 10px 14px; border-radius: 12px; box-shadow: 0 8px 18px rgba(40,199,111,.3); cursor: pointer; }
-.search button:hover { filter: brightness(1.05); }
-
-.player, .queue, .tools {
-  background: var(--panel);
-  border-radius: 16px;
-  padding: 12px;
-  box-shadow: 0 6px 20px var(--shadow);
-  outline: 1px solid rgba(255,255,255,.06);
-}
-
-.player { aspect-ratio: 16 / 9; position: relative; overflow: hidden; }
-#player { position: absolute; inset: 0; }
-
-.meta { margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-
-.queue { display: flex; flex-direction: column; gap: 10px; }
-.queue h3 { margin: 4px 0 2px; font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
-
-/* Keep your original class name */
-.next-box {
+/* Main YT Screen */
+.main-yt {
   position: relative;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 58vh;
-  padding-right: 2px;
-}
-
-.song {
-  display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center;
-  background: #0f131b;
-  border: 1px solid rgba(255,255,255,.06);
+  width: 70%;
+  height: 70vh;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid #0ff;
   border-radius: 12px;
-  padding: 8px;
-  transition: transform .12s ease, background .12s ease, border-color .12s ease;
-}
-.song:hover { transform: translateY(-1px); background: #111723; border-color: rgba(92,255,154,.22); }
-.song img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
-.song .t { display: flex; flex-direction: column; gap: 2px; }
-.song .t .title { font-weight: 700; font-size: 13px; }
-.song .t .sub { color: var(--muted); font-size: 12px; }
-
-.song .actions { display: flex; gap: 6px; }
-.btn { padding: 8px 10px; border-radius: 10px; background: #0b0f15; border: 1px solid rgba(255,255,255,.08); color: var(--text); cursor: pointer; }
-.btn:hover { border-color: rgba(92,255,154,.35); }
-.btn.danger { border-color: rgba(255,77,79,.35); color: #ffd8d8; }
-
-.tools { display: grid; gap: 10px; }
-
-.notif-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  background: #0d121a; border: 1px dashed rgba(255,255,255,.15);
-  padding: 10px; border-radius: 12px;
-}
-.notif-msg { font-weight: 600; letter-spacing: .2px; }
-.notif-msg.hidden { display: none; }
-
-.notif-volume { display: flex; align-items: center; gap: 8px; }
-.vol-dot { width: 24px; height: 24px; border-radius: 999px; border: 2px solid rgba(255,255,255,.2); background: #0b0f15; cursor: pointer; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
-.vol-dot.active { border-color: var(--accent); box-shadow: 0 0 0 6px var(--ring); }
-
-/* Universal popup */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 10; }
-.modal { width: min(520px, 94vw); background: var(--panel); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; box-shadow: 0 20px 80px rgba(0,0,0,.45); overflow: hidden; }
-.modal-hd { padding: 14px 16px; font-weight: 800; letter-spacing: .4px; background: #0f141d; border-bottom: 1px solid rgba(255,255,255,.06); }
-.modal-bd { padding: 16px; color: var(--text); }
-.modal-ft { display: flex; gap: 8px; padding: 12px; background: #0f141d; border-top: 1px solid rgba(255,255,255,.06); justify-content: flex-end; }
-
-/* Score badge */
-.score-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; background: #0f141d; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
-.score-number { font-weight: 900; font-size: 18px; }
-.score-note { font-size: 12px; color: var(--muted); }
-
-@media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
-  header { position: static; }
-  .search { width: 56%; }
+  box-shadow: 0 0 20px rgba(0,255,255,0.3);
 }
 
+/* Right Handle */
+.right-handle {
+  position: absolute;
+  top: 50%;
+  right: 0; /* flush with YT screen */
+  transform: translateY(-50%);
+  width: 22px;
+  height: 50%;
+  background: #0ff;
+  cursor: pointer;
+  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 90%);
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 0 12px rgba(0,255,255,0.8);
+  transition: all 0.4s ease;
+}
+
+/* Active state → stretch full YT screen height */
+.right-handle.active {
+  height: 100%;
+  top: 0;
+  transform: none;
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 0 20px rgba(0,255,255,1), 0 0 40px rgba(0,255,255,0.7);
+}
+
+/* Placeholder text */
+.yt-placeholder {
+  color: #0ff;
+  font-size: 1.5rem;
+  text-align: center;
+  line-height: 70vh;
+  font-family: sans-serif;
+}
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="brand"><span class="dot"></span> CueTube</div>
-      <div class="search" onsubmit="return false;">
-        <input id="ytInput" type="text" placeholder="Paste YouTube link or ID…" />
-        <button id="addBtn" class="btn">Add to Queue</button>
-      </div>
-      <div class="notif-volume" id="notif-volume">
-        <!-- Keep your naming change: notif-section → notif-volume; dot1,2,3 → vol1,2,3 -->
-        <div class="vol-dot" id="vol1">1</div>
-        <div class="vol-dot" id="vol2">2</div>
-        <div class="vol-dot" id="vol3">3</div>
-      </div>
-    </header><section>
-  <div class="player">
-    <div id="player"></div>
-  </div>
-  <div class="meta">
-    <div class="now">Now Playing: <strong id="nowTitle">—</strong></div>
-    <div class="score-badge" title="Karaoke score appears after each track">
-      <span>Last Score</span>
-      <span class="score-number" id="lastScore">—</span>
-      <span class="score-note" id="scoreNote">Sing with mic on!</span>
+ 
+  <!-- Wrapper -->
+<div class="yt-wrapper">
+  <!-- Main YT Screen -->
+  <div class="main-yt">
+    <div class="right-handle" id="rightHandle"></div>
+    <div class="yt-placeholder">
+      Main YT Screen
     </div>
   </div>
-  <div class="tools">
-    <div class="notif-bar">
-      <div class="notif-msg hidden" id="noUpcoming">No upcoming song</div>
-      <div class="notif-msg" id="upcomingCount">Queue: <span id="queueCount">0</span></div>
-      <div style="display:flex; gap:8px">
-        <button class="btn" id="clearQueue">Clear Queue</button>
-        <button class="btn" id="micToggle">Mic: Off</button>
-      </div>
-    </div>
-  </div>
-</section>
+</div>
+  
+  <div class="overlay" id="overlay"></div>
 
-<aside class="queue">
-  <h3>Next up</h3>
-  <div class="next-box" id="nextBox"></div>
-</aside>
-
-  </div>  <!-- Universal Popup Modal -->  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
-    <div class="modal" id="modal">
-      <div class="modal-hd" id="modalTitle">Notice</div>
-      <div class="modal-bd" id="modalBody">—</div>
-      <div class="modal-ft" id="modalBtns"></div>
+  <aside class="drawer drawer-left" id="leftDrawer">
+    <button class="handle handle-left" id="handleLeft">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="content">
+      <h2>Left Drawer</h2>
+      <p>Navigation links or content goes here.</p>
     </div>
-  </div>  <!-- Sounds: replace src with your GitHub RAW URLs if needed --><audio id="successSound" preload="auto" src=""></audio> <audio id="trashSound" preload="auto" src=""></audio> <audio id="slideSound" preload="auto" src=""></audio> <audio id="notifySound" preload="auto" src=""></audio>
+  </aside>
+
+  <section class="drawer drawer-bottom" id="bottomDrawer">
+    <button class="handle handle-bottom" id="handleBottom">
+      <span></span><span></span>
+    </button>
+    <div class="content">
+      <h2>Bottom Drawer</h2>
+      <p>Quick actions or options go here.</p>
+    </div>
+  </section>
 
   <script>
-    // ===== Utility =====
-    const $ = (q, d=document) => d.querySelector(q);
-    const $$ = (q, d=document) => Array.from(d.querySelectorAll(q));
+    const overlay = document.getElementById('overlay');
+    const leftDrawer = document.getElementById('leftDrawer');
+    const bottomDrawer = document.getElementById('bottomDrawer');
+    const handleLeft = document.getElementById('handleLeft');
+    const handleBottom = document.getElementById('handleBottom');
 
-    // ===== State =====
-    let player; // YT Player
-    let queue = []; // { id, title, thumb }
-    let currentIndex = -1;
-    let selectedSongIndex = null;
-    let selectedSongEl = null;
-
-    // Karaoke scoring state (mic-based, with fallback)
-    let micEnabled = false;
-    let mediaStream = null;
-    let audioCtx = null;
-    let analyser = null;
-    let dataArray = null;
-    let rafId = null;
-    let volumeSamples = []; // rms per frame
-
-    // Notif volume level 1..3
-    let notifLevel = 2; // default mid
-
-    const sounds = {
-      success: $('#successSound'),
-      trash: $('#trashSound'),
-      slide: $('#slideSound'),
-      notify: $('#notifySound')
-    };
-
-    function applyNotifLevel() {
-      const v = notifLevel === 1 ? 0.2 : notifLevel === 2 ? 0.5 : 0.9;
-      Object.values(sounds).forEach(a => { if (a) a.volume = v; });
-      $$('#notif-volume .vol-dot').forEach((el, i) => el.classList.toggle('active', i+1 === notifLevel));
+    function closeAll() {
+      [leftDrawer, bottomDrawer].forEach(d => d.classList.remove('open'));
+      [handleLeft, handleBottom].forEach(h => h.classList.remove('active'));
+      overlay.classList.remove('active');
     }
 
-    // ===== Sounds API (keep original names) =====
-    function playSuccessSound() {
-      const a = sounds.success; if (!a) return; a.currentTime = 0; a.play().catch(()=>{});
-    }
-    function playTrashSound() {
-      const a = sounds.trash; if (!a) return; a.currentTime = 0; a.play().catch(()=>{});
-    }
-    function playSlideSound() {
-      const a = sounds.slide; if (!a) return; a.currentTime = 0; a.play().catch(()=>{});
-    }
-    function playNotifySound() {
-      const a = sounds.notify; if (!a) return; a.currentTime = 0; a.play().catch(()=>{});
-    }
-
-    // ===== YouTube API Loader =====
-    let ytApiLoaded = false;
-    function loadYTAPI() {
-      if (ytApiLoaded) return;
-      ytApiLoaded = true;
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    }
-    loadYTAPI();
-
-    // YT global callback
-    window.onYouTubeIframeAPIReady = () => {
-      player = new YT.Player('player', {
-        height: '100%', width: '100%', videoId: '',
-        playerVars: { autoplay: 0, controls: 1, rel: 0, modestbranding: 1 },
-        events: { onStateChange: onPlayerStateChange }
-      });
-    };
-
-    // ===== Queue Rendering =====
-    const nextBox = $('#nextBox');
-    const nowTitle = $('#nowTitle');
-
-    function renderQueue() {
-      nextBox.innerHTML = '';
-      queue.forEach((song, index) => {
-        const row = document.createElement('div');
-        row.className = 'song';
-        row.innerHTML = `
-          <img src="https://i.ytimg.com/vi/${song.id}/hqdefault.jpg" alt="thumb" />
-          <div class="t">
-            <div class="title">${song.title || song.id}</div>
-            <div class="sub">youtube.com • ${song.id}</div>
-          </div>
-          <div class="actions">
-            <button class="btn" data-act="play">Play</button>
-            <button class="btn" data-act="up">▲</button>
-            <button class="btn" data-act="down">▼</button>
-            <button class="btn danger" data-act="del">✕</button>
-          </div>
-        `;
-        row.addEventListener('click', (e) => {
-          const act = e.target.closest('button')?.dataset.act;
-          if (!act) return;
-          if (act === 'play') playAt(index);
-          if (act === 'up') moveItem(index, Math.max(0, index-1));
-          if (act === 'down') moveItem(index, Math.min(queue.length-1, index+1));
-          if (act === 'del') steadyClickToDelete(row, index);
-        });
-        nextBox.appendChild(row);
-      });
-      $('#queueCount').textContent = String(queue.length);
-      updateUpcomingNotice();
-    }
-
-    function moveItem(from, to) {
-      if (from === to) return;
-      const [it] = queue.splice(from, 1);
-      queue.splice(to, 0, it);
-      renderQueue();
-    }
-
-    // Keep original signature
-    function steadyClickToDelete(songElement, index) {
-      selectedSongIndex = index;
-      selectedSongEl = songElement;
-      openModal({
-        title: 'Remove from queue?',
-        body: `Do you want to remove <strong>${queue[index]?.title || queue[index]?.id}</strong>?`,
-        buttons: [
-          { text: 'Cancel', role: 'cancel' },
-          { text: 'Remove', role: 'danger', action: () => { deleteAt(selectedSongIndex); } }
-        ]
-      });
-    }
-
-    function deleteAt(i) {
-      if (i == null || i < 0 || i >= queue.length) return;
-      queue.splice(i, 1);
-      playTrashSound();
-      renderQueue();
-    }
-
-    function updateUpcomingNotice() {
-      const noUpcoming = $('#noUpcoming');
-      const hasNext = queue.length > 0 || currentIndex < queue.length - 1;
-      if (!hasNext) {
-        noUpcoming.classList.remove('hidden');
-      } else {
-        if (!noUpcoming.classList.contains('hidden')) {
-          // hide animation trigger
-          playSlideSound();
-        }
-        noUpcoming.classList.add('hidden');
+    function toggleDrawer(drawer, handle, forceOpen = null) {
+      const isOpen = drawer.classList.contains('open');
+      if (forceOpen === false) {
+        drawer.classList.remove('open');
+        handle.classList.remove('active');
+        overlay.classList.remove('active');
+        return;
+      }
+      closeAll();
+      if (!isOpen || forceOpen === true) {
+        drawer.classList.add('open');
+        handle.classList.add('active');
+        overlay.classList.add('active');
       }
     }
 
-    // ===== Adding to Queue =====
-    function parseVideoId(input) {
-      try {
-        // Accept raw ID or any YouTube URL
-        if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
-        const u = new URL(input);
-        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-        const id = u.searchParams.get('v');
-        if (id) return id;
-      } catch {}
-      return null;
-    }
+    handleLeft.addEventListener('click', () => toggleDrawer(leftDrawer, handleLeft));
+    handleBottom.addEventListener('click', () => toggleDrawer(bottomDrawer, handleBottom));
 
-    async function fetchTitle(videoId) {
-      // Without API key, fallback to using ID as title
-      return `Video ${videoId}`;
-    }
+    overlay.addEventListener('click', closeAll);
 
-    async function addToQueue(raw) {
-      const id = parseVideoId(raw.trim());
-      if (!id) return openModal({ title: 'Invalid link', body: 'Please paste a YouTube link or video ID.' });
-      const title = await fetchTitle(id);
-      queue.push({ id, title });
-      playSuccessSound();
-      renderQueue();
-      playNotifySound();
-    }
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === "ArrowUp") toggleDrawer(bottomDrawer, handleBottom, true);
+      if (e.key === "ArrowDown") toggleDrawer(bottomDrawer, handleBottom, false);
+      if (e.key === "ArrowRight") toggleDrawer(leftDrawer, handleLeft, true);
+      if (e.key === "ArrowLeft") toggleDrawer(leftDrawer, handleLeft, false);
+      if (e.key === "Escape") closeAll();
+    });
 
-    // ===== Playback Control =====
-    function playAt(index) {
-      if (!player) return;
-      currentIndex = index;
-      const v = queue[index];
-      if (!v) return;
-      player.loadVideoById(v.id);
-      nowTitle.textContent = v.title || v.id;
-      // Start mic capture if enabled
-      resetScoreSession();
-      if (micEnabled) startMicCapture();
-    }
-
-    function playNext() {
-      if (currentIndex + 1 < queue.length) {
-        playAt(currentIndex + 1);
-      } else {
-        // Last tune popup, hide the "No upcoming song" notif as requested, and play slide sound when show/hide
-        $('#noUpcoming').classList.remove('hidden');
-        playSlideSound();
-        openModal({
-          title: "That's the last tune!",
-          body: "Queue is empty. Add more tracks?",
-          buttons: [
-            { text: 'Close', role: 'cancel' },
-            { text: 'Open Add Box', role: 'primary', action: () => { $('#ytInput').focus(); } }
-          ]
-        });
-      }
-      updateUpcomingNotice();
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) {
-        finishAndScore(); // compute score at end
-        const isLastVideo = currentIndex === queue.length - 1;
-        if (queue.length === 0 || isLastVideo) {
-          // "No upcoming song" handling is inside playNext() when last
-          playNext();
-        } else {
-          playNext();
-        }
-      }
-    }
-
-    // ===== Karaoke Score (mic optional) =====
-    function resetScoreSession() {
-      stopMicCapture();
-      volumeSamples = [];
-      $('#scoreNote').textContent = micEnabled ? 'Recording… sing!' : 'Mic off (tap to enable)';
-      $('#lastScore').textContent = '—';
-    }
-
-    async function startMicCapture() {
-      try {
-        if (mediaStream) return; // already
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioCtx.createMediaStreamSource(mediaStream);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 1024;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        source.connect(analyser);
-        tick();
-      } catch (err) {
-        micEnabled = false;
-        $('#micToggle').textContent = 'Mic: Off';
-        $('#scoreNote').textContent = 'Mic blocked';
-        console.warn('Mic permission denied', err);
-      }
-    }
-
-    function stopMicCapture() {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-      }
-      if (audioCtx) {
-        audioCtx.close();
-      }
-      mediaStream = null; audioCtx = null; analyser = null; dataArray = null;
-    }
-
-    function tick() {
-      if (!analyser) return;
-      analyser.getByteTimeDomainData(dataArray);
-      // RMS of waveform around 128
-      let sum = 0;
-      for (let i=0; i<dataArray.length; i++) {
-        const v = (dataArray[i] - 128) / 128; // -1..1
-        sum += v*v;
-      }
-      const rms = Math.sqrt(sum / dataArray.length); // 0..~1
-      volumeSamples.push(rms);
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function finishAndScore() {
-      if (micEnabled && volumeSamples.length > 10) {
-        const avg = average(volumeSamples);
-        const std = stdev(volumeSamples, avg);
-        // Score heuristics: louder (to a point) & consistent gets higher score.
-        const loudScore = clamp(mapRange(avg, 0.005, 0.12, 0, 70), 0, 70);
-        const stableScore = clamp(mapRange(0.08 - std, 0.0, 0.08, 0, 30), 0, 30);
-        const total = Math.round(loudScore + stableScore);
-        showScore(total, `avg ${avg.toFixed(3)}, σ ${std.toFixed(3)}`);
-      } else {
-        // Fallback: simple participation score if mic off
-        const total = 50; // neutral
-        showScore(total, 'Mic off — participation score');
-      }
-      stopMicCapture();
-    }
-
-    function showScore(total, note) {
-      $('#lastScore').textContent = String(total);
-      $('#scoreNote').textContent = note;
-      openModal({
-        title: 'Karaoke Score',
-        body: `<div style="display:flex;align-items:center;gap:12px;">
-                 <div class="score-number" style="font-size:34px;">${total}</div>
-                 <div>
-                   <div style="font-weight:800">Great job!</div>
-                   <div style="opacity:.75;font-size:12px;margin-top:4px;">${note}</div>
-                 </div>
-               </div>`,
-        buttons: [ { text: 'OK', role: 'primary' } ]
-      });
-    }
-
-    // Helpers
-    const average = arr => arr.reduce((a,b)=>a+b,0) / arr.length;
-    const stdev = (arr, mean) => Math.sqrt(arr.reduce((a,b)=>a + (b-mean)*(b-mean),0) / arr.length);
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    const mapRange = (v, inMin, inMax, outMin, outMax) => {
-      const t = (v - inMin) / (inMax - inMin);
-      return outMin + clamp(t,0,1) * (outMax - outMin);
-    };
-
-    // ===== Modal =====
-    function openModal({ title='Notice', body='', buttons=[{text:'Close', role:'cancel'}] }) {
-      $('#modalTitle').innerHTML = title;
-      $('#modalBody').innerHTML = body;
-      const btns = $('#modalBtns');
-      btns.innerHTML = '';
-      buttons.forEach(b => {
-        const el = document.createElement('button');
-        el.className = 'btn' + (b.role === 'danger' ? ' danger' : '');
-        el.textContent = b.text;
-        el.addEventListener('click', () => { closeModal(); b.action?.(); });
-        btns.appendChild(el);
-      });
-      $('#modalBackdrop').style.display = 'flex';
-    }
-    function closeModal() { $('#modalBackdrop').style.display = 'none'; }
-    $('#modalBackdrop').addEventListener('click', (e) => { if
+    // Toggle Right Handle Active State
+  document.getElementById("rightHandle").addEventListener("click", function() {
+    this.classList.toggle("active");
+  });
+  </script>
+</body>
+</html>
