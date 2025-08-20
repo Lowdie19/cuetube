@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Neon Futuristic Drawer</title>
+  <title>Neon Futuristic Drawer Dual YT</title>
   <style>
+    /* ===========================
+       GLOBAL STYLES
+    ============================ */
     body {
       margin: 0;
       font-family: "Segoe UI", Roboto, sans-serif;
@@ -13,7 +16,9 @@
       overflow: hidden;
     }
 
-    /* Overlay */
+    /* ===========================
+       OVERLAY (dim background when drawer opens)
+    ============================ */
     .overlay {
       position: fixed;
       inset: 0;
@@ -24,19 +29,20 @@
     }
     .overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* Drawers */
+    /* ===========================
+       DRAWER BASE STYLE
+    ============================ */
     .drawer {
       position: fixed;
       background: #111;
       color: #0ff;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       z-index: 500;
-      box-shadow: none; /* default no glow */
+      box-shadow: none;
     }
-    .drawer.open {
-      box-shadow: 0 0 20px #0ff; /* glow only when open */
-    }
+    .drawer.open { box-shadow: 0 0 20px #0ff; }
 
+    /* LEFT DRAWER */
     .drawer-left {
       top: 0; bottom: 0; left: 0;
       width: 250px;
@@ -44,6 +50,7 @@
     }
     .drawer-left.open { transform: translateX(0); }
 
+    /* BOTTOM DRAWER */
     .drawer-bottom {
       left: 0; right: 0; bottom: 0;
       height: 200px;
@@ -51,11 +58,11 @@
     }
     .drawer-bottom.open { transform: translateY(0); }
 
-    .drawer .content {
-      padding: 60px 20px 20px;
-    }
+    .drawer .content { padding: 60px 20px 20px; }
 
-    /* Handles */
+    /* ===========================
+       HANDLES
+    ============================ */
     .handle {
       position: absolute;
       background: none;
@@ -63,8 +70,7 @@
       cursor: pointer;
       z-index: 1000;
     }
-
-    /* LEFT handle (attached sa drawer, upper-left corner) */
+    /* LEFT DRAWER HANDLE (hamburger → X) */
     .handle-left {
       top: 15px; right: -50px;
     }
@@ -78,16 +84,14 @@
       transition: all 0.3s ease;
     }
     .handle-left.active span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
+      transform: rotate(45deg) translate(5px,5px);
     }
-    .handle-left.active span:nth-child(2) {
-      opacity: 0;
-    }
+    .handle-left.active span:nth-child(2) { opacity: 0; }
     .handle-left.active span:nth-child(3) {
-      transform: rotate(-45deg) translate(6px, -6px);
+      transform: rotate(-45deg) translate(6px,-6px);
     }
 
-    /* Bottom drawer handle (single line → X) */
+    /* BOTTOM DRAWER HANDLE (single line → X) */
     .handle-bottom {
       top: -45px; left: 50%;
       transform: translateX(-50%);
@@ -105,88 +109,98 @@
       transition: all 0.3s ease;
       position: absolute;
     }
-    .handle-bottom.active span:nth-child(1) {
-      transform: rotate(45deg);
+    .handle-bottom.active span:nth-child(1) { transform: rotate(45deg); }
+    .handle-bottom.active span:nth-child(2) { transform: rotate(-45deg); opacity: 1; }
+    .handle-bottom span:nth-child(2) { opacity: 0; }
+
+    /* ===========================
+       MAIN YT SCREEN WRAPPER
+    ============================ */
+    .yt-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background: #000;
+      position: relative;
     }
-    .handle-bottom.active span:nth-child(2) {
-      transform: rotate(-45deg);
-      opacity: 1;
+
+    /* MAIN YT SCREEN BOX */
+    .main-yt {
+      position: relative;
+      width: 45%;
+      height: 70vh;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid #0ff;
+      border-radius: 0;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
     }
-    .handle-bottom span:nth-child(2) {
-      opacity: 0;
+
+    /* SECOND YT SCREEN (interactive browser) */
+    .second-yt {
+      position: relative;
+      width: 45%;
+      height: 70vh;
+      margin-left: 10px;
+      border: 2px solid #0ff;
+      border-radius: 0;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+      overflow: hidden;
+    }
+    .second-yt iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
-/* Wrapper centers everything */
-.yt-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;   /* full screen height */
-  width: 100vw;    /* full screen width */
-  background: #000; /* optional background */
-}
+    /* RIGHT HANDLES */
+    .right-handle {
+      position: absolute;
+      width: 20px;
+      height: 50%;
+      background: #0ff;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,255,255,0.8);
+      transition: all 0.4s ease;
+    }
+    .right-handle.active {
+      height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,255,255,1), 0 0 40px rgba(0,255,255,0.7);
+    }
 
-/* Main YT Screen */
-.main-yt {
-  position: relative;
-  width: 70%;
-  height: 70vh;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid #0ff;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.3);
-}
-
-/* Right Handle */
-.right-handle {
-  position: absolute;
-  top: 50%;
-  right: 0; /* flush with YT screen */
-  transform: translateY(-50%);
-  width: 22px;
-  height: 50%;
-  background: #0ff;
-  cursor: pointer;
-  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 90%);
-  border-radius: 12px 0 0 12px;
-  box-shadow: 0 0 12px rgba(0,255,255,0.8);
-  transition: all 0.4s ease;
-}
-
-/* Active state → stretch full YT screen height */
-.right-handle.active {
-  height: 100%;
-  top: 0;
-  transform: none;
-  border-radius: 12px 0 0 12px;
-  box-shadow: 0 0 20px rgba(0,255,255,1), 0 0 40px rgba(0,255,255,0.7);
-}
-
-/* Placeholder text */
-.yt-placeholder {
-  color: #0ff;
-  font-size: 1.5rem;
-  text-align: center;
-  line-height: 70vh;
-  font-family: sans-serif;
-}
+    /* YT SCREEN PLACEHOLDER TEXT */
+    .yt-placeholder {
+      color: #0ff;
+      font-size: 1.5rem;
+      text-align: center;
+      line-height: 70vh;
+      font-family: sans-serif;
+    }
   </style>
 </head>
 <body>
- 
-  <!-- Wrapper -->
-<div class="yt-wrapper">
-  <!-- Main YT Screen -->
-  <div class="main-yt">
-    <div class="right-handle" id="rightHandle"></div>
-    <div class="yt-placeholder">
-      Main YT Screen
+
+  <!-- MAIN & SECOND YT SCREENS -->
+  <div class="yt-wrapper">
+    <div class="main-yt" id="mainYT">
+      <div class="yt-placeholder">Main YT Screen</div>
     </div>
+    <div class="second-yt" id="secondYT">
+      <iframe src="https://www.youtube.com/" allowfullscreen></iframe>
+    </div>
+
+    <!-- Right handles for each screen -->
+    <div class="right-handle" id="rightHandle1"></div>
+    <div class="right-handle" id="rightHandle2"></div>
   </div>
-</div>
-  
+
+  <!-- OVERLAY -->
   <div class="overlay" id="overlay"></div>
 
+  <!-- LEFT DRAWER -->
   <aside class="drawer drawer-left" id="leftDrawer">
     <button class="handle handle-left" id="handleLeft">
       <span></span><span></span><span></span>
@@ -197,6 +211,7 @@
     </div>
   </aside>
 
+  <!-- BOTTOM DRAWER -->
   <section class="drawer drawer-bottom" id="bottomDrawer">
     <button class="handle handle-bottom" id="handleBottom">
       <span></span><span></span>
@@ -207,25 +222,51 @@
     </div>
   </section>
 
+  <!-- JAVASCRIPT -->
   <script>
     const overlay = document.getElementById('overlay');
     const leftDrawer = document.getElementById('leftDrawer');
     const bottomDrawer = document.getElementById('bottomDrawer');
     const handleLeft = document.getElementById('handleLeft');
     const handleBottom = document.getElementById('handleBottom');
+    const mainYT = document.getElementById('mainYT');
+    const secondYT = document.getElementById('secondYT');
+    const rightHandle1 = document.getElementById('rightHandle1');
+    const rightHandle2 = document.getElementById('rightHandle2');
 
+    /* Position right handles next to each YT screen */
+    function positionHandles() {
+      const rect1 = mainYT.getBoundingClientRect();
+      rightHandle1.style.left = (rect1.right + 5) + "px";
+      rightHandle1.style.top = (rect1.top + rect1.height/2) + "px";
+      rightHandle1.style.transform = "translateY(-50%)";
+
+      const rect2 = secondYT.getBoundingClientRect();
+      rightHandle2.style.left = (rect2.right + 5) + "px";
+      rightHandle2.style.top = (rect2.top + rect2.height/2) + "px";
+      rightHandle2.style.transform = "translateY(-50%)";
+    }
+    window.addEventListener("resize", positionHandles);
+    window.addEventListener("load", positionHandles);
+
+    /* Close all drawers */
     function closeAll() {
       [leftDrawer, bottomDrawer].forEach(d => d.classList.remove('open'));
       [handleLeft, handleBottom].forEach(h => h.classList.remove('active'));
       overlay.classList.remove('active');
+      handleLeft.style.display = "block";
+      handleBottom.style.display = "block";
     }
 
+    /* Toggle a specific drawer */
     function toggleDrawer(drawer, handle, forceOpen = null) {
       const isOpen = drawer.classList.contains('open');
       if (forceOpen === false) {
         drawer.classList.remove('open');
         handle.classList.remove('active');
         overlay.classList.remove('active');
+        handleLeft.style.display = "block";
+        handleBottom.style.display = "block";
         return;
       }
       closeAll();
@@ -233,27 +274,41 @@
         drawer.classList.add('open');
         handle.classList.add('active');
         overlay.classList.add('active');
+        // hide the other drawer's handle
+        if(handle === handleLeft) handleBottom.style.display = "none";
+        if(handle === handleBottom) handleLeft.style.display = "none";
       }
     }
 
+    /* Drawer handle clicks */
     handleLeft.addEventListener('click', () => toggleDrawer(leftDrawer, handleLeft));
     handleBottom.addEventListener('click', () => toggleDrawer(bottomDrawer, handleBottom));
 
+    /* Click overlay closes all */
     overlay.addEventListener('click', closeAll);
 
-    // Keyboard shortcuts
+    /* Keyboard shortcuts */
     document.addEventListener('keydown', (e) => {
-      if (e.key === "ArrowUp") toggleDrawer(bottomDrawer, handleBottom, true);
-      if (e.key === "ArrowDown") toggleDrawer(bottomDrawer, handleBottom, false);
-      if (e.key === "ArrowRight") toggleDrawer(leftDrawer, handleLeft, true);
-      if (e.key === "ArrowLeft") toggleDrawer(leftDrawer, handleLeft, false);
-      if (e.key === "Escape") closeAll();
+      // Disable conflicting keys
+      if(leftDrawer.classList.contains('open') && e.key==="ArrowDown") return;
+      if(bottomDrawer.classList.contains('open') && e.key==="ArrowLeft") return;
+
+      if(e.key==="ArrowUp") toggleDrawer(bottomDrawer, handleBottom,true);
+      if(e.key==="ArrowDown") toggleDrawer(bottomDrawer, handleBottom,false);
+      if(e.key==="ArrowRight") toggleDrawer(leftDrawer, handleLeft,true);
+      if(e.key==="ArrowLeft") toggleDrawer(leftDrawer, handleLeft,false);
+      if(e.key==="Escape") closeAll();
     });
 
-    // Toggle Right Handle Active State
-  document.getElementById("rightHandle").addEventListener("click", function() {
-    this.classList.toggle("active");
-  });
+    /* Right handle clicks */
+    rightHandle1.addEventListener("click", function() {
+      this.classList.toggle("active");
+      positionHandles();
+    });
+    rightHandle2.addEventListener("click", function() {
+      this.classList.toggle("active");
+      positionHandles();
+    });
   </script>
 </body>
 </html>
