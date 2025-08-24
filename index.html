@@ -3,50 +3,109 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dual YT Screens with Drawers</title>
+<title>Fresh Start - YouTube Popup</title>
 <style>
-body { margin:0; font-family:Segoe UI, Roboto, sans-serif; background:#0a0a0a; color:#fff; overflow:hidden; }
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+body {
+  margin:0;
+  font-family:Segoe UI, Roboto, sans-serif;
+  background:#0a0a0a;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* Overlay */
+.overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.5);
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+}
 .overlay.active { opacity:1; pointer-events:auto; }
-.drawer { position:fixed; background:#111; color:#0ff; transition:transform 0.3s ease, box-shadow 0.3s ease; z-index:500; box-shadow:none; }
+
+/* Drawer system */
+.drawer {
+  position:fixed;
+  background:#111;
+  color:#0ff;
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
+  z-index:500;
+  box-shadow:none;
+}
 .drawer.open { box-shadow:0 0 20px #0ff; }
 .drawer-left { top:0; bottom:0; left:0; width:250px; transform:translateX(-100%); }
 .drawer-left.open { transform:translateX(0); }
 .drawer-bottom { left:0; right:0; bottom:0; height:200px; transform:translateY(100%); }
 .drawer-bottom.open { transform:translateY(0); }
 .drawer .content { padding:60px 20px 20px; }
+
+/* Drawer handles */
 .handle { position:absolute; background:none; border:none; cursor:pointer; z-index:1000; }
 .handle-left { top:15px; right:-50px; }
-.handle-left span { display:block; width:28px; height:3px; margin:6px 0; background:#0ff; border-radius:2px; transition:all 0.3s ease; }
+.handle-left span {
+  display:block; width:28px; height:3px; margin:6px 0;
+  background:#0ff; border-radius:2px;
+  transition:all 0.3s ease;
+}
 .handle-left.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
 .handle-left.active span:nth-child(2) { opacity:0; }
 .handle-left.active span:nth-child(3) { transform:rotate(-45deg) translate(6px,-6px); }
-.handle-bottom { top:-45px; left:50%; transform:translateX(-50%); width:30px; height:30px; display:flex; align-items:center; justify-content:center; }
-.handle-bottom span { display:block; width:28px; height:3px; background:#0ff; border-radius:2px; transition:all 0.3s ease; position:absolute; }
+
+.handle-bottom {
+  top:-45px; left:50%; transform:translateX(-50%);
+  width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+}
+.handle-bottom span {
+  display:block; width:28px; height:3px;
+  background:#0ff; border-radius:2px;
+  transition:all 0.3s ease; position:absolute;
+}
 .handle-bottom.active span:nth-child(1) { transform:rotate(45deg); }
 .handle-bottom.active span:nth-child(2) { transform:rotate(-45deg); opacity:1; }
 .handle-bottom span:nth-child(2) { opacity:0; }
-.yt-wrapper { display:flex; justify-content:center; align-items:center; height:100vh; width:100vw; background:#000; position:relative; overflow:hidden; }
-.main-yt { position:relative; width:100%; height:70vh; background:green; border-radius:0; box-shadow:0 0 20px rgba(0,255,255,0.3); transition:all 0.5s ease; }
-.second-yt { position:absolute; background:red; width:100%; height:70vh; top:0; left:100%; border-radius:0; box-shadow:0 0 20px rgba(0,255,255,0.3); transition:all 0.5s ease; display:flex; justify-content:center; align-items:center; }
-.second-yt iframe { width:100%; height:100%; border:0; }
-#ytButton { position:absolute; top:10px; right:10px; width:50px; height:50px; border-radius:50%; background:red; display:flex; justify-content:center; align-items:center; cursor:pointer; z-index:1000; transition:opacity 0.5s ease, transform 0.3s ease; }
+
+/* Main YT Screen */
+.yt-wrapper {
+  display:flex; justify-content:center; align-items:center;
+  height:100vh; width:100vw;
+  background:#000; position:relative; overflow:hidden;
+}
+.main-yt {
+  width:100%; height:100%;
+  background:#111; 
+  border-radius:0;
+  box-shadow:0 0 20px rgba(0,255,255,0.3);
+  transition:all 0.5s ease;
+  position:relative;
+}
+.main-yt iframe {
+  width:100%; height:100%;
+  border:none;
+}
+
+/* YouTube popup button */
+#ytButton {
+  position:absolute; top:10px; right:10px;
+  width:50px; height:50px;
+  border-radius:50%;
+  background:red;
+  display:flex; justify-content:center; align-items:center;
+  cursor:pointer; z-index:1000;
+  transition:opacity 0.5s ease, transform 0.3s ease;
+}
 #ytButton svg { width:60%; height:60%; fill:white; }
 #ytButton.dim { opacity:0.2; }
 </style>
 </head>
 <body>
 
-<!-- MAIN & SECOND YT SCREENS -->
+<!-- MAIN YT SCREEN -->
 <div class="yt-wrapper">
   <div class="main-yt" id="mainYT">
-    <div class="yt-placeholder">Main YT Screen (Green)</div>
+    <iframe id="mainYTFrame" src="https://www.youtube.com/embed/?autoplay=0" allowfullscreen></iframe>
   </div>
-  <div class="second-yt" id="secondYT">
-    <iframe src="https://www.youtube.com/embed/?listType=search&list=music" allowfullscreen></iframe>
-  </div>
-  <!-- YouTube Toggle Button -->
-  <div id="ytButton" title="Open Second YT">
+  <!-- YouTube Popup Button -->
+  <div id="ytButton" title="Open Karaoke YouTube">
     <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"></polygon></svg>
   </div>
 </div>
@@ -57,13 +116,19 @@ body { margin:0; font-family:Segoe UI, Roboto, sans-serif; background:#0a0a0a; c
 <!-- LEFT DRAWER -->
 <aside class="drawer drawer-left" id="leftDrawer">
   <button class="handle handle-left" id="handleLeft"><span></span><span></span><span></span></button>
-  <div class="content"><h2>Left Drawer</h2><p>Navigation links or content goes here.</p></div>
+  <div class="content">
+    <h2>Left Drawer</h2>
+    <p>Navigation links or content goes here.</p>
+  </div>
 </aside>
 
 <!-- BOTTOM DRAWER -->
 <section class="drawer drawer-bottom" id="bottomDrawer">
   <button class="handle handle-bottom" id="handleBottom"><span></span><span></span></button>
-  <div class="content"><h2>Bottom Drawer</h2><p>Quick actions or options go here.</p></div>
+  <div class="content">
+    <h2>Bottom Drawer</h2>
+    <p>Quick actions or options go here.</p>
+  </div>
 </section>
 
 <script>
@@ -72,10 +137,9 @@ const leftDrawer = document.getElementById('leftDrawer');
 const bottomDrawer = document.getElementById('bottomDrawer');
 const handleLeft = document.getElementById('handleLeft');
 const handleBottom = document.getElementById('handleBottom');
-const mainYT = document.getElementById('mainYT');
-const secondYT = document.getElementById('secondYT');
 const ytButton = document.getElementById('ytButton');
 let ytTimeout;
+let ytPopup = null;
 
 /* Drawer Functions */
 function closeAll(){
@@ -88,38 +152,40 @@ function toggleDrawer(drawer,handle,forceOpen=null){
   const isOpen=drawer.classList.contains('open');
   if(forceOpen===false){ drawer.classList.remove('open'); handle.classList.remove('active'); overlay.classList.remove('active'); handleLeft.style.display='block'; handleBottom.style.display='block'; return; }
   closeAll();
-  if(!isOpen || forceOpen===true){ drawer.classList.add('open'); handle.classList.add('active'); overlay.classList.add('active'); if(handle===handleLeft) handleBottom.style.display='none'; if(handle===handleBottom) handleLeft.style.display='none'; }
+  if(!isOpen || forceOpen===true){
+    drawer.classList.add('open'); handle.classList.add('active'); overlay.classList.add('active');
+    if(handle===handleLeft) handleBottom.style.display='none';
+    if(handle===handleBottom) handleLeft.style.display='none';
+  }
 }
 handleLeft.addEventListener('click',()=>toggleDrawer(leftDrawer,handleLeft));
 handleBottom.addEventListener('click',()=>toggleDrawer(bottomDrawer,handleBottom));
 overlay.addEventListener('click',closeAll);
 
-/* YT Button Functions */
+/* YT Popup Function */
 ytButton.addEventListener('click',()=>{
-  const isOpen = secondYT.style.left==='0%';
-  if(!isOpen){
-    if(window.innerWidth>window.innerHeight){ secondYT.style.left='50%'; mainYT.style.width='50%'; } // landscape
-    else { secondYT.style.top='50%'; secondYT.style.left='0'; mainYT.style.height='50%'; } // portrait
+  if(ytPopup && !ytPopup.closed){
+    ytPopup.focus();
   } else {
-    secondYT.style.left='100%'; secondYT.style.top='0'; mainYT.style.width='100%'; mainYT.style.height='70vh';
+    const w = Math.floor(window.screen.width/2);
+    const h = window.screen.height;
+    const left = window.screen.width - w;
+    ytPopup = window.open(
+      "https://www.youtube.com/results?search_query=karaoke",
+      "karaokePopup",
+      `width=${w},height=${h},left=${left},top=0,resizable=yes,scrollbars=yes`
+    );
   }
-  ytButton.style.transform='scale(0.9)';
-  setTimeout(()=>{ytButton.style.transform='scale(1)';},200);
-  resetYTButtonTimer();
 });
 
 /* Dim Button on idle */
-function resetYTButtonTimer(){ clearTimeout(ytTimeout); ytButton.classList.remove('dim'); ytTimeout=setTimeout(()=>{ytButton.classList.add('dim');},5000); }
+function resetYTButtonTimer(){
+  clearTimeout(ytTimeout);
+  ytButton.classList.remove('dim');
+  ytTimeout=setTimeout(()=>{ytButton.classList.add('dim');},5000);
+}
 ['mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,resetYTButtonTimer));
 resetYTButtonTimer();
-
-/* Responsive adjustments */
-window.addEventListener('resize',()=>{
-  if(secondYT.style.left==='50%'){
-    if(window.innerWidth>window.innerHeight){ secondYT.style.left='50%'; secondYT.style.top='0'; mainYT.style.width='50%'; mainYT.style.height='70vh'; }
-    else { secondYT.style.top='50%'; secondYT.style.left='0'; mainYT.style.width='100%'; mainYT.style.height='50%'; }
-  }
-});
 
 /* Keyboard and Drawer Restrictions */
 document.addEventListener('keydown',e=>{
