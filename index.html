@@ -1264,12 +1264,7 @@ function updateNowPlaying() {
 // Notify helper functions
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
-
-  // delay sound by 2 seconds
-  setTimeout(() => {
-    playSlideSound(); // 🔊 play sound on show
-  }, 2000);
-
+  playSlideSound(); // 🔊 play sound on show
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
@@ -1286,7 +1281,7 @@ function showTempNotify(message) {
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    // playSlideSound(); // 🔊 play sound on hide
+    playSlideSound(); // 🔊 play sound on hide
     notifyEl.classList.add('hide');
     setTimeout(() => notifyEl.remove(), 1500);
   }
@@ -1508,6 +1503,7 @@ function confirmPlayNext() {
   });
 
     
+
   // Play click sound
 function playClickSound() {
   const click = document.getElementById("clickSound");
@@ -1516,38 +1512,15 @@ function playClickSound() {
     click.play().catch((e) => console.log("Click sound blocked", e));
   }
 }
-// note: Success and Trash with no delay ---s // 
+
 // Play success sound
-// function playSuccessSound() {
-//  const success = document.getElementById("successSound");
-//  if (success) {
-//    success.currentTime = 0;
-//    success.play().catch((e) => console.log("Success sound blocked", e));
-//  }
-//}
-// note: Success and Trash with no delay ---e // 
-
-
-// Play success sound with .5s delay
 function playSuccessSound() {
   const success = document.getElementById("successSound");
   if (success) {
     success.currentTime = 0;
-    setTimeout(() => {
-      success.play().catch((e) => console.log("Success sound blocked", e));
-    }, 500); // ⏳ .5-second delay
+    success.play().catch((e) => console.log("Success sound blocked", e));
   }
 }
-    
-//Play trash sound
-function playTrashSound() {
-  const trash = document.getElementById("trashSound");
-  if (trash) {
-    trash.currentTime = 0;
-   trash.play().catch((e) => console.log("trash sound blocked", e));
-  }
-}
-
 
 // Play error sound
 function playErrorSound() {
@@ -1555,6 +1528,15 @@ function playErrorSound() {
   if (error) {
     error.currentTime = 0;
     error.play().catch((e) => console.log("Error sound blocked", e));
+  }
+}
+    
+// Play trash sound
+function playTrashSound() {
+  const trash = document.getElementById("trashSound");
+  if (trash) {
+    trash.currentTime = 0;
+    trash.play().catch((e) => console.log("trash sound blocked", e));
   }
 }
 
@@ -1684,8 +1666,6 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
 
 
 
