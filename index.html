@@ -3,115 +3,133 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CueTube Fresh Start</title>
+<title>Fresh Start - YouTube Popup</title>
 <style>
-  body {
-    margin: 0;
-    background: #000;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-  }
-  /* Main YouTube Screen */
-  #main {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    background: #111;
-  }
-  #ytplayer {
-    width: 100%; height: 100%;
-    border: none;
-    box-shadow: 0 0 40px rgba(255,0,0,0.4);
-  }
-  /* YouTube Button */
-  #ytButton {
-    position: fixed;
-    top: 15px; right: 15px;
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: red;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: opacity 0.4s;
-    z-index: 1001;
-  }
-  #ytButton.dim { opacity: 0.3; }
-  #ytButton:before {
-    content: "";
-    border-style: solid;
-    border-width: 12px 0 12px 20px;
-    border-color: transparent transparent transparent white;
-    margin-left: 5px;
-  }
-  /* Overlay */
-  #overlay {
-    position: fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.4);
-    display: none; z-index:1000;
-  }
-  #overlay.active { display: block; }
-  /* Drawers */
-  .drawer {
-    position: fixed; background: #222; color: #fff;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    transition: transform 0.3s;
-    z-index: 1002;
-    padding: 15px;
-  }
-  #leftDrawer {
-    top: 0; left: 0; height: 100%; width: 250px;
-    transform: translateX(-100%);
-  }
-  #leftDrawer.open { transform: translateX(0); }
-  #bottomDrawer {
-    left: 0; bottom: 0; width: 100%; height: 250px;
-    transform: translateY(100%);
-  }
-  #bottomDrawer.open { transform: translateY(0); }
-  /* Drawer Handles */
-  .handle {
-    position: fixed; background: rgba(255,255,255,0.1);
-    border-radius: 10px; cursor: pointer; z-index:1003;
-    transition: background 0.3s;
-  }
-  .handle:hover { background: rgba(255,255,255,0.3); }
-  #handleLeft {
-    top: 50%; left: 0;
-    transform: translateY(-50%);
-    width: 20px; height: 60px;
-  }
-  #handleBottom {
-    left: 50%; bottom: 0;
-    transform: translateX(-50%);
-    width: 60px; height: 20px;
-  }
+body {
+  margin:0;
+  font-family:Segoe UI, Roboto, sans-serif;
+  background:#0a0a0a;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* Overlay */
+.overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.5);
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.overlay.active { opacity:1; pointer-events:auto; }
+
+/* Drawer system */
+.drawer {
+  position:fixed;
+  background:#111;
+  color:#0ff;
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
+  z-index:500;
+  box-shadow:none;
+}
+.drawer.open { box-shadow:0 0 20px #0ff; }
+.drawer-left { top:0; bottom:0; left:0; width:250px; transform:translateX(-100%); }
+.drawer-left.open { transform:translateX(0); }
+.drawer-bottom { left:0; right:0; bottom:0; height:200px; transform:translateY(100%); }
+.drawer-bottom.open { transform:translateY(0); }
+.drawer .content { padding:60px 20px 20px; }
+
+/* Drawer handles */
+.handle { position:absolute; background:none; border:none; cursor:pointer; z-index:1000; }
+.handle-left { top:15px; right:-50px; }
+.handle-left span {
+  display:block; width:28px; height:3px; margin:6px 0;
+  background:#0ff; border-radius:2px;
+  transition:all 0.3s ease;
+}
+.handle-left.active span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+.handle-left.active span:nth-child(2) { opacity:0; }
+.handle-left.active span:nth-child(3) { transform:rotate(-45deg) translate(6px,-6px); }
+
+.handle-bottom {
+  top:-45px; left:50%; transform:translateX(-50%);
+  width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+}
+.handle-bottom span {
+  display:block; width:28px; height:3px;
+  background:#0ff; border-radius:2px;
+  transition:all 0.3s ease; position:absolute;
+}
+.handle-bottom.active span:nth-child(1) { transform:rotate(45deg); }
+.handle-bottom.active span:nth-child(2) { transform:rotate(-45deg); opacity:1; }
+.handle-bottom span:nth-child(2) { opacity:0; }
+
+/* Main YT Screen */
+.yt-wrapper {
+  display:flex; justify-content:center; align-items:center;
+  height:100vh; width:100vw;
+  background:#000; position:relative; overflow:hidden;
+}
+.main-yt {
+  width:100%; height:100%;
+  background:#111; 
+  border-radius:0;
+  box-shadow:0 0 20px rgba(0,255,255,0.3);
+  transition:all 0.5s ease;
+  position:relative;
+}
+.main-yt iframe {
+  width:100%; height:100%;
+  border:none;
+}
+
+/* YouTube popup button */
+#ytButton {
+  position:absolute; top:10px; right:10px;
+  width:50px; height:50px;
+  border-radius:50%;
+  background:red;
+  display:flex; justify-content:center; align-items:center;
+  cursor:pointer; z-index:1000;
+  transition:opacity 0.5s ease, transform 0.3s ease;
+}
+#ytButton svg { width:60%; height:60%; fill:white; }
+#ytButton.dim { opacity:0.2; }
 </style>
 </head>
 <body>
-  <!-- Main YouTube Screen -->
-  <div id="main">
-    <iframe id="ytplayer" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+
+<!-- MAIN YT SCREEN -->
+<div class="yt-wrapper">
+  <div class="main-yt" id="mainYT">
+    <iframe id="mainYTFrame" src="https://www.youtube.com/embed/?autoplay=0" allowfullscreen></iframe>
   </div>
+  <!-- YouTube Popup Button -->
+  <div id="ytButton" title="Open Karaoke YouTube">
+    <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"></polygon></svg>
+  </div>
+</div>
 
-  <!-- YouTube Button -->
-  <div id="ytButton"></div>
+<!-- OVERLAY -->
+<div class="overlay" id="overlay"></div>
 
-  <!-- Drawers -->
-  <div id="leftDrawer" class="drawer">
+<!-- LEFT DRAWER -->
+<aside class="drawer drawer-left" id="leftDrawer">
+  <button class="handle handle-left" id="handleLeft"><span></span><span></span><span></span></button>
+  <div class="content">
     <h2>Left Drawer</h2>
-    <p>Navigation or links here.</p>
+    <p>Navigation links or content goes here.</p>
   </div>
-  <div id="bottomDrawer" class="drawer">
+</aside>
+
+<!-- BOTTOM DRAWER -->
+<section class="drawer drawer-bottom" id="bottomDrawer">
+  <button class="handle handle-bottom" id="handleBottom"><span></span><span></span></button>
+  <div class="content">
     <h2>Bottom Drawer</h2>
-    <p>Quick actions or options here.</p>
+    <p>Quick actions or options go here.</p>
   </div>
-
-  <!-- Handles -->
-  <div id="handleLeft" class="handle"></div>
-  <div id="handleBottom" class="handle"></div>
-
-  <!-- Overlay -->
-  <div id="overlay"></div>
+</section>
 
 <script>
 const overlay = document.getElementById('overlay');
@@ -176,7 +194,7 @@ function resetYTButtonTimer(){
 ['mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,resetYTButtonTimer));
 resetYTButtonTimer();
 
-/* Keyboard Shortcuts */
+/* Keyboard Restrictions */
 document.addEventListener('keydown',e=>{
   if(leftDrawer.classList.contains('open') && e.key==='ArrowDown') return;
   if(bottomDrawer.classList.contains('open') && e.key==='ArrowLeft') return;
@@ -187,7 +205,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closeAll();
 });
 
-/* 🔥 Swipe Gesture Support */
+/* 🔥 Swipe Gesture Support for Android */
 let touchStartX=0, touchStartY=0, touchEndX=0, touchEndY=0;
 
 document.addEventListener('touchstart',e=>{
