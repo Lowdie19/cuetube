@@ -1240,7 +1240,7 @@ function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
   const current = queue[currentIndex];
 
-  // Cancel any pending notify timers (important when skipping songs)
+  // Cancel any pending notify timers when switching songs
   if (notifyShowTimeout) {
     clearTimeout(notifyShowTimeout);
     notifyShowTimeout = null;
@@ -1266,11 +1266,11 @@ function updateNowPlaying() {
 
     // Delay 10s before showing notify
     notifyShowTimeout = setTimeout(() => {
-      showNotify("No upcoming song");
+      showNotify("No upcoming song"); // 🔊 sound plays here
 
       // Auto-hide after 10s of being visible
       notifyHideTimeout = setTimeout(() => {
-        hideNotify();
+        hideNotify(); // 🔊 sound plays when hiding starts
       }, 10000);
 
     }, 10000);
@@ -1287,26 +1287,26 @@ function updateNowPlaying() {
 // Notify helper functions
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
-  playNotifSound(); // 🔊 play sound on show
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
       <div class="text">${message}</div>
     </div>
   `;
+  playNotifSound(); // 🔊 play sound exactly when shown
 }
 
 function showTempNotify(message) {
-  showNotify(message);
+  showNotify(message); // sound plays here
   setTimeout(() => hideNotify(), 10000); // auto-hide after 10s
 }
 
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
+    playSlideSound(); // 🔊 play sound right when hide starts
     notifyEl.classList.add('hide');
-    setTimeout(() => notifyEl.remove(), 1500);
-    playSlideSound(); // 🔊 play sound on hide
+    setTimeout(() => notifyEl.remove(), 1500); // remove after animation
   }
 }
 
@@ -1355,7 +1355,7 @@ function scheduleNextSongNotify(duration, currentTime) {
       </div>
     `;
 
-    showTempNotify(messageHTML);
+    showTempNotify(messageHTML); // plays notif sound on show, slide sound on hide
     return true;
   }
   return false;
