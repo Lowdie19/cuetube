@@ -1120,18 +1120,26 @@
   }
 
   function playNextFromQueue() {
-    if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+  if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+    // ❌ Error case — delay error popup + sound by 0.8s
+    setTimeout(() => {
       showPopup("No next song.", "red", true, true);
       playErrorSound();
-      return;
-    }
-
-    currentIndex++;
-    player.loadVideoById(queue[currentIndex].id);
-    updateNowPlaying();
-    updateQueueDisplay();
-    showPopup("Next song!", "magenta", false, "magenta");
+    }, 600);
+    return;
   }
+
+  currentIndex++;
+  player.loadVideoById(queue[currentIndex].id);
+  updateNowPlaying();
+  updateQueueDisplay();
+
+  // ✅ Success case — delay success popup + sound by 0.8s
+  setTimeout(() => {
+    showPopup("Next song!", "magenta", false, "magenta");
+    playSuccessSound();
+  }, 600);
+}
 
   function updateQueueDisplay() {
   const list = document.getElementById("nextList");
