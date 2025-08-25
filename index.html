@@ -852,35 +852,38 @@
   <!-- JS -->
   <script>
   let overlayTouchStartX = 0;
-  let isLeftOverlayOpen = false;
-  let touchStartX = 0;
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('drawerOverlay');
-    const popupOverlay = document.getElementById("popupOverlay");
-    
+let isLeftOverlayOpen = false;
+let touchStartX = 0;
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('drawerOverlay');
+const popupOverlay = document.getElementById("popupOverlay");
+const bottomDrawer = document.getElementById("bottomDrawer");
 
-  function handleTouchStart(evt) {
-    touchStartX = evt.touches[0].clientX;
+// Handle touch start
+function handleTouchStart(evt) {
+  touchStartX = evt.touches[0].clientX;
+}
+
+// Handle touch move
+function handleTouchMove(evt) {
+  const deltaX = evt.touches[0].clientX - touchStartX;
+  if (deltaX > 50) openDrawer();
+  else if (deltaX < -50) closeDrawer();
+}
+
+// Handle tap outside
+function handleTap(evt) {
+  if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+    closeDrawer();
   }
+}
 
-  function handleTouchMove(evt) {
-    const deltaX = evt.touches[0].clientX - touchStartX;
-    if (deltaX > 50) openDrawer();
-    else if (deltaX < -50) closeDrawer();
-  }
+function toggleDrawer() {
+  if (drawer.classList.contains("open")) closeDrawer();
+  else openDrawer();
+}
 
-  function handleTap(evt) {
-    if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
-      closeDrawer();
-    }
-  }
-
-  function toggleDrawer() {
-    if (drawer.classList.contains("open")) closeDrawer();
-    else openDrawer();
-  }
-
-  function openDrawer() {
+function openDrawer() {
   // Close bottom drawer if open
   if (bottomDrawer.classList.contains("open")) {
     bottomDrawer.classList.remove("open");
@@ -892,51 +895,42 @@
   isLeftOverlayOpen = true;
   document.getElementById('drawerHandle').style.display = 'none';
   document.getElementById("confirmDelete").style.display = "none";
-  // playSlideSound();
 }
-  document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
 });
 
-  function closeDrawer() {
-    drawer.classList.remove('open');
-    overlay.classList.remove('visible');
-    isLeftOverlayOpen = false;
-    bottomDrawerOverlay.classList.remove("visible");
-    document.getElementById('drawerHandle').style.display = 'flex';
-    document.getElementById("confirmDelete").style.display = "none";
-   // playSlideSound();
-  }
+function closeDrawer() {
+  drawer.classList.remove('open');
+  overlay.classList.remove('visible');
+  isLeftOverlayOpen = false;
+  bottomDrawerOverlay.classList.remove("visible");
+  document.getElementById('drawerHandle').style.display = 'flex';
+  document.getElementById("confirmDelete").style.display = "none";
+}
 
-  function closeBottomDrawer() {
+function closeBottomDrawer() {
   if (bottomDrawer.classList.contains("open")) {
     bottomDrawer.classList.remove("open");
     document.querySelector(".bottom-drawer-handle").style.display = "flex";
-    bottomDrawerOverlay.classList.remove("visible"); // hide overlay here
-   // playSlideSound();
+    bottomDrawerOverlay.classList.remove("visible"); // hide overlay
   }
 }
 
-  // For swipe close of left drawer --s//
-  overlay.addEventListener('touchstart', (e) => {
-    overlayTouchStartX = e.touches[0].clientX;
-  });
-  
-  overlay.addEventListener('touchmove', (e) => {
-    const touchCurrentX = e.touches[0].clientX;
-    const deltaX = touchCurrentX - overlayTouchStartX;
-  
-    if (deltaX < -50) {  // Swipe left detected (moved more than 50px left)
-      closeDrawer();
-    }
-  });
-  // For swipe close of left drawer --e//
+// Swipe close for left drawer
+overlay.addEventListener('touchstart', (e) => {
+  overlayTouchStartX = e.touches[0].clientX;
+});
 
+overlay.addEventListener('touchmove', (e) => {
+  const touchCurrentX = e.touches[0].clientX;
+  const deltaX = touchCurrentX - overlayTouchStartX;
+  if (deltaX < -50) closeDrawer(); // swipe left
+});
 
-  let startY = 0;
-  const bottomDrawer = document.getElementById("bottomDrawer");
-
-  function toggleBottomDrawer() {
+// Toggle bottom drawer
+function toggleBottomDrawer() {
   const isOpen = bottomDrawer.classList.toggle("open");
   document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
   bottomDrawerOverlay.classList.toggle("visible", isOpen);
@@ -950,40 +944,50 @@
       document.getElementById("confirmDelete").style.display = "none";
     }
   } else {
-    bottomDrawerOverlay.classList.remove("visible"); // hide when closing
+    bottomDrawerOverlay.classList.remove("visible");
   }
-   // playSlideSound();
 }
-    bottomDrawerOverlay.onclick = function() {
-  if (drawer.classList.contains("open")) {
-    closeDrawer();
-  }
-  if (bottomDrawer.classList.contains("open")) {
-    closeBottomDrawer();
-  }
+
+bottomDrawerOverlay.onclick = function() {
+  if (drawer.classList.contains("open")) closeDrawer();
+  if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
+// Swipe handling
+let startY = 0;
+document.body.addEventListener("touchstart", evt => {
+  startY = evt.touches[0].clientY;
+  handleTouchStart(evt);
+});
 
-  document.body.addEventListener("touchstart", evt => {
-    startY = evt.touches[0].clientY;
-    handleTouchStart(evt);
-  });
+document.body.addEventListener("touchmove", evt => {
+  const deltaY = evt.touches[0].clientY - startY;
 
-  document.body.addEventListener("touchmove", evt => {
-    const deltaY = evt.touches[0].clientY - startY;
-    
-    if (isLeftOverlayOpen) {
-    // Left drawer overlay visible, disable bottom drawer open swipe
-    if (deltaY > 40) closeBottomDrawer(); // allow close bottom drawer if open
-    return; // do not open bottom drawer while overlay visible
+  if (isLeftOverlayOpen) {
+    if (deltaY > 40) closeBottomDrawer();
+    return; // block bottom drawer open while left is open
   }
-    if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-      toggleBottomDrawer(); // swipe up to open only if it's not already open
-    } else if (deltaY > 40) {
-      closeBottomDrawer(); // swipe down always closes
-    }
-    handleTouchMove(evt);
-  });
+
+  if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+    toggleBottomDrawer(); // swipe up to open
+  } else if (deltaY > 40) {
+    closeBottomDrawer(); // swipe down always closes
+  }
+
+  handleTouchMove(evt);
+});
+
+// Keyboard Shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === "ArrowUp") toggleBottomDrawer();     // Open/close bottom drawer
+  if (e.key === "ArrowDown") closeBottomDrawer();    // Force close bottom drawer
+  if (e.key === "ArrowRight") openDrawer();          // Open left drawer
+  if (e.key === "ArrowLeft") closeDrawer();          // Close left drawer
+  if (e.key === "Escape") {                          // Close everything
+    closeDrawer();
+    closeBottomDrawer();
+  }
+});
 
   document.body.addEventListener("click", handleTap);
 
@@ -1714,6 +1718,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
+
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
