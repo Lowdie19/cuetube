@@ -1069,7 +1069,7 @@
     updateNowPlaying();
     updateQueueDisplay();
     input.value = "";
-    showPopup("Reserved!", "lime", false, "lime");
+    showPopup("Reserved!", "lime", false, "lime", 400); //400 = for Delay of showing Popup
     playSuccessSound();
     closeBottomDrawer();
   }
@@ -1250,8 +1250,11 @@ function updateNowPlaying() {
       </div>
     `;
 
-    // Show Notify
-    showNotify("No upcoming song");
+    // Show Notify with 10s delay
+    setTimeout(() => {
+      showNotify("No upcoming song");
+    }, 10000);
+
     stopProgressChecker();
   } else {
     // Update the title only
@@ -1281,9 +1284,9 @@ function showTempNotify(message) {
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    playSlideSound(); // 🔊 play sound on hide
     notifyEl.classList.add('hide');
     setTimeout(() => notifyEl.remove(), 1500);
+    playSlideSound(); // 🔊 play sound on hide
   }
 }
 
@@ -1343,37 +1346,40 @@ function scheduleNextSongNotify(duration, currentTime) {
     
   let persistentPopupActive = false;
 
-function showPopup(message, color = 'magenta', persistent = false, glow = false) {
-  const popup = document.getElementById('popupModal');
-  const overlay = document.getElementById('popupOverlay');
+function showPopup(message, color = 'magenta', persistent = false, glow = false, delay = 0) {
+  setTimeout(() => {
+    const popup = document.getElementById('popupModal');
+    const overlay = document.getElementById('popupOverlay');
 
-  popup.textContent = message;
-  popup.style.color = 'white';
-  popup.classList.remove('glow-text', 'static-glow');
+    popup.textContent = message;
+    popup.style.color = 'white';
+    popup.classList.remove('glow-text', 'static-glow');
 
-  if (typeof glow === 'string') {
-    // Static glow with glow color = glow parameter
-    popup.style.setProperty('--glow-color', glow);
-    popup.classList.add('static-glow');
-  } else if (glow === true) {
-    // Animated glow with glow color = 'color' parameter
-    popup.style.setProperty('--glow-color', color);
-    popup.classList.add('glow-text');
-  }
+    if (typeof glow === 'string') {
+      // Static glow with glow color = glow parameter
+      popup.style.setProperty('--glow-color', glow);
+      popup.classList.add('static-glow');
+    } else if (glow === true) {
+      // Animated glow with glow color = 'color' parameter
+      popup.style.setProperty('--glow-color', color);
+      popup.classList.add('glow-text');
+    }
 
-  overlay.classList.add('visible');
-  popup.classList.add('show');
+    overlay.classList.add('visible');
+    popup.classList.add('show');
 
-  if (persistent) {
-    persistentPopupActive = true;
-  } else {
-    persistentPopupActive = false;
-    setTimeout(() => {
-      popup.classList.remove('show');
-      overlay.classList.remove('visible');
-    }, 800);
-  }
+    if (persistent) {
+      persistentPopupActive = true;
+    } else {
+      persistentPopupActive = false;
+      setTimeout(() => {
+        popup.classList.remove('show');
+        overlay.classList.remove('visible');
+      }, 800);
+    }
+  }, delay); // 👈 delay in ms (default 0 = instant)
 }
+
 
 function clearPersistentPopup() {
   if (persistentPopupActive) {
