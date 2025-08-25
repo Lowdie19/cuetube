@@ -843,11 +843,11 @@
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
-  <audio id="successSound" src="success.wav" preload="auto"
-    ></audio>
+  <audio id="successSound" src="success.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
+  <audio id="notifSound" src="notif.wav" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -1264,7 +1264,7 @@ function updateNowPlaying() {
 // Notify helper functions
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
-  playSlideSound(); // 🔊 play sound on show
+  playNotifSound(); // 🔊 play sound on show
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
@@ -1539,13 +1539,22 @@ function playTrashSound() {
     trash.play().catch((e) => console.log("trash sound blocked", e));
   }
 }
-
+  
 // Play slide sound
 function playSlideSound() {
   const slide = document.getElementById("slideSound");
   if (slide) {
     slide.currentTime = 0;
     slide.play().catch((e) => console.log("slide sound blocked", e));
+  }
+}
+
+// Play notif sound
+function playNotifSound() {
+  const notif = document.getElementById("notifSound");
+  if (notif) {
+    notif.currentTime = 0;
+    notif.play().catch((e) => console.log("notif sound blocked", e));
   }
 }
 
