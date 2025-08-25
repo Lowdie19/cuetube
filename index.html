@@ -1232,9 +1232,23 @@
 let progressChecker = null;
 let nextSongNotifyShown = false;
 
+// Track notify timers
+let notifyShowTimeout = null;
+let notifyHideTimeout = null;
+
 function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
   const current = queue[currentIndex];
+
+  // Cancel any pending notify timers (important when skipping songs)
+  if (notifyShowTimeout) {
+    clearTimeout(notifyShowTimeout);
+    notifyShowTimeout = null;
+  }
+  if (notifyHideTimeout) {
+    clearTimeout(notifyHideTimeout);
+    notifyHideTimeout = null;
+  }
 
   if (!current) return;
 
@@ -1250,9 +1264,15 @@ function updateNowPlaying() {
       </div>
     `;
 
-    // Show Notify with 10s delay
-    setTimeout(() => {
+    // Delay 10s before showing notify
+    notifyShowTimeout = setTimeout(() => {
       showNotify("No upcoming song");
+
+      // Auto-hide after 10s of being visible
+      notifyHideTimeout = setTimeout(() => {
+        hideNotify();
+      }, 10000);
+
     }, 10000);
 
     stopProgressChecker();
