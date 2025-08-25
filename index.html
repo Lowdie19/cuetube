@@ -1040,39 +1040,49 @@
   }
 
   async function reserveFromDrawer() {
-    clearPersistentPopup();
-    
-    const input = document.getElementById("youtubeInputDrawer");
-    const url = input.value.trim();
-    const videoId = extractVideoId(url);
-    
-    if (!videoId) {
-      input.value = "";
+  clearPersistentPopup();
+  
+  const input = document.getElementById("youtubeInputDrawer");
+  const url = input.value.trim();
+  const videoId = extractVideoId(url);
+  
+  if (!videoId) {
+    input.value = "";
+
+    // ❌ Delay error popup + sound by 0.8s
+    setTimeout(() => {
       showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
-      return;
-    }
-  
-    const title = await fetchTitle(videoId);
-    
-    // If it's the first video being added
-    if (queue.length === 0 && currentIndex === -1) {
-      queue.push({ id: videoId, title });
-      currentIndex = 0;
-      player.loadVideoById(videoId);
-      updateNowPlaying();
-      
-    } else {
-      // Add to the end of queue
-      queue.push({ id: videoId, title });
-    }
-    updateNowPlaying();
-    updateQueueDisplay();
-    input.value = "";
-    showPopup("Reserved!", "lime", false, "lime", 400); //400 = for Delay of showing Popup
-    playSuccessSound();
-    closeBottomDrawer();
+    }, 600);
+
+    return;
   }
+
+  const title = await fetchTitle(videoId);
+
+  // If it's the first video being added
+  if (queue.length === 0 && currentIndex === -1) {
+    queue.push({ id: videoId, title });
+    currentIndex = 0;
+    player.loadVideoById(videoId);
+    updateNowPlaying();
+  } else {
+    // Add to the end of queue
+    queue.push({ id: videoId, title });
+  }
+
+  updateNowPlaying();
+  updateQueueDisplay();
+  input.value = "";
+
+  // ✅ Delay success popup + sound by 0.8s
+  setTimeout(() => {
+    showPopup("Reserved!", "lime", false, "lime");
+    playSuccessSound();
+  }, 600);
+
+  closeBottomDrawer();
+}
 
   async function fetchTitle(videoId) {
     try {
