@@ -843,11 +843,11 @@
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
-  <audio id="successSound" src="success.wav" preload="auto"></audio>
+  <audio id="successSound" src="success.wav" preload="auto"
+    ></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
   <audio id="trashSound" src="trash.wav" preload="auto"></audio>
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
-  <audio id="notifSound" src="notif.wav" preload="auto"></audio>
   
   <!-- JS -->
   <script>
@@ -1264,7 +1264,7 @@ function updateNowPlaying() {
 // Notify helper functions
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
-  playNotifSound(); // 🔊 play sound on show
+  playSlideSound(); // 🔊 play sound on show
   document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
@@ -1355,7 +1355,7 @@ function showPopup(message, color = 'magenta', persistent = false, glow = false)
     // Static glow with glow color = glow parameter
     popup.style.setProperty('--glow-color', glow);
     popup.classList.add('static-glow');
-  } else i f (glow === true) {
+  } else if (glow === true) {
     // Animated glow with glow color = 'color' parameter
     popup.style.setProperty('--glow-color', color);
     popup.classList.add('glow-text');
@@ -1371,7 +1371,7 @@ function showPopup(message, color = 'magenta', persistent = false, glow = false)
     setTimeout(() => {
       popup.classList.remove('show');
       overlay.classList.remove('visible');
-    }, 1500);
+    }, 800);
   }
 }
 
@@ -1549,15 +1549,6 @@ function playSlideSound() {
   }
 }
 
-// Play notif sound
-function playNotifSound() {
-  const notif = document.getElementById("notifSound");
-  if (notif) {
-    notif.currentTime = 0;
-    notif.play().catch((e) => console.log("notif sound blocked", e));
-  }
-}
-
   document.querySelectorAll('.cyan-btn').forEach(btn => {
     btn.addEventListener('click', playClickSound);
   });
@@ -1675,18 +1666,3 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
   <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
