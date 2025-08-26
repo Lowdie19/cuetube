@@ -792,7 +792,7 @@
     <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
     
   <div class="url-group">
-    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" autocomplete="off" />
       <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
         <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
       </button>
@@ -849,9 +849,12 @@
   <audio id="slideSound" src="slide.wav" preload="auto"></audio>
   <audio id="notifSound" src="notif.wav" preload="auto"></audio>
   
-  <!-- JS -->
-  <script>
-  let overlayTouchStartX = 0;
+<!-- JS -->
+<script>
+// =====================
+// Global Variables
+// =====================
+let overlayTouchStartX = 0;
 let isLeftOverlayOpen = false;
 let touchStartX = 0;
 const drawer = document.getElementById('drawer');
@@ -859,19 +862,19 @@ const overlay = document.getElementById('drawerOverlay');
 const popupOverlay = document.getElementById("popupOverlay");
 const bottomDrawer = document.getElementById("bottomDrawer");
 
-// Handle touch start
+// =====================
+// Drawer Controls (Left Drawer)
+// =====================
 function handleTouchStart(evt) {
   touchStartX = evt.touches[0].clientX;
 }
 
-// Handle touch move
 function handleTouchMove(evt) {
   const deltaX = evt.touches[0].clientX - touchStartX;
   if (deltaX > 50) openDrawer();
   else if (deltaX < -50) closeDrawer();
 }
 
-// Handle tap outside
 function handleTap(evt) {
   if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
     closeDrawer();
@@ -897,10 +900,6 @@ function openDrawer() {
   document.getElementById("confirmDelete").style.display = "none";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateQueueDisplay();
-});
-
 function closeDrawer() {
   drawer.classList.remove('open');
   overlay.classList.remove('visible');
@@ -908,52 +907,50 @@ function closeDrawer() {
   bottomDrawerOverlay.classList.remove("visible");
   document.getElementById('drawerHandle').style.display = 'flex';
   document.getElementById("confirmDelete").style.display = "none";
+
+  // Restore focus to body so spacebar works again
+  document.activeElement.blur();
+  document.body.focus();
 }
 
+// =====================
+// Bottom Drawer Controls
+// =====================
 function closeBottomDrawer() {
   if (bottomDrawer.classList.contains("open")) {
     bottomDrawer.classList.remove("open");
     document.querySelector(".bottom-drawer-handle").style.display = "flex";
-    bottomDrawerOverlay.classList.remove("visible"); // hide overlay
+    bottomDrawerOverlay.classList.remove("visible");
+
+    // Restore focus to body
+    document.activeElement.blur();
+    document.body.focus();
   }
 }
 
-// Swipe close for left drawer
-overlay.addEventListener('touchstart', (e) => {
-  overlayTouchStartX = e.touches[0].clientX;
-});
-
-overlay.addEventListener('touchmove', (e) => {
-  const touchCurrentX = e.touches[0].clientX;
-  const deltaX = touchCurrentX - overlayTouchStartX;
-  if (deltaX < -50) closeDrawer(); // swipe left
-});
-
-// Toggle bottom drawer
 function toggleBottomDrawer() {
   const isOpen = bottomDrawer.classList.toggle("open");
   document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
   bottomDrawerOverlay.classList.toggle("visible", isOpen);
 
-  if (isOpen) {
-    // Close left drawer if open
-    if (drawer.classList.contains("open")) {
-      drawer.classList.remove("open");
-      drawerOverlay.classList.remove("visible");
-      document.getElementById('drawerHandle').style.display = 'flex';
-      document.getElementById("confirmDelete").style.display = "none";
-    }
+  if (isOpen && drawer.classList.contains("open")) {
+    drawer.classList.remove("open");
+    drawerOverlay.classList.remove("visible");
+    document.getElementById('drawerHandle').style.display = 'flex';
+    document.getElementById("confirmDelete").style.display = "none";
   } else {
     bottomDrawerOverlay.classList.remove("visible");
   }
 }
 
-bottomDrawerOverlay.onclick = function() {
+bottomDrawerOverlay.onclick = () => {
   if (drawer.classList.contains("open")) closeDrawer();
   if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
-// Swipe handling
+// =====================
+// Swipe Handling
+// =====================
 let startY = 0;
 document.body.addEventListener("touchstart", evt => {
   startY = evt.touches[0].clientY;
@@ -965,43 +962,69 @@ document.body.addEventListener("touchmove", evt => {
 
   if (isLeftOverlayOpen) {
     if (deltaY > 40) closeBottomDrawer();
-    return; // block bottom drawer open while left is open
+    return; // prevent bottom drawer opening if left drawer open
   }
 
   if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-    toggleBottomDrawer(); // swipe up to open
+    toggleBottomDrawer(); // swipe up
   } else if (deltaY > 40) {
-    closeBottomDrawer(); // swipe down always closes
+    closeBottomDrawer();   // swipe down
   }
 
   handleTouchMove(evt);
 });
 
+// Left drawer swipe
+overlay.addEventListener('touchstart', e => overlayTouchStartX = e.touches[0].clientX);
+overlay.addEventListener('touchmove', e => {
+  const deltaX = e.touches[0].clientX - overlayTouchStartX;
+  if (deltaX < -50) closeDrawer();
+});
+
+// =====================
 // Keyboard Shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.key === "ArrowUp") toggleBottomDrawer();     // Open/close bottom drawer
-  if (e.key === "ArrowDown") closeBottomDrawer();    // Force close bottom drawer
-  if (e.key === "ArrowRight") openDrawer();          // Open left drawer
-  if (e.key === "ArrowLeft") closeDrawer();          // Close left drawer
-  if (e.key === "Escape") {                          // Close everything
+// =====================
+document.addEventListener("keydown", e => {
+  // Spacebar: Play/Pause
+  if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+    e.preventDefault();
+    if (player && player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
+    else if (player) player.playVideo();
+    window.focus(); // keep arrow keys working
+  }
+
+  // Enter key: Reserve from URL input
+  if (e.key === "Enter" && e.target.id === "youtubeInputDrawer") {
+    e.preventDefault();
+    reserveFromDrawer();
+  }
+
+  // Drawer Navigation
+  if (e.key === "ArrowUp") toggleBottomDrawer();
+  if (e.key === "ArrowDown") closeBottomDrawer();
+  if (e.key === "ArrowRight") openDrawer();
+  if (e.key === "ArrowLeft") closeDrawer();
+  if (e.key === "Escape") {
     closeDrawer();
     closeBottomDrawer();
   }
 });
 
-  document.body.addEventListener("click", handleTap);
+// =====================
+// YouTube Player Setup
+// =====================
+let player;
+let queue = [];
+let currentIndex = -1;
 
-  let player;
-  let queue = [];
-  let currentIndex = -1;
-
-  if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 }
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
     events: {
       onReady: () => console.log("Player Ready"),
       onStateChange: onPlayerStateChange
@@ -1010,20 +1033,20 @@ document.addEventListener('keydown', (e) => {
   });
 }
 
- function onPlayerStateChange(event) {
+// =====================
+// YouTube Player State Change
+// =====================
+function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.ENDED) {
     const isLastVideo = currentIndex === queue.length - 1;
     if (queue.length === 0 || isLastVideo) {
-      hideNotify(); // 🔊 hides "No upcoming song" and plays sound
+      hideNotify();
       queue = [];
       currentIndex = -1;
-
       updateNowPlaying();
       updateQueueDisplay();
-
       player.stopVideo();
       player.clearVideo();
-
       showPopup("That's the last tune!", "magenta", true, true);
     } else {
       currentIndex++;
@@ -1031,47 +1054,41 @@ document.addEventListener('keydown', (e) => {
       updateNowPlaying();
       updateQueueDisplay();
     }
-  } else if (event.data === YT.PlayerState.PLAYING) {
-    startProgressChecker();
-  } else {
-    stopProgressChecker();
-  }
+  } else if (event.data === YT.PlayerState.PLAYING) startProgressChecker();
+  else stopProgressChecker();
 }
 
-  function extractVideoId(url) {
-    const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
-    return match ? match[1] : null;
-  }
+// =====================
+// Queue Management
+// =====================
+function extractVideoId(url) {
+  const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
+  return match ? match[1] : null;
+}
 
-  async function reserveFromDrawer() {
+async function reserveFromDrawer() {
   clearPersistentPopup();
-  
   const input = document.getElementById("youtubeInputDrawer");
   const url = input.value.trim();
   const videoId = extractVideoId(url);
-  
+
   if (!videoId) {
     input.value = "";
-
-    // ❌ Delay error popup + sound by 0.8s
     setTimeout(() => {
       showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
     }, 600);
-
     return;
   }
 
   const title = await fetchTitle(videoId);
 
-  // If it's the first video being added
   if (queue.length === 0 && currentIndex === -1) {
     queue.push({ id: videoId, title });
     currentIndex = 0;
     player.loadVideoById(videoId);
     updateNowPlaying();
   } else {
-    // Add to the end of queue
     queue.push({ id: videoId, title });
   }
 
@@ -1079,7 +1096,6 @@ document.addEventListener('keydown', (e) => {
   updateQueueDisplay();
   input.value = "";
 
-  // ✅ Delay success popup + sound by 0.8s
   setTimeout(() => {
     showPopup("Reserved!", "lime", false, "lime");
     playSuccessSound();
@@ -1088,64 +1104,22 @@ document.addEventListener('keydown', (e) => {
   closeBottomDrawer();
 }
 
-  async function fetchTitle(videoId) {
-    try {
-      const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-      const data = await res.json();
-      return data.title || videoId;
-    } catch (err) {
+async function fetchTitle(videoId) {
+  try {
+    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+    const data = await res.json();
+    return data.title || videoId;
+  } catch (err) {
     showPopup("⚠️ Oops! Try choosing\nanother video.", "red", false, "red");
     playErrorSound();
     return videoId;
   }
-  }
-
-  function showDeleteConfirm(e, index) {
-    const confirmBox = document.getElementById("confirmDelete");
-    const x = e.clientX || (e.touches && e.touches[0].clientX);
-    const y = e.clientY || (e.touches && e.touches[0].clientY);
-    confirmBox.style.left = `${x + 10}px`;
-    confirmBox.style.top = `${y}px`;
-    confirmBox.style.display = "block";
-
-    const yes = document.getElementById("yesBtn");
-    const no = document.getElementById("noBtn");
-
-    yes.onclick = () => {
-      queue.splice(index, 1);
-      confirmBox.style.display = "none";
-      updateQueueDisplay();
-      playTrashSound();
-    };
-
-    no.onclick = () => {
-      confirmBox.style.display = "none";
-    };
-  }
-
-  function playNextFromQueue() {
-  if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-    // ❌ Error case — delay error popup + sound by 0.8s
-    setTimeout(() => {
-      showPopup("No next song.", "red", true, true);
-      playErrorSound();
-    }, 600);
-    return;
-  }
-
-  currentIndex++;
-  player.loadVideoById(queue[currentIndex].id);
-  updateNowPlaying();
-  updateQueueDisplay();
-
-  // ✅ Success case — delay success popup + sound by 0.8s
-  setTimeout(() => {
-    showPopup("Next song!", "magenta", false, "magenta");
-    playSuccessSound();
-  }, 600);
 }
 
-  function updateQueueDisplay() {
+// =====================
+// Queue Display / Overflow
+// =====================
+function updateQueueDisplay() {
   const list = document.getElementById("nextList");
   const overflow = document.getElementById("overflowCounter");
   list.innerHTML = "";
@@ -1156,28 +1130,24 @@ document.addEventListener('keydown', (e) => {
     div.textContent = queue[i].title;
     div.style.cursor = "pointer";
 
-    let longPressTimer;
-    let longPressTriggered = false;
+    let longPressTimer, longPressTriggered = false;
 
-    const startHandler = (e) => {
+    const startHandler = e => {
       e.preventDefault();
       longPressTriggered = false;
       div.classList.add("long-pressing");
-
       longPressTimer = setTimeout(() => {
         longPressTriggered = true;
         navigator.vibrate?.(50);
         showDeleteConfirm(e, i);
       }, 500);
     };
-
     const endHandler = () => {
       if (!longPressTriggered) {
         clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
       }
     };
-
     const cancelHandler = () => {
       clearTimeout(longPressTimer);
       div.classList.remove("long-pressing");
@@ -1186,14 +1156,13 @@ document.addEventListener('keydown', (e) => {
     // Events for both mouse and touch
     div.addEventListener("mousedown", startHandler);
     div.addEventListener("touchstart", startHandler, { passive: false });
-
     div.addEventListener("mouseup", endHandler);
     div.addEventListener("mouseleave", cancelHandler);
     div.addEventListener("touchend", endHandler);
     div.addEventListener("touchcancel", cancelHandler);
 
-    // Optional: Right-click support for desktop
-    div.addEventListener("contextmenu", (e) => {
+    // Right-click support
+    div.addEventListener("contextmenu", e => {
       e.preventDefault();
       showDeleteConfirm(e, i);
     });
@@ -1211,50 +1180,15 @@ document.addEventListener('keydown', (e) => {
 
   const nextBox = document.querySelector('.next-box');
   const upcomingCount = queue.length - (currentIndex + 1);
-  
-  // Hide or show next-box based on upcoming songs
-  if (upcomingCount >= 1) {
-    nextBox.classList.remove('hidden');
-  } else {
-    nextBox.classList.add('hidden');
-  }
-  }
-    
-  document.addEventListener("DOMContentLoaded", () => {
-  updateQueueDisplay();
-});
+  if (upcomingCount >= 1) nextBox.classList.remove('hidden');
+  else nextBox.classList.add('hidden');
+}
 
-  function updateOverflowCounter() {
-    const list = document.getElementById("nextList");
-    const overflow = document.getElementById("overflowCounter");
-    if (!list || !overflow) return;
-
-    const totalHeight = list.scrollHeight;
-    const visibleHeight = list.clientHeight;
-    const scrollable = totalHeight > visibleHeight;
-
-    if (scrollable) {
-      const items = list.children;
-      let shown = 0;
-      let accHeight = 0;
-      for (let i = 0; i < items.length; i++) {
-        accHeight += items[i].offsetHeight;
-        if (accHeight < visibleHeight) shown++;
-      }
-      const remainingCount = items.length - shown;
-      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-      overflow.style.display = "block";
-    } else {
-      overflow.style.display = "none";
-    }
-  }
-
-    
-// ---- Notify Animation ----s //
+// =====================
+// Notify / Popup Handling
+// =====================
 let progressChecker = null;
 let nextSongNotifyShown = false;
-
-// Track notify timers
 let notifyShowTimeout = null;
 let notifyHideTimeout = null;
 
@@ -1262,15 +1196,8 @@ function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
   const current = queue[currentIndex];
 
-  // Cancel any pending notify timers when switching songs
-  if (notifyShowTimeout) {
-    clearTimeout(notifyShowTimeout);
-    notifyShowTimeout = null;
-  }
-  if (notifyHideTimeout) {
-    clearTimeout(notifyHideTimeout);
-    notifyHideTimeout = null;
-  }
+  if (notifyShowTimeout) { clearTimeout(notifyShowTimeout); notifyShowTimeout=null; }
+  if (notifyHideTimeout) { clearTimeout(notifyHideTimeout); notifyHideTimeout=null; }
 
   if (!current) return;
 
@@ -1278,72 +1205,45 @@ function updateNowPlaying() {
   let remaining = queue.length - (currentIndex + 1);
 
   if (remaining === 0) {
-    // Show in title area
-    nowTitleEl.innerHTML = `
-      <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
-      <div style="color: rgba(91, 24, 194, 1); font-family: Arial, sans-serif; font-weight: regular; opacity: 0.5; margin-top: 10px; font-size: 0.8em;">
-        No upcoming song . . .
-      </div>
-    `;
-
-    // Delay 10s before showing notify
+    nowTitleEl.innerHTML = `<span style="text-shadow:0 0 8px magenta,0 0 16px magenta;">${title}</span>
+      <div style="color: rgba(91, 24, 194, 1); font-family: Arial, sans-serif; font-weight: regular; opacity: 0.5; margin-top: 10px; font-size: 0.8em;">No upcoming song . . .</div>`;
     notifyShowTimeout = setTimeout(() => {
-      showNotify("No upcoming song"); // 🔊 sound plays here
-
-      // Auto-hide after 10s of being visible
-      notifyHideTimeout = setTimeout(() => {
-        hideNotify(); // 🔊 sound plays when hiding starts
-      }, 10000);
-
+      showNotify("No upcoming song");
+      notifyHideTimeout = setTimeout(hideNotify, 10000);
     }, 10000);
-
     stopProgressChecker();
   } else {
-    // Update the title only
-    nowTitleEl.innerHTML = `<span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>`;
+    nowTitleEl.innerHTML = `<span style="text-shadow:0 0 8px magenta,0 0 16px magenta;">${title}</span>`;
     hideNotify();
     startProgressChecker();
   }
 }
 
-// Notify helper functions
 function showNotify(message) {
-  hideNotify(); // remove any existing notify first
-  document.getElementById("nowPlayingCopy").innerHTML = `
-    <div class="Notify">
-      <div class="line"></div>
-      <div class="text">${message}</div>
-    </div>
-  `;
-  playNotifSound(); // 🔊 play sound exactly when shown
-}
-
-function showTempNotify(message) {
-  showNotify(message); // sound plays here
-  setTimeout(() => hideNotify(), 10000); // auto-hide after 10s
+  hideNotify();
+  document.getElementById("nowPlayingCopy").innerHTML = `<div class="Notify"><div class="line"></div><div class="text">${message}</div></div>`;
+  playNotifSound();
 }
 
 function hideNotify() {
   const notifyEl = document.querySelector('.Notify');
   if (notifyEl) {
-    playSlideSound(); // 🔊 play sound right when hide starts
+    playSlideSound();
     notifyEl.classList.add('hide');
-    setTimeout(() => notifyEl.remove(), 1500); // remove after animation
+    setTimeout(() => notifyEl.remove(), 1500);
   }
 }
 
-// Progress checking for "Up next"
+// =====================
+// Progress Checker
+// =====================
 function startProgressChecker() {
-  if (progressChecker) return; // already running
+  if (progressChecker) return;
   nextSongNotifyShown = false;
   progressChecker = setInterval(() => {
     const currentTime = player.getCurrentTime();
     const duration = player.getDuration();
-
-    if (!nextSongNotifyShown) {
-      const shown = scheduleNextSongNotify(duration, currentTime);
-      if (shown) nextSongNotifyShown = true;
-    }
+    if (!nextSongNotifyShown && scheduleNextSongNotify(duration, currentTime)) nextSongNotifyShown = true;
   }, 1000);
 }
 
@@ -1353,56 +1253,40 @@ function stopProgressChecker() {
 }
 
 function scheduleNextSongNotify(duration, currentTime) {
-  const secondsBeforeEnd = 20; // how early to show upnext
+  const secondsBeforeEnd = 20;
   const timeRemaining = duration - currentTime;
 
   if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
     const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
-
-    const messageHTML = `
-      <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
-        <span style="
-          font-family: Arial, sans-serif;
-          font-weight: normal;
-          font-size: 0.7em; 
-          color: grey; 
-          margin-bottom: 4px;
-        ">Up next:</span>
-        <span style="
-          font-family: Arial, sans-serif;
-          font-weight: bold;
-          font-size: 1.0em;
-          word-wrap: break-word;
-        ">${nextSongTitle}</span>
-      </div>
-    `;
-
-    showTempNotify(messageHTML); // plays notif sound on show, slide sound on hide
+    const messageHTML = `<div style="display:flex;flex-direction:column;white-space:normal;max-width:90%;">
+      <span style="font-family:Arial,sans-serif;font-weight:normal;font-size:0.7em;color:grey;margin-bottom:4px;">Up next:</span>
+      <span style="font-family:Arial,sans-serif;font-weight:bold;font-size:1.0em;word-wrap:break-word;">${nextSongTitle}</span>
+      </div>`;
+    showTempNotify(messageHTML);
     return true;
   }
   return false;
 }
-// ---- Notify Animation ----e //
 
+function showTempNotify(message) { showNotify(message); setTimeout(hideNotify,10000); }
 
-    
-  let persistentPopupActive = false;
-
-function showPopup(message, color = 'magenta', persistent = false, glow = false, delay = 0) {
+// =====================
+// Popup Modal Handling
+// =====================
+let persistentPopupActive = false;
+function showPopup(message, color='magenta', persistent=false, glow=false, delay=0) {
   setTimeout(() => {
     const popup = document.getElementById('popupModal');
     const overlay = document.getElementById('popupOverlay');
 
     popup.textContent = message;
     popup.style.color = 'white';
-    popup.classList.remove('glow-text', 'static-glow');
+    popup.classList.remove('glow-text','static-glow');
 
     if (typeof glow === 'string') {
-      // Static glow with glow color = glow parameter
       popup.style.setProperty('--glow-color', glow);
       popup.classList.add('static-glow');
-    } else if (glow === true) {
-      // Animated glow with glow color = 'color' parameter
+    } else if (glow===true) {
       popup.style.setProperty('--glow-color', color);
       popup.classList.add('glow-text');
     }
@@ -1410,315 +1294,109 @@ function showPopup(message, color = 'magenta', persistent = false, glow = false,
     overlay.classList.add('visible');
     popup.classList.add('show');
 
-    if (persistent) {
-      persistentPopupActive = true;
-    } else {
+    if (persistent) persistentPopupActive = true;
+    else {
       persistentPopupActive = false;
       setTimeout(() => {
         popup.classList.remove('show');
         overlay.classList.remove('visible');
       }, 800);
     }
-  }, delay); // 👈 delay in ms (default 0 = instant)
+  }, delay);
 }
-
 
 function clearPersistentPopup() {
   if (persistentPopupActive) {
     const popup = document.getElementById('popupModal');
     const overlay = document.getElementById('popupOverlay');
-    popup.classList.remove('show');
+    popup.classList.remove('show','glow-text');
     overlay.classList.remove('visible');
-    popup.classList.remove('glow-text'); // remove glow when clearing
     persistentPopupActive = false;
   }
 }
 
-  (function enableDragScroll() {
-    const box = document.querySelector('.next-box');
-    let isDown = false;
-    let startY, scrollTop;
+// =====================
+// Sound Functions
+// =====================
+function playClickSound() { const click=document.getElementById("clickSound"); if(click){click.currentTime=0; click.play().catch(e=>console.log("Click sound blocked",e)); } }
+function playSuccessSound() { const success=document.getElementById("successSound"); if(success){success.currentTime=0; success.play().catch(e=>console.log("Success sound blocked",e)); } }
+function playErrorSound() { const error=document.getElementById("errorSound"); if(error){error.currentTime=0; error.play().catch(e=>console.log("Error sound blocked",e)); } }
+function playTrashSound() { const trash=document.getElementById("trashSound"); if(trash){trash.currentTime=0; trash.play().catch(e=>console.log("Trash sound blocked",e)); } }
+function playSlideSound() { const slide=document.getElementById("slideSound"); if(slide){slide.currentTime=0; slide.play().catch(e=>console.log("Slide sound blocked",e)); } }
+function playNotifSound() { const notif=document.getElementById("notifSound"); if(notif){notif.currentTime=0; notif.play().catch(e=>console.log("Notif sound blocked",e)); } }
 
-    box.addEventListener('mousedown', (e) => {
-      isDown = true;
-      box.classList.add('dragging');
-      startY = e.pageY - box.offsetTop;
-      scrollTop = box.scrollTop;
-    });
-    box.addEventListener('mouseleave', () => {
-      isDown = false;
-      box.classList.remove('dragging');
-    });
-    box.addEventListener('mouseup', () => {
-      isDown = false;
-      box.classList.remove('dragging');
-    });
-    box.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const y = e.pageY - box.offsetTop;
-      const walk = (y - startY);
-      box.scrollTop = scrollTop - walk;
-    });
+// =====================
+// Miscellaneous / Helpers
+// =====================
+document.body.addEventListener("click", handleTap);
 
-    let startYTouch = 0, scrollTopTouch = 0;
-    box.addEventListener("touchstart", e => {
-      startYTouch = e.touches[0].clientY;
-      scrollTopTouch = box.scrollTop;
-    }, { passive: true });
-
-    box.addEventListener("touchmove", e => {
-      const y = e.touches[0].clientY;
-      const walk = y - startYTouch;
-      box.scrollTop = scrollTopTouch - walk;
-    }, { passive: true });
-  })();
-
-  document.getElementById("popupOverlay").onclick = () => {
-    const popup = document.getElementById("popupModal");
-    popup.classList.remove("show");
-    document.getElementById("popupOverlay").classList.remove("visible");
-    persistentPopupActive = false;
-  };
-
-  document.body.addEventListener("click", () => {
-    const confirm = document.getElementById("confirmDelete");
-    if (confirm.style.display !== "none") {
-      confirm.style.display = "none";
-    }
-  });
-    
-  window.onload = () => {
-    hideNextConfirm();
-  };
-    
-  function showNextConfirm() {
-  const messages = [
-    "Ready to jump to the next song?",
-    "Skip this one and move on?",
-    "Next up? Let's go!",
-    "Want to move to the next jam?",
-    "Time to switch it up?"
-  ];
-  const random = messages[Math.floor(Math.random() * messages.length)];
-
-  const textEl = document.getElementById("nextConfirmText");
-  const overlay = document.getElementById("nextConfirmOverlay");
-  const modal = document.getElementById("nextConfirmModal");
-
-  textEl.innerText = random;
-  overlay.style.display = "block";
-  modal.style.display = "inline-block";  // show modal sized to content
-}
-
-function hideNextConfirm() {
-  document.getElementById("nextConfirmOverlay").style.display = "none";
-  document.getElementById("nextConfirmModal").style.display = "none";
-}
-
-function confirmPlayNext() {
-  hideNextConfirm();
-  playNextFromQueue();
-}
-
-// Show Exit Modal
-  function showExitConfirm() {
-    document.getElementById("exitConfirmOverlay").style.display = "block";
-    document.getElementById("exitConfirmModal").style.display = "block";
-    playErrorSound();
-  }
-
-  // Hide Exit Modal
-  function hideExitConfirm() {
-    document.getElementById("exitConfirmOverlay").style.display = "none";
-    document.getElementById("exitConfirmModal").style.display = "none";
-  }
-
-  // Android/WebView Back Button Handler
-  window.addEventListener("load", () => {
-    history.pushState(null, document.title, location.href);
-  });
-
-  window.addEventListener("popstate", function (e) {
-    showExitConfirm();
-    history.pushState(null, document.title, location.href);
-  });
-
-  // PC/Browser close confirmation
-  window.addEventListener("beforeunload", function (e) {
-    e.preventDefault();
-    e.returnValue = "";
-  });
-
-    
-
-  // Play click sound
-function playClickSound() {
-  const click = document.getElementById("clickSound");
-  if (click) {
-    click.currentTime = 0;
-    click.play().catch((e) => console.log("Click sound blocked", e));
-  }
-}
-
-// Play success sound
-function playSuccessSound() {
-  const success = document.getElementById("successSound");
-  if (success) {
-    success.currentTime = 0;
-    success.play().catch((e) => console.log("Success sound blocked", e));
-  }
-}
-
-// Play error sound
-function playErrorSound() {
-  const error = document.getElementById("errorSound");
-  if (error) {
-    error.currentTime = 0;
-    error.play().catch((e) => console.log("Error sound blocked", e));
-  }
-}
-    
-// Play trash sound
-function playTrashSound() {
-  const trash = document.getElementById("trashSound");
-  if (trash) {
-    trash.currentTime = 0;
-    trash.play().catch((e) => console.log("trash sound blocked", e));
-  }
-}
-  
-// Play slide sound
-function playSlideSound() {
-  const slide = document.getElementById("slideSound");
-  if (slide) {
-    slide.currentTime = 0;
-    slide.play().catch((e) => console.log("slide sound blocked", e));
-  }
-}
-
-// Play notif sound
-function playNotifSound() {
-  const notif = document.getElementById("notifSound");
-  if (notif) {
-    notif.currentTime = 0;
-    notif.play().catch((e) => console.log("notif sound blocked", e));
-  }
-}
-
-  document.querySelectorAll('.cyan-btn').forEach(btn => {
-    btn.addEventListener('click', playClickSound);
-  });
-    
-  window.addEventListener("beforeunload", function (e) {
-  e.preventDefault();
-  e.returnValue = "";
+// Glow effect for URL input
+const youtubeInput = document.getElementById("youtubeInputDrawer");
+youtubeInput.addEventListener("input", () => {
+  if (youtubeInput.value.trim()) youtubeInput.classList.add("glow");
+  else youtubeInput.classList.remove("glow");
 });
 
-// Intercept Android back button using history
-window.addEventListener("load", () => {
-// Push dummy history state to trap the back button
-  history.pushState(null, document.title, location.href);
-});
-    
-window.addEventListener("popstate", function (e) {
-// Show confirmation instead of exiting
-  showExitConfirm();
-// Re-push the dummy state so user must confirm before exiting
-  history.pushState(null, document.title, location.href);
-});
-
-    function enterFullScreenIfLandscape() {
-    const isLandscape = window.innerWidth > window.innerHeight;
-
-    if (isLandscape && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.warn("Fullscreen failed:", err);
-      });
-    } else if (!isLandscape && document.fullscreenElement) {
-      document.exitFullscreen().catch((err) => {
-        console.warn("Exit fullscreen failed:", err);
-      });
-    }
-  }
-
-  window.addEventListener("resize", enterFullScreenIfLandscape);
-  window.addEventListener("orientationchange", enterFullScreenIfLandscape);
-  enterFullScreenIfLandscape();
-    
-    // Optional: manual trigger on user click (some browsers require gesture)
-    document.addEventListener("click", goFullscreenIfLandscape);
-
-  async function pasteFromClipboard() {
-  playClickSound(); // Play click sound immediately
-
+// Paste from clipboard with auto-reserve
+async function pasteFromClipboard() {
+  playClickSound();
   try {
     const text = await navigator.clipboard.readText();
     const input = document.getElementById("youtubeInputDrawer");
     input.value = text;
-
     const videoId = extractVideoId(text);
-
     if (!videoId) {
       input.value = "";
       showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
     } else {
-      input.dispatchEvent(new Event("input")); // Trigger glow if needed
-      await reserveFromDrawer(); // ✅ Auto-reserve if valid
+      input.dispatchEvent(new Event("input"));
+      await reserveFromDrawer();
     }
-  } catch (err) {
+  } catch(err) {
     showPopup("⚠️ Failed!\nPaste manually.", "red", true, "red");
     playErrorSound();
-    console.error("Clipboard error:", err);
+    console.error("Clipboard error:",err);
   }
 }
 
-  function adjustForKeyboard() {
-    const drawer = document.getElementById('bottomDrawer');
-    const isLandscape = window.innerWidth > window.innerHeight;
+// =====================
+// Fullscreen / Orientation Handling
+// =====================
+function enterFullScreenIfLandscape() {
+  const isLandscape = window.innerWidth > window.innerHeight;
+  if (isLandscape && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(err=>console.warn("Fullscreen failed:",err));
+  else if (!isLandscape && document.fullscreenElement) document.exitFullscreen().catch(err=>console.warn("Exit fullscreen failed:",err));
+}
 
-    if (!window.visualViewport || !isLandscape) {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = '25px';
-      return;
-    }
+window.addEventListener("resize", enterFullScreenIfLandscape);
+window.addEventListener("orientationchange", enterFullScreenIfLandscape);
+enterFullScreenIfLandscape();
+document.addEventListener("click", goFullscreenIfLandscape);
 
-    const vp = window.visualViewport;
-    const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
-
-    if (keyboardHeight > 100) {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = `${keyboardHeight + 20}px`;
-    } else {
-      drawer.style.transition = 'padding-bottom 0.25s ease';
-      drawer.style.paddingBottom = '25px';
-    }
+// =====================
+// Keyboard Adjustment for Mobile
+// =====================
+function adjustForKeyboard() {
+  const drawer = document.getElementById('bottomDrawer');
+  const isLandscape = window.innerWidth > window.innerHeight;
+  if (!window.visualViewport || !isLandscape) {
+    drawer.style.transition = 'padding-bottom 0.25s ease';
+    drawer.style.paddingBottom = '25px';
+    return;
   }
+  const vp = window.visualViewport;
+  const keyboardHeight = window.innerHeight - vp.height - vp.offsetTop;
+  drawer.style.transition = 'padding-bottom 0.25s ease';
+  drawer.style.paddingBottom = keyboardHeight>100 ? `${keyboardHeight+20}px` : '25px';
+}
 
-  if (window.visualViewport) {
-    visualViewport.addEventListener("resize", adjustForKeyboard);
-    visualViewport.addEventListener("scroll", adjustForKeyboard);
-  }
-
-  window.addEventListener("orientationchange", () => {
-    setTimeout(adjustForKeyboard, 200); // Give time for reflow
-  });
-
-  // Initial call in case landscape is already active
-  window.addEventListener("DOMContentLoaded", adjustForKeyboard);
-
- // Glow the URL box
-const youtubeInput = document.getElementById("youtubeInputDrawer");
-
-  youtubeInput.addEventListener("input", () => {
-    if (youtubeInput.value.trim()) {
-      youtubeInput.classList.add("glow");
-    } else {
-      youtubeInput.classList.remove("glow");
-    }
-  });
-
+if (window.visualViewport) {
+  visualViewport.addEventListener("resize", adjustForKeyboard);
+  visualViewport.addEventListener("scroll", adjustForKeyboard);
+}
+window.addEventListener("orientationchange", ()=>setTimeout(adjustForKeyboard,200));
+window.addEventListener("DOMContentLoaded", adjustForKeyboard);
 
   </script>
   <script src="https://www.youtube.com/iframe_api"></script>
