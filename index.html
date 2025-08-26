@@ -1068,7 +1068,7 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
   if (event.data === YT.PlayerState.ENDED) {
     const isLastVideo = currentIndex === queue.length - 1;
     if (queue.length === 0 || isLastVideo) {
-      hideNotify(); // 🔊 hides "No upcoming song" and plays sound
+      hideNotify(); //🔊 hides "No upcoming song" and plays sound
       queue = [];
       currentIndex = -1;
 
@@ -1085,9 +1085,18 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
       updateNowPlaying();
       updateQueueDisplay();
     }
-  } else if (event.data === YT.PlayerState.PLAYING) {
+  } 
+  else if (event.data === YT.PlayerState.PLAYING) {
+    // 🎬 Hide "Paused" popup if it exists
+    clearPersistentPopup();
     startProgressChecker();
-  } else {
+  } 
+  else if (event.data === YT.PlayerState.PAUSED) {
+    // ⏸ Show "Paused" popup (persistent until play resumes)
+    showPopup("Paused", "yellow", true, "yellow");
+    stopProgressChecker();
+  } 
+  else {
     stopProgressChecker();
   }
 }
