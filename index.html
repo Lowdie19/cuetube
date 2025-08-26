@@ -851,38 +851,51 @@
   
   <!-- JS -->
   <script>
+// =====================
+// Drawer & Overlay Setup
+// =====================
 let overlayTouchStartX = 0;
 let isLeftOverlayOpen = false;
 let touchStartX = 0;
+
+// Drawer elements
 const drawer = document.getElementById('drawer');
 const overlay = document.getElementById('drawerOverlay');
 const popupOverlay = document.getElementById("popupOverlay");
 const bottomDrawer = document.getElementById("bottomDrawer");
 
-// Handle touch start
+// =====================
+// Touch Handlers
+// =====================
+
+// Track initial X position when touch starts
 function handleTouchStart(evt) {
   touchStartX = evt.touches[0].clientX;
 }
 
-// Handle touch move
+// Track movement to swipe left/right for drawer
 function handleTouchMove(evt) {
   const deltaX = evt.touches[0].clientX - touchStartX;
   if (deltaX > 50) openDrawer();
   else if (deltaX < -50) closeDrawer();
 }
 
-// Handle tap outside
+// Tap outside left drawer closes it
 function handleTap(evt) {
   if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
     closeDrawer();
   }
 }
 
+// =====================
+// Drawer Toggle Functions
+// =====================
 function toggleDrawer() {
   if (drawer.classList.contains("open")) closeDrawer();
   else openDrawer();
 }
 
+// Open left drawer
 function openDrawer() {
   // Close bottom drawer if open
   if (bottomDrawer.classList.contains("open")) {
@@ -897,10 +910,7 @@ function openDrawer() {
   document.getElementById("confirmDelete").style.display = "none";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateQueueDisplay();
-});
-
+// Close left drawer
 function closeDrawer() {
   drawer.classList.remove('open');
   overlay.classList.remove('visible');
@@ -908,17 +918,28 @@ function closeDrawer() {
   bottomDrawerOverlay.classList.remove("visible");
   document.getElementById('drawerHandle').style.display = 'flex';
   document.getElementById("confirmDelete").style.display = "none";
+
+  // Restore focus to body so keyboard shortcuts (like SPACEBAR) still work
+  document.activeElement.blur();
+  document.body.focus();
 }
 
+// Close bottom drawer
 function closeBottomDrawer() {
   if (bottomDrawer.classList.contains("open")) {
     bottomDrawer.classList.remove("open");
     document.querySelector(".bottom-drawer-handle").style.display = "flex";
-    bottomDrawerOverlay.classList.remove("visible"); // hide overlay
+    bottomDrawerOverlay.classList.remove("visible");
+
+    // Restore focus to body
+    document.activeElement.blur();
+    document.body.focus();
   }
 }
 
-// Swipe close for left drawer
+// =====================
+// Swipe to Close Left Drawer
+// =====================
 overlay.addEventListener('touchstart', (e) => {
   overlayTouchStartX = e.touches[0].clientX;
 });
@@ -926,10 +947,12 @@ overlay.addEventListener('touchstart', (e) => {
 overlay.addEventListener('touchmove', (e) => {
   const touchCurrentX = e.touches[0].clientX;
   const deltaX = touchCurrentX - overlayTouchStartX;
-  if (deltaX < -50) closeDrawer(); // swipe left
+  if (deltaX < -50) closeDrawer(); // swipe left to close
 });
 
-// Toggle bottom drawer
+// =====================
+// Bottom Drawer Toggle
+// =====================
 function toggleBottomDrawer() {
   const isOpen = bottomDrawer.classList.toggle("open");
   document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
@@ -948,12 +971,15 @@ function toggleBottomDrawer() {
   }
 }
 
+// Click on bottom overlay closes drawers
 bottomDrawerOverlay.onclick = function() {
   if (drawer.classList.contains("open")) closeDrawer();
   if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
-// Swipe handling
+// =====================
+// Vertical Swipe Handling
+// =====================
 let startY = 0;
 document.body.addEventListener("touchstart", evt => {
   startY = evt.touches[0].clientY;
@@ -965,37 +991,38 @@ document.body.addEventListener("touchmove", evt => {
 
   if (isLeftOverlayOpen) {
     if (deltaY > 40) closeBottomDrawer();
-    return; // block bottom drawer open while left is open
+    return; // prevent bottom drawer while left is open
   }
 
   if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-    toggleBottomDrawer(); // swipe up to open
+    toggleBottomDrawer(); // swipe up to open bottom drawer
   } else if (deltaY > 40) {
     closeBottomDrawer(); // swipe down always closes
   }
 
-  handleTouchMove(evt);
+  handleTouchMove(evt); // handle left/right swipe
 });
 
+// =====================
 // Keyboard Shortcuts
+// =====================
 document.addEventListener('keydown', (e) => {
-  // Prevent shortcuts while typing
-  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
-    return;
-  }
+  // Ignore shortcuts when typing in input or textarea
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
+  // Drawer arrow controls
   if (e.key === "ArrowUp") toggleBottomDrawer();     // Open/close bottom drawer
-  if (e.key === "ArrowDown") closeBottomDrawer();    // Force close bottom drawer
+  if (e.key === "ArrowDown") closeBottomDrawer();    // Close bottom drawer
   if (e.key === "ArrowRight") openDrawer();          // Open left drawer
   if (e.key === "ArrowLeft") closeDrawer();          // Close left drawer
-  if (e.key === "Escape") {                          // Close everything
+  if (e.key === "Escape") {                          // Close all drawers
     closeDrawer();
     closeBottomDrawer();
   }
 
-  // SPACEBAR = toggle play/pause YouTube video
+  // Spacebar: Play / Pause YouTube video
   if (e.code === "Space") {
-    e.preventDefault(); // prevent page scrolling
+    e.preventDefault(); // prevent page scroll
     if (player && player.getPlayerState) {
       if (player.getPlayerState() === YT.PlayerState.PLAYING) {
         player.pauseVideo();
@@ -1006,10 +1033,13 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// =====================
+// URL Input Enter Key
+// =====================
 document.getElementById("youtubeInputDrawer").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
-    e.preventDefault(); // para hindi mag-submit or mag-refresh
-    reserveFromDrawer(); // tawagin yung reserve function
+    e.preventDefault(); // prevent form submission / page refresh
+    reserveFromDrawer(); // trigger reserve function
   }
 });
 
