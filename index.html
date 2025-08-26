@@ -1099,41 +1099,43 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
 
   async function reserveFromDrawer() {
   clearPersistentPopup();
-  
+
   const input = document.getElementById("youtubeInputDrawer");
   const url = input.value.trim();
   const videoId = extractVideoId(url);
-  
+
   if (!videoId) {
     input.value = "";
-
-    // ❌ Delay error popup + sound by 0.8s
+    // ❌ Delay error popup + sound by 0.6s
     setTimeout(() => {
       showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
       playErrorSound();
     }, 600);
-
     return;
   }
 
   const title = await fetchTitle(videoId);
 
-  // If it's the first video being added
+  // =====================
+  // AUTO PLAY FIRST VIDEO
+  // =====================
   if (queue.length === 0 && currentIndex === -1) {
     queue.push({ id: videoId, title });
     currentIndex = 0;
+
+    // Auto-load and play the first video
     player.loadVideoById(videoId);
+    player.playVideo(); // ✅ ensure it auto-plays
     updateNowPlaying();
   } else {
-    // Add to the end of queue
+    // Add to the end of queue without playing
     queue.push({ id: videoId, title });
   }
 
-  updateNowPlaying();
   updateQueueDisplay();
   input.value = "";
 
-  // ✅ Delay success popup + sound by 0.8s
+  // ✅ Delay success popup + sound by 0.6s
   setTimeout(() => {
     showPopup("Reserved!", "lime", false, "lime");
     playSuccessSound();
