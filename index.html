@@ -281,7 +281,23 @@
     }
     .drawer-overlay.visible { display: block; }
 
-  
+    .youtube-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 50vh; /* 50% of the screen height */
+      padding: 0;
+      margin: 0;
+    }
+    
+    .youtube-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
     .url-group {
       display: flex;
       justify-content: center;
@@ -469,106 +485,20 @@
     .paste-btn-icon:active img {
       filter: drop-shadow(0 0 5px magenta);
     }
-
-
-
     
-    .youtube-wrapper {
-      position: relative;
-      width: 100%;          
-      max-width: 100vw;     
-      aspect-ratio: 16 / 9; /* keep 16:9 ratio */
-      margin: 0 auto;
-      background: black;
-    
-      /* 🔑 leave safe space for bottom drawer */
-      margin-bottom: 160px; /* equal to bottom drawer’s height */
-      box-sizing: content-box;
-    }
-    
-    .youtube-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;   
-      height: 100%;
-      border: none;
-    }
-    
-/* Portrait mode: normal layout */
-@media (orientation: portrait) {
-  .youtube-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 100vw;
-    aspect-ratio: 16 / 9;
-    margin: 0 auto;
-    background: black;
-    margin-bottom: 160px; /* space for bottom drawer */
-  }
-
-  .youtube-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  .title-bar {
-    display: flex;
-  }
-
-  .bottom-drawer,
-  .bottom-drawer-handle {
-    display: flex;
-  }
-}
-
-    
-  /* Landscape mode: fullscreen video */
-  @media (orientation: landscape) {
-    .youtube-wrapper {
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      margin: 0;
-      padding: 0;
-    }
-  
-    .youtube-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-    }
-  
-    /* 🔒 Hide title bar & bottom drawer visually */
-    .title-bar,
-    .bottom-drawer,
-    .bottom-drawer-handle {
-      display: none !important;
-    }
-  }
-
-
-    
- /*  ----------
-     @media (orientation: landscape) {
+    @media (orientation: landscape) {
       .youtube-wrapper {
         height: 75vh;
       }
       .drawer {
-        height: 100vh; /* Full screen height in landscape 
-        justify-content: space-between; /* Keep space for top + bottom parts 
-        padding-bottom: 20px; /* Add some space at the bottom 
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
       }
       .url-input, .search-bar {
-        display: block; /* Make sure it's visible 
+        display: block; /* Make sure it's visible */
       }
-    } 
+    }
     
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
@@ -591,22 +521,6 @@
     @media (max-height: 500px) {
       .bottom-buttons { position: static; margin-top: 20px; }
     }
-
-
-    
-  @media screen and (orientation: landscape) and (max-width: 900px) {
-      .youtube-wrapper {
-        height: 100vh;
-        margin: 0;
-      }
-      body, html {
-        overflow: hidden;
-      }
-    }
-    --------- */
-
-
-    
     
     #popupOverlay {
       position: fixed;
@@ -670,8 +584,6 @@
       box-shadow: 0 0 10px red;
     }
 
-
-    
     /* For URL box ---s */
     input[type="text"]::placeholder {
       color: white;
@@ -696,9 +608,15 @@
       border: 2px solid magenta;
     }  /* For URL box ---e */
 
-
-    
-  
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
     .nextConfirmModal {
       /* only one display here */
       display: inline-block;  /* size to content */
@@ -1601,14 +1519,6 @@ function clearPersistentPopup() {
     persistentPopupActive = false;
   }
 }
-
-// Tap anywhere to clear persistent popup and resume video if paused
-document.body.addEventListener("click", () => {
-  if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
-    player.playVideo();
-  }
-  clearPersistentPopup();
-});
 // ---- PopUps ----e // 
 
   (function enableDragScroll() {
