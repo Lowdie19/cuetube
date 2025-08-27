@@ -1527,7 +1527,31 @@ document.body.addEventListener("click", () => {
   }
   clearPersistentPopup();
 });
-// ---- PopUps ----e // 
+
+
+// =====================
+// Landscape
+// ===================== 
+function handleOrientationChange() {
+  const playerWrapper = document.querySelector(".youtube-wrapper");
+
+  if (window.matchMedia("(orientation: landscape)").matches) {
+    // Landscape → make video fill screen (but no forced fullscreen)
+    playerWrapper.style.height = "100vh";
+    playerWrapper.style.width = "100vw";
+  } else {
+    // Portrait → restore to normal size
+    playerWrapper.style.height = "50vh";
+    playerWrapper.style.width = "100%";
+  }
+}
+
+// Run once on load
+document.addEventListener("DOMContentLoaded", handleOrientationChange);
+
+// Run on orientation change
+window.addEventListener("orientationchange", handleOrientationChange);
+// ---- Landscape ----e // 
 
   (function enableDragScroll() {
     const box = document.querySelector('.next-box');
@@ -1723,26 +1747,7 @@ window.addEventListener("popstate", function (e) {
   history.pushState(null, document.title, location.href);
 });
 
-    function enterFullScreenIfLandscape() {
-    const isLandscape = window.innerWidth > window.innerHeight;
-
-    if (isLandscape && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.warn("Fullscreen failed:", err);
-      });
-    } else if (!isLandscape && document.fullscreenElement) {
-      document.exitFullscreen().catch((err) => {
-        console.warn("Exit fullscreen failed:", err);
-      });
-    }
-  }
-
-  window.addEventListener("resize", enterFullScreenIfLandscape);
-  window.addEventListener("orientationchange", enterFullScreenIfLandscape);
-  enterFullScreenIfLandscape();
-    
-    // Optional: manual trigger on user click (some browsers require gesture)
-    document.addEventListener("click", goFullscreenIfLandscape);
+ 
 
   async function pasteFromClipboard() {
   playClickSound(); // Play click sound immediately
