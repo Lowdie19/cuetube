@@ -524,31 +524,69 @@
       }
     }
 
+
+    
+.youtube-wrapper {
+  position: relative; /* always */
+  width: 100%;
+  max-width: 100vw;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  background: black;
+}
+
+/* Portrait mode: normal layout */
+@media (orientation: portrait) {
+  .youtube-wrapper {
+    aspect-ratio: 16 / 9;
+    margin-bottom: 160px; /* space for bottom drawer */
+    height: auto; /* let aspect-ratio control */
+  }
+
+  .youtube-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .title-bar {
+    display: flex;
+  }
+
+  .bottom-drawer,
+  .bottom-drawer-handle {
+    display: flex;
+  }
+}
+    
 /* Landscape mode: fullscreen video */
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        width: 100vw;
-        height: 100vh;
-        aspect-ratio: auto;
-        margin: 0;
-        padding: 0;
-      }
-    
-      .youtube-wrapper iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-      }
-    
-      /* 🔒 Hide title bar & bottom drawer visually */
-      .title-bar,
-      .bottom-drawer,
-      .bottom-drawer-handle {
-        display: none !important;
-      }
-    }
+@media (orientation: landscape) {
+  .youtube-wrapper {
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto; /* disable */
+    margin: 0;
+    padding: 0;
+  }
+
+  .youtube-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .title-bar,
+  .bottom-drawer,
+  .bottom-drawer-handle {
+    display: none !important;
+  }
+}
+
+
 
     
     /*@media screen and (orientation: landscape) and (max-width: 900px) {
