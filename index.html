@@ -1450,8 +1450,8 @@ function scheduleNextSongNotify(duration, currentTime) {
 // ---- Notify Animation ----e //
 
 
-    
-  let persistentPopupActive = false;
+// ---- PopUps ----s //    
+let persistentPopupActive = false;
 
 function showPopup(message, color = 'magenta', persistent = false, glow = false, delay = 0) {
   setTimeout(() => {
@@ -1463,11 +1463,9 @@ function showPopup(message, color = 'magenta', persistent = false, glow = false,
     popup.classList.remove('glow-text', 'static-glow');
 
     if (typeof glow === 'string') {
-      // Static glow with glow color = glow parameter
       popup.style.setProperty('--glow-color', glow);
       popup.classList.add('static-glow');
     } else if (glow === true) {
-      // Animated glow with glow color = 'color' parameter
       popup.style.setProperty('--glow-color', color);
       popup.classList.add('glow-text');
     }
@@ -1484,9 +1482,25 @@ function showPopup(message, color = 'magenta', persistent = false, glow = false,
         overlay.classList.remove('visible');
       }, 800);
     }
-  }, delay); // 👈 delay in ms (default 0 = instant)
-}
 
+    // 🎯 Anywhere click/tap when paused will unpause
+    if (message === "Paused") {
+      overlay.style.cursor = "pointer";
+      overlay.onclick = () => {
+        if (player && player.playVideo) {
+          player.playVideo(); // resume video
+        }
+        clearPersistentPopup(); // hide popup
+        overlay.onclick = null; // remove listener
+        overlay.style.cursor = "default";
+      };
+    } else {
+      overlay.onclick = null;
+      overlay.style.cursor = "default";
+    }
+
+  }, delay);
+}
 
 function clearPersistentPopup() {
   if (persistentPopupActive) {
@@ -1498,6 +1512,7 @@ function clearPersistentPopup() {
     persistentPopupActive = false;
   }
 }
+// ---- PopUps ----e // 
 
   (function enableDragScroll() {
     const box = document.querySelector('.next-box');
