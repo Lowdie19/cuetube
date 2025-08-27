@@ -1006,7 +1006,7 @@ document.body.addEventListener("touchmove", evt => {
 // =====================
 // Keyboard Shortcuts
 // =====================
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', async (e) => {
   // Ignore shortcuts when typing in input or textarea
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
@@ -1030,6 +1030,12 @@ document.addEventListener('keydown', (e) => {
         player.playVideo();
       }
     }
+  }
+
+  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
+    e.preventDefault(); // prevent default paste
+    await pasteFromClipboard();
   }
 });
 
@@ -1314,8 +1320,9 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
     }
   }
 
-    
-// ---- Notify Animation ----s //
+// =====================
+// Notify Animation 
+// =====================    
 let progressChecker = null;
 let nextSongNotifyShown = false;
 
@@ -1447,10 +1454,10 @@ function scheduleNextSongNotify(duration, currentTime) {
   }
   return false;
 }
-// ---- Notify Animation ----e //
 
-
-// ---- PopUps ----s //    
+// =====================
+// PopUps 
+// =====================    
 let persistentPopupActive = false;
 
 function showPopup(message, color = 'magenta', persistent = false, glow = false, delay = 0) {
