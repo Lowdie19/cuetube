@@ -1519,6 +1519,15 @@ function clearPersistentPopup() {
     persistentPopupActive = false;
   }
 }
+    
+// Tap anywhere to clear persistent popup and resume video if paused
+document.body.addEventListener("click", () => {
+  if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
+    player.playVideo();
+  }
+  clearPersistentPopup();
+});
+
 // ---- PopUps ----e // 
 
   (function enableDragScroll() {
