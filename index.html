@@ -743,7 +743,37 @@
       animation: slideIn 1.2s forwards;
     }
     /* Notify text-line --e */
-        
+
+    
+/* Custom Tooltip Style for Paste Button -- s */
+#pasteButton {
+  position: relative;
+}
+
+#pasteButton::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%; /* Show tooltip above button */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;         /* chamfered black background */
+  color: cyan;              /* cyan text */
+  padding: 6px 10px;
+  border-radius: 8px;       /* chamfered corners */
+  white-space: nowrap;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  box-shadow: 0px 2px 6px rgba(0, 255, 255, 0.4); /* subtle glow */
+}
+
+#pasteButton:hover::after {
+  opacity: 1;
+}
+/* Custom Tooltip Style for Paste Button -- e */   
+
+    
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
@@ -793,7 +823,7 @@
     
   <div class="url-group">
     <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-      <button id="pasteButton" class="paste-btn-icon" onclick="pasteFromClipboard()" title="Paste">
+      <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste" onclick="pasteFromClipboard()">
         <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
       </button>
   </div>
