@@ -158,13 +158,13 @@
     
     .drawer-handle {
       position: absolute;
-      top: 0%;
-      right: -45px;
+      top: 7px;
+      right: -55px;
       width: 50px;
       height: 50px;
       background: rgba(0, 0, 0, 0.0);
       color: magenta;
-      font-size: 1.6em;
+      font-size: 1.7em; /* bigger text */
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
       display: flex;
@@ -172,13 +172,20 @@
       justify-content: center;
       cursor: pointer;
       z-index: 80;
+      text-shadow: none; /* no glow by default */
+      transition: text-shadow 0.15s ease-in-out, transform 0.1s ease-in-out;
     }
-   
-    @media (min-width: 768px) {
-      .drawer-handle {
-        right: -40px;
-      }
+    
+    .drawer-handle:hover {
+      text-shadow:
+        0 0 15px magenta,
+        0 0 40px magenta,
+        0 0 80px magenta,
+        0 0 150px magenta; /* 💡 BIG bright glow */
+      transform: scale(1.15); /* enlarge a bit more */
     }
+
+
     
     .nowplaying-box {
       border: 2px solid cyan;
@@ -385,21 +392,32 @@
     .bottom-drawer.open {
       bottom: 0;
     }
+
     
     .bottom-drawer-handle {
       position: absolute;
-      top: -70px;
+      top: -80px;
       left: 50%;
       transform: translateX(-50%);
       background: none;
       border: none;
       color: magenta;
-      font-size: 1.8em;
+      font-size: 2.0em;
       cursor: pointer;
-      text-shadow: none; //* text-shadow: 0 0 6px magenta, 0 0 12px magenta; *//
+      text-shadow: none; /* 🚫 no glow by default */
       z-index: 99;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, text-shadow 0.15s ease-in-out, transform 0.1s ease-in-out;
     }
+    
+    .bottom-drawer-handle:hover {
+      text-shadow:
+        0 0 15px magenta,
+        0 0 40px magenta,
+        0 0 80px magenta,
+        0 0 150px magenta; /* ✨ BIG bright glow */
+      transform: translateX(-50%) scale(1.15); /* pop + glow */
+    }
+    
     .bottom-drawer-handle[style*="display: none"] {
       opacity: 0;
     }
