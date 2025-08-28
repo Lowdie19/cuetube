@@ -1070,11 +1070,13 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
   });
 }
 
- function onPlayerStateChange(event) {
+let pauseTimeout = null;
+
+function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.ENDED) {
     const isLastVideo = currentIndex === queue.length - 1;
     if (queue.length === 0 || isLastVideo) {
-      hideNotify(); //🔊 hides "No upcoming song" and plays sound
+      hideNotify();
       queue = [];
       currentIndex = -1;
 
@@ -1092,15 +1094,18 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
       updateQueueDisplay();
     }
   } 
+  else if (event.data === YT.PlayerState.PAUSED) {
+    // ⏸️ Delay before showing pause popup (ignore buffering/quick pauses)
+    pauseTimeout = setTimeout(() => {
+      showPopup("Paused", "yellow", true, "yellow");
+    }, 500); // 0.5s
+    stopProgressChecker();
+  } 
   else if (event.data === YT.PlayerState.PLAYING) {
-    // 🎬 Hide "Paused" popup if it exists
+    // ▶️ Cancel pause popup if video resumes quickly
+    clearTimeout(pauseTimeout);
     clearPersistentPopup();
     startProgressChecker();
-  } 
-  else if (event.data === YT.PlayerState.PAUSED) {
-    // ⏸ Show "Paused" popup (persistent until play resumes)
-    showPopup("Paused", "yellow", true, "yellow");
-    stopProgressChecker();
   } 
   else {
     stopProgressChecker();
