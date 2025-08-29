@@ -844,8 +844,43 @@
 #pasteButton:hover::after {
   opacity: 1;
 }
-/* Custom Tooltip Style for Paste Button -- e */   
+/* Custom Tooltip Style for Paste Button -- e */  
 
+
+/* Bouncing Drawers -- s */  
+/* Left drawer edge shadow */
+.drawer-glow.left {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;               /* thin line for edge */
+  height: 120%;
+  background: cyan;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  box-shadow:
+    0 0 5px 1px cyan,
+    0 0 80px 4px cyan;  /* soft glow around edge */
+  z-index: 0;
+}
+
+.drawer-glow.bottom {
+  position: absolute;
+  bottom: 100%;            /* place at top edge of bottom drawer */
+  left: 0;
+  width: 100%;             /* span entire width */
+  height: 1px;             /* thin line for edge */
+  background: cyan;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  box-shadow:
+    0 0 5px 1px cyan,
+    0 0 80px 4px cyan;    /* soft glow along top edge */
+  z-index: 0;
+}
+/* Bouncing Drawers -- e */  
     
   </style>
 </head>
@@ -1656,7 +1691,91 @@ document.body.addEventListener("click", () => {
   clearPersistentPopup();
 });
 
-// ---- PopUps ----e // 
+
+// =====================
+// Bounce & Glow Setup
+// =====================
+
+// Glow elements
+const leftGlow = document.createElement('div');
+leftGlow.className = 'drawer-glow left';
+drawer.appendChild(leftGlow);
+
+const bottomGlow = document.createElement('div');
+bottomGlow.className = 'drawer-glow top';
+bottomDrawer.appendChild(bottomGlow);
+
+// Springy bounce function
+function applySpringBounce(drawerElement, distance, velocity = 0, axis = 'Y') {
+  let pos = distance;
+  const damping = 0.6;   // slows oscillation
+  const stiffness = 0.2; // spring stiffness
+
+  const frame = () => {
+    velocity += -pos * stiffness;
+    velocity *= damping;
+    pos += velocity;
+
+    if(axis === 'X') drawerElement.style.transform = `translateX(${pos}px)`;
+    else drawerElement.style.transform = `translateY(${pos}px)`;
+
+    if(Math.abs(pos) > 0.5 || Math.abs(velocity) > 0.5) {
+      requestAnimationFrame(frame);
+    } else {
+      drawerElement.style.transform = '';
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+// Glow helper
+function triggerGlow(glowElement) {
+  glowElement.style.opacity = 1;
+  setTimeout(() => glowElement.style.opacity = 0, 1500);
+}
+
+// =====================
+// Automatic Bounce + Glow Integration
+// =====================
+
+// Left drawer open/close hooks
+const originalOpenDrawer = openDrawer;
+openDrawer = function() {
+  originalOpenDrawer();
+  applySpringBounce(drawer, 20, 0, 'X'); // right bounce
+  triggerGlow(leftGlow);
+};
+
+const originalCloseDrawer = closeDrawer;
+closeDrawer = function() {
+  originalCloseDrawer();
+  applySpringBounce(drawer, -20, 0, 'X'); // left bounce
+  triggerGlow(leftGlow);
+};
+
+// Bottom drawer toggle hooks
+const originalToggleBottomDrawer = toggleBottomDrawer;
+toggleBottomDrawer = function() {
+  const isOpenBefore = bottomDrawer.classList.contains('open');
+  originalToggleBottomDrawer();
+  applySpringBounce(bottomDrawer, !isOpenBefore ? -20 : 20, 0, 'Y'); // up/down bounce
+  triggerGlow(bottomGlow);
+};
+
+// Bottom drawer close hook
+const originalCloseBottomDrawer = closeBottomDrawer;
+closeBottomDrawer = function() {
+  const isOpenBefore = bottomDrawer.classList.contains('open');
+  originalCloseBottomDrawer();
+  if(isOpenBefore) {
+    applySpringBounce(bottomDrawer, 20, 0, 'Y'); // down bounce
+    triggerGlow(bottomGlow);
+  }
+};
+// ---- Bounce & Glow Setup ----e // 
+
+    
 
   (function enableDragScroll() {
     const box = document.querySelector('.next-box');
