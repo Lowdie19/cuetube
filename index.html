@@ -888,7 +888,25 @@
   transform: scale(1.02);   /* slightly bigger (rubber-band) */
   transition: transform 0.2s ease-out;
 }
-/*  Drawer Glow (Left + Bottom) -- e */  
+
+
+    
+/* =====================
+   Drawer Stretch Styles
+   ===================== */
+
+/* Left drawer stretching effect */
+.drawer.stretch {
+  transition: width 0.2s ease-out;
+  width: calc(250px + 20px); /* stretch 20px wider */
+}
+
+/* Bottom drawer stretching effect */
+.bottom-drawer.stretch {
+  transition: height 0.2s ease-out;
+  height: calc(250px + 20px); /* stretch 20px taller */
+}
+/*  Drawer Stretch Styles -- e */  
 
     
   </style>
@@ -1745,9 +1763,9 @@ function triggerGlow(glowElement) {
 }
 
 // =====================
-// Over-Pull Bounce + Glow
+// Over-Pull Stretch + Glow
 // =====================
-function handleOverPullGlow(drawerEl, glowEl, axis = 'X') {
+function handleOverPullStretch(drawerEl, glowEl, axis = 'X') {
   let startX = 0, startY = 0;
 
   drawerEl.addEventListener("touchstart", (e) => {
@@ -1780,9 +1798,9 @@ function handleOverPullGlow(drawerEl, glowEl, axis = 'X') {
   });
 }
 
-// Apply to left + bottom drawer
-handleOverPullGlow(drawer, document.querySelector(".drawer-glow.left"), "X");
-handleOverPullGlow(bottomDrawer, document.querySelector(".drawer-glow.bottom"), "Y");
+// Hook it up
+handleOverPullStretch(drawer, document.querySelector(".drawer-glow.left"), "X");
+handleOverPullStretch(bottomDrawer, document.querySelector(".drawer-glow.bottom"), "Y");
 // ---- Bounce & Glow Setup ----e // 
 
     
