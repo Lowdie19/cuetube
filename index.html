@@ -230,6 +230,8 @@
       word-wrap: break-word;
       font-weight: bold;
     }
+
+
     
     .next-box {
       position: relative;
@@ -242,18 +244,20 @@
       background: none;
       flex: 1;
       min-height: 0;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;          /* keeps scroll contained */
+      -webkit-overflow-scrolling: touch;     /* smooth scrolling on iOS */
       scroll-padding-bottom: 40px;
       touch-action: pan-y;
       cursor: grab;
-      scrollbar-width: none;
-   /* max-height: 200px;       >> Or your desired height to allow scrolling */
+      
+      /* Android / Mobile fixes */
+      -webkit-tap-highlight-color: transparent; /* removes red highlight on touch */
+      -webkit-touch-callout: none;              /* disables long press menu */
+      
+      scrollbar-width: none; /* hide scrollbar for Firefox */
     }
     
-    .next-box.hidden {
-      display: none !important;
-    }
+    /* Hide scrollbar for WebKit browsers */
     .next-box::-webkit-scrollbar {
       display: none;
     }
@@ -264,6 +268,12 @@
     .next-box.dragging {
       cursor: grabbing;
     }
+    
+    .next-box.hidden {
+      display: none !important;
+    }
+
+    
    
     .drawer > div {
       flex: 1;
@@ -1123,6 +1133,12 @@ document.addEventListener('keydown', async (e) => {
         player.playVideo();
       }
     }
+  }
+
+  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
+    e.preventDefault(); // prevent default paste
+    await pasteFromClipboard();
   }
 
   // Enter: confirm active modal
