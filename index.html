@@ -155,6 +155,7 @@
         left: -40%;
       }
     }
+
     
     .drawer-handle {
       position: absolute;
@@ -173,16 +174,38 @@
       cursor: pointer;
       z-index: 80;
       text-shadow: none; /* no glow by default */
-      transition: text-shadow 0.15s ease-in-out, transform 0.1s ease-in-out;
+      -webkit-text-stroke: 0px transparent;
+      transition: opacity 0.2s ease,
+                  color 0.2s ease,
+                  -webkit-text-stroke 0.1s ease,
+                  transform 0.1s ease-in-out;
     }
     
+    /* Hover effect */
     .drawer-handle:hover {
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
       text-shadow:
-        0 0 15px magenta,
-        0 0 40px magenta,
-        0 0 80px magenta,
-        0 0 150px magenta; /* 💡 BIG bright glow */
-      transform: scale(1.15); /* enlarge a bit more */
+        0 0 15px cyan,
+        0 0 40px cyan,
+        0 0 80px cyan,
+        0 0 150px cyan; /* 💡 BIG bright glow */
+      transform: scale(1.15); /* enlarge a bit */
+    }
+    
+    /* Focus-visible (keyboard navigation) */
+    .drawer-handle:focus-visible {
+      outline: none; /* remove default dotted outline */
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
+      text-shadow:
+        0 0 15px cyan,
+        0 0 40px cyan,
+        0 0 80px cyan,
+        0 0 150px cyan;
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.6); /* cyan focus ring */
+      border-radius: 10px;
     }
 
 
@@ -397,25 +420,47 @@
     .bottom-drawer-handle {
       position: absolute;
       top: -80px;
-      left: 50%;
+      left: 49%;
       transform: translateX(-50%);
       background: none;
       border: none;
-      color: magenta;
+      color: magenta; /* default text color */
       font-size: 2.0em;
       cursor: pointer;
-      text-shadow: none; /* 🚫 no glow by default */
+      text-shadow: none; /* 🚫 no glow */
+      -webkit-text-stroke: 0px transparent; /* no stroke initially */
       z-index: 99;
-      transition: opacity 0.3s ease, text-shadow 0.15s ease-in-out, transform 0.1s ease-in-out;
+      transition: opacity 0.2s ease,
+                  color 0.2s ease,
+                  -webkit-text-stroke 0.1s ease,
+                  transform 0.1s ease-in-out;
     }
     
+    /* Hover: Cyan glowing pop */
     .bottom-drawer-handle:hover {
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
       text-shadow:
-        0 0 15px magenta,
-        0 0 40px magenta,
-        0 0 80px magenta,
-        0 0 150px magenta; /* ✨ BIG bright glow */
-      transform: translateX(-50%) scale(1.15); /* pop + glow */
+        0 0 15px cyan,
+        0 0 40px cyan,
+        0 0 80px cyan,
+        0 0 150px cyan;
+      transform: translateX(-50%) scale(1.1);
+    }
+    
+    /* Focus (keyboard navigation): same as hover + strong outline */
+    .bottom-drawer-handle:focus-visible {
+      outline: none; /* remove default dotted outline */
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
+      text-shadow:
+        0 0 15px cyan,
+        0 0 40px cyan,
+        0 0 80px cyan,
+        0 0 150px cyan;
+      transform: translateX(-50%) scale(1.1);
+      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); /* clear cyan ring */
+      border-radius: 6px; /* round focus ring */
     }
     
     .bottom-drawer-handle[style*="display: none"] {
@@ -836,21 +881,21 @@
 </div>
 
   <!-- Bottom Drawer -->
-  <div class="bottom-drawer" id="bottomDrawer">
-    <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
-    
+<div class="bottom-drawer" id="bottomDrawer">
+  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
+  
   <div class="url-group">
     <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-      <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste" onclick="pasteFromClipboard()">
-        <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
-      </button>
+    <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste" onclick="pasteFromClipboard()">
+      <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
+    </button>
   </div>
-    
-    <div class="bottom-buttons inside">
-      <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-      <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
-    </div>
+  
+  <div class="bottom-buttons inside">
+    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+    <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
   </div>
+</div>
   
   <!-- Popup -->
   <div id="popupOverlay"></div>
