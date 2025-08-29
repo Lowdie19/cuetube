@@ -1763,7 +1763,7 @@ function triggerGlow(glowElement) {
 }
 
 // =====================
-// Rubber Band Stretch Effect
+// Rubber Band Stretch Effect (Left + Bottom Drawers)
 // =====================
 
 function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
@@ -1771,6 +1771,7 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   let isDragging = false;
 
   drawerEl.addEventListener("touchstart", (e) => {
+    // Only allow effect when drawer is open
     if (!drawerEl.classList.contains("open")) return;
     isDragging = true;
     if (axis === "X") startPos = e.touches[0].clientX;
@@ -1783,13 +1784,13 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
     let delta = 0;
     if (axis === "X") {
       delta = e.touches[0].clientX - startPos;
-      if (delta > 0) { // pulling right
+      if (delta > 0) { // pushing further right (past edge)
         const stretch = Math.min(delta, maxStretch);
         drawerEl.style.transform = `translateX(${stretch}px)`;
       }
     } else if (axis === "Y") {
       delta = e.touches[0].clientY - startPos;
-      if (delta < 0) { // pulling up
+      if (delta < 0) { // pulling upward (past edge)
         const stretch = Math.max(delta, -maxStretch);
         drawerEl.style.transform = `translateY(${stretch}px)`;
       }
@@ -1799,20 +1800,24 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   drawerEl.addEventListener("touchend", () => {
     if (!isDragging) return;
     isDragging = false;
-    drawerEl.style.transition = "transform 0.3s ease-out";
-    drawerEl.style.transform = "translate(0, 0)"; // snap back
+
+    // Snap back
+    drawerEl.style.transition = "transform 0.25s cubic-bezier(0.25, 1.5, 0.5, 1)";
+    drawerEl.style.transform = "translate(0,0)";
 
     setTimeout(() => {
-      drawerEl.style.transition = ""; // clear for smooth future drags
+      drawerEl.style.transition = "";
     }, 300);
   });
 }
 
 // Attach to your drawers
-addRubberBandEffect(drawer, "X");          // Left drawer stretch
-addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
+const leftDrawer = document.querySelector(".drawer");
+const bottomDrawer = document.querySelector(".bottom-drawer");
 
-// Rubber Band Stretch Effect ----e // 
+if (leftDrawer) addRubberBandEffect(leftDrawer, "X", 60);   // Left drawer: stretch right
+if (bottomDrawer) addRubberBandEffect(bottomDrawer, "Y", 60); // Bottom drawer: stretch up
+// Rubber Band Stretch Effect (Left + Bottom Drawers) ----e // 
 
     
 
