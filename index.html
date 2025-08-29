@@ -213,14 +213,14 @@
     .nowplaying-box {
       border: 1.5px solid cyan;
       border-radius: 10px;
-      padding: 20px;
+      padding: 18px;
       background: black;
       margin: 35px 10px 15px 10px;  /* top | right | bottom | left */
     
       /* Glow effect (both inner + outer) with opacity */
       box-shadow: 
-              0 0 15px 1px rgba(0, 255, 255, 0.6),  /* outer glow */
-        inset 0 0 15px 1px rgba(0, 255, 255, 0.6);  /* inner glow */
+              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
     
     .nowplaying-box .label {
@@ -1682,51 +1682,7 @@ document.body.addEventListener("click", () => {
   clearPersistentPopup();
 });
 
-    
-// =====================
-// Bounce & Glow Setup
-// =====================
 
-// Glow elements
-const leftGlow = document.createElement('div');
-leftGlow.className = 'drawer-glow left';
-drawer.appendChild(leftGlow);
-
-const bottomGlow = document.createElement('div');
-bottomGlow.className = 'drawer-glow top';
-bottomDrawer.appendChild(bottomGlow);
-
-// Springy bounce function
-function applySpringBounce(drawerElement, distance, velocity = 0, axis = 'Y') {
-  let pos = distance;
-  const damping = 0.6;   // slows oscillation
-  const stiffness = 0.2; // spring stiffness
-
-  const frame = () => {
-    velocity += -pos * stiffness;
-    velocity *= damping;
-    pos += velocity;
-
-    if(axis === 'X') drawerElement.style.transform = `translateX(${pos}px)`;
-    else drawerElement.style.transform = `translateY(${pos}px)`;
-
-    if(Math.abs(pos) > 0.5 || Math.abs(velocity) > 0.5) {
-      requestAnimationFrame(frame);
-    } else {
-      drawerElement.style.transform = '';
-    }
-  }
-
-  requestAnimationFrame(frame);
-}
-
-// Glow helper
-function triggerGlow(glowElement) {
-  glowElement.style.opacity = 1;
-  setTimeout(() => glowElement.style.opacity = 0, 1500);
-}
-
-    
 // =====================
 // Rubber Band Stretch Effect
 // =====================
