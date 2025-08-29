@@ -190,7 +190,7 @@
         0 0 40px cyan,
         0 0 80px cyan,
         0 0 150px cyan; /* 💡 BIG bright glow */
-      transform: scale(1.15); /* enlarge a bit */
+      transform: scale(1.05); /* enlarge a bit */
     }
     
     /* Focus-visible (keyboard navigation) */
@@ -203,24 +203,30 @@
         0 0 40px cyan,
         0 0 80px cyan,
         0 0 150px cyan;
-      transform: scale(1.1);
-      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.6); /* cyan focus ring */
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); /* clear cyan ring */
       border-radius: 10px;
     }
 
 
     
     .nowplaying-box {
-      border: 2px solid cyan;
+      border: 1.5px solid cyan;
       border-radius: 10px;
-      padding: 10px;
+      padding: 20px;
       background: black;
-      margin-bottom: 15px;
+      margin: 30px 10px 15px 10px;  /* top | right | bottom | left */
+    
+      /* Glow effect (both inner + outer) with opacity */
+      box-shadow: 
+              0 0 15px 1px rgba(0, 255, 255, 0.6),  /* outer glow */
+        inset 0 0 15px 1px rgba(0, 255, 255, 0.6);  /* inner glow */
     }
     
     .nowplaying-box .label {
       font-size: 0.7em;
       color: #aaa;
+      margin-bottom: 15px;
     }
 
     .nowplaying-box .title {
@@ -455,7 +461,7 @@
         0 0 40px cyan,
         0 0 80px cyan,
         0 0 150px cyan;
-      transform: translateX(-50%) scale(1.1);
+      transform: translateX(-50%) scale(1.05);
     }
     
     /* Focus (keyboard navigation): same as hover + strong outline */
@@ -468,7 +474,7 @@
         0 0 40px cyan,
         0 0 80px cyan,
         0 0 150px cyan;
-      transform: translateX(-50%) scale(1.1);
+      transform: translateX(-50%) scale(1.05);
       box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); /* clear cyan ring */
       border-radius: 6px; /* round focus ring */
     }
@@ -657,7 +663,10 @@
       box-shadow: 0 0 10px red;
     }
 
-    /* For URL box ---s */
+    
+/*  ==========================
+    URL box -- s 
+    ==========================  */
     input[type="text"]::placeholder {
       color: white;
       opacity: .3;
@@ -679,8 +688,11 @@
       box-shadow: 0 0 2px magenta, 0 0 9px magenta;
       border-color: magenta;
       border: 2px solid magenta;
-    }  /* For URL box ---e */
+    }
+/*  URL box -- e ==========================  */
+    
 
+    
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .youtube-wrapper {
         height: 100vh;
@@ -720,7 +732,9 @@
 
 
     
-    /* Notify text-line --s */
+/*  =====================
+    Notify text-line --e 
+    =====================  */
     .notify-box {
       height: 60px;
       width: 90%;            /* leaves 5% space on each side */
@@ -815,10 +829,13 @@
     .Notify.hide .text {
       animation: slideIn 1.2s forwards;
     }
-    /* Notify text-line --e */
+/*  Notify text-line --e =====================  */
+    
 
     
-/* Custom Tooltip Style for Paste Button -- s */
+/*  ===========================================
+    Custom Tooltip Style for Paste Button -- s 
+    ===========================================  */
 #pasteButton {
   position: relative;
 }
@@ -844,69 +861,9 @@
 #pasteButton:hover::after {
   opacity: 1;
 }
-/* Custom Tooltip Style for Paste Button -- e */  
+/* Custom Tooltip Style for Paste Button -- e   ================  */ 
+   
 
-
-/* =====================
-   Drawer Glow (Left + Bottom)
-   ===================== */
-.drawer-glow.left {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1px;
-  height: 120%;
-  background: cyan;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s ease;
-  box-shadow:
-    0 0 5px 1px cyan,
-    0 0 80px 4px cyan;
-  z-index: 0;
-}
-
-.drawer-glow.bottom {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: cyan;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s ease;
-  box-shadow:
-    0 0 5px 1px cyan,
-    0 0 80px 4px cyan;
-  z-index: 0;
-}
-
-/* Stretch effect */
-.drawer.stretch,
-.bottom-drawer.stretch {
-  transform: scale(1.02);   /* slightly bigger (rubber-band) */
-  transition: transform 0.2s ease-out;
-}
-
-
-    
-/* =====================
-   Drawer Stretch Styles
-   ===================== */
-
-/* Left drawer stretching effect */
-.drawer.stretch {
-  transition: width 0.2s ease-out;
-  width: calc(250px + 20px); /* stretch 20px wider */
-}
-
-/* Bottom drawer stretching effect */
-.bottom-drawer.stretch {
-  transition: height 0.2s ease-out;
-  height: calc(250px + 20px); /* stretch 20px taller */
-}
-/*  Drawer Stretch Styles -- e */  
 
     
   </style>
@@ -1115,6 +1072,7 @@ overlay.addEventListener('touchmove', (e) => {
   if (deltaX < -50) closeDrawer(); // swipe left to close
 });
 
+    
 // =====================
 // Bottom Drawer Toggle
 // =====================
@@ -1142,6 +1100,7 @@ bottomDrawerOverlay.onclick = function() {
   if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
+    
 // =====================
 // Vertical Swipe Handling
 // =====================
@@ -1168,6 +1127,7 @@ document.body.addEventListener("touchmove", evt => {
   handleTouchMove(evt); // handle left/right swipe
 });
 
+    
 // =====================
 // Keyboard Shortcuts
 // =====================
@@ -1224,6 +1184,7 @@ document.addEventListener('keydown', async (e) => {
   }
 });
 
+    
 // =====================
 // URL Input Enter Key
 // =====================
@@ -1321,6 +1282,7 @@ function onPlayerStateChange(event) {
 
   const title = await fetchTitle(videoId);
 
+    
   // =====================
   // AUTO PLAY FIRST VIDEO
   // =====================
@@ -1510,6 +1472,7 @@ function onPlayerStateChange(event) {
     }
   }
 
+    
 // =====================
 // Notify Animation 
 // =====================    
@@ -1645,6 +1608,7 @@ function scheduleNextSongNotify(duration, currentTime) {
   return false;
 }
 
+    
 // =====================
 // PopUps 
 // =====================    
@@ -1718,7 +1682,7 @@ document.body.addEventListener("click", () => {
   clearPersistentPopup();
 });
 
-
+    
 // =====================
 // Bounce & Glow Setup
 // =====================
@@ -1762,6 +1726,7 @@ function triggerGlow(glowElement) {
   setTimeout(() => glowElement.style.opacity = 0, 1500);
 }
 
+    
 // =====================
 // Rubber Band Stretch Effect
 // =====================
