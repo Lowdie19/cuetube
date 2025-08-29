@@ -1125,10 +1125,24 @@ document.addEventListener('keydown', async (e) => {
     }
   }
 
-  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
-    e.preventDefault(); // prevent default paste
-    await pasteFromClipboard();
+  // Enter: confirm active modal
+  if (e.key === "Enter") {
+    // 1️⃣ Delete confirm
+    const deleteBox = document.getElementById("confirmDelete");
+    const yesBtn = document.getElementById("yesBtn");
+    if (deleteBox && deleteBox.style.display === "block") {
+      yesBtn.click();
+      e.preventDefault();
+      return;
+    }
+
+    // 2️⃣ Next song confirm
+    const nextModal = document.getElementById("nextConfirmModal");
+    if (nextModal && nextModal.style.display !== "none") {
+      confirmPlayNext();
+      e.preventDefault();
+      return;
+    }
   }
 });
 
