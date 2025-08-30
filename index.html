@@ -898,7 +898,7 @@
   pointer-events: none;
   opacity: 0;         /* hidden by default */
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
-  transition: opacity 0.5s ease-in-out;       /* smooth fade */
+  transition: opacity 0.3s ease-in-out;       /* smooth fade */
 }
 
 /* Show tooltip when class is added */
@@ -1805,11 +1805,20 @@ tooltipElements.forEach(el => {
     el.classList.remove("show-tooltip");
   });
 
-  // Mobile/Android touch
-  el.addEventListener("touchstart", () => {
-    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 5000);
+  // Mobile/Android long-press
+  el.addEventListener("touchstart", (e) => {
+    // Only trigger on first finger
+    if (e.touches.length > 1) return;
+
+    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000); // 3-sec press
   });
+
   el.addEventListener("touchend", () => {
+    clearTimeout(tooltipTimeout);
+    el.classList.remove("show-tooltip");
+  });
+
+  el.addEventListener("touchcancel", () => {
     clearTimeout(tooltipTimeout);
     el.classList.remove("show-tooltip");
   });
