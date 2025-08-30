@@ -219,15 +219,23 @@
     Nowplaying-box 
     =============================  */
     /* Box */
+    /* Default box (inactive, no glow) */
     .nowplaying-box {
-      border: 1.5px solid cyan;
+      border: 2px solid gray;
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 35px 10px 15px 10px;                    /* top | right | bottom | left */
-      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
-              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
+      margin: 35px 10px 15px 10px; /* top | right | bottom | left */
+      box-shadow: none; /* no glow at start */
+      transition: box-shadow 0.6s ease, border-color 0.6s ease;
+    }
+    
+    /* Glow state (when a song is playing) */
+    .nowplaying-box.glow {
+      border: 1.5px solid cyan;
+      box-shadow: /* Glow effect (both inner + outer) with opacity */
+          0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+          inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5); /* inner glow */
     }
     
     /* Label "Now playing" */
@@ -1567,6 +1575,7 @@ let notifyHideTimeout = null;
 
 function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
+  const nowBoxEl = document.querySelector(".nowplaying-box"); // get the box
   const current = queue[currentIndex];
 
   // Cancel any pending notify timers
@@ -1587,6 +1596,8 @@ function updateNowPlaying() {
       </div>
     `;
 
+    nowBoxEl.classList.add("glow");   // box glows with title
+
     notifyShowTimeout = setTimeout(() => {
       showNotify("No upcoming song");
 
@@ -1599,6 +1610,7 @@ function updateNowPlaying() {
   } else {
     // Update the title with glow
     nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
+    nowBoxEl.classList.add("glow");   // box glows when playing
     hideNotify();
     startProgressChecker();
   }
