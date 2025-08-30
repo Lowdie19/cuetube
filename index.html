@@ -219,23 +219,15 @@
     Nowplaying-box 
     =============================  */
     /* Box */
-    /* Default box (inactive, no glow) */
     .nowplaying-box {
-      border: 2px solid gray;
+      border: 1.5px solid cyan;
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 35px 10px 15px 10px; /* top | right | bottom | left */
-      box-shadow: none; /* no glow at start */
-      transition: box-shadow 0.6s ease, border-color 0.6s ease;
-    }
-    
-    /* Glow state (when a song is playing) */
-    .nowplaying-box.glow {
-      border: 1.5px solid cyan;
-      box-shadow: /* Glow effect (both inner + outer) with opacity */
-          0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-          inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5); /* inner glow */
+      margin: 35px 10px 15px 10px;                    /* top | right | bottom | left */
+      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
+              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
     
     /* Label "Now playing" */
@@ -1563,7 +1555,7 @@ function onPlayerStateChange(event) {
   }
 
     
-// =====================
+// ===================== 
 // Notify Animation & Now Playing
 // =====================    
 let progressChecker = null;
@@ -1573,16 +1565,22 @@ let nextSongNotifyShown = false;
 let notifyShowTimeout = null;
 let notifyHideTimeout = null;
 
+// =====================
+// Update Now Playing Box
+// =====================
 function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
-  const nowBoxEl = document.querySelector(".nowplaying-box"); // get the box
   const current = queue[currentIndex];
 
   // Cancel any pending notify timers
   if (notifyShowTimeout) { clearTimeout(notifyShowTimeout); notifyShowTimeout = null; }
   if (notifyHideTimeout) { clearTimeout(notifyHideTimeout); notifyHideTimeout = null; }
 
-  if (!current) return;
+  if (!current) {
+    nowTitleEl.innerHTML = '';
+    stopProgressChecker();
+    return;
+  }
 
   let title = current.title || `Video ID: ${current.id}`;
   let remaining = queue.length - (currentIndex + 1);
@@ -1591,12 +1589,10 @@ function updateNowPlaying() {
     // No upcoming song
     nowTitleEl.innerHTML = `
       <span class="now-playing-glow">${title}</span>
-      <div style="color: rgba(91, 24, 194, 1); font-family: Arial, sans-serif; font-weight: regular; margin-top: 10px; font-size: 0.8em;">
+      <div id="noUpcoming" style="color: rgba(91, 24, 194, 1); font-family: Arial, sans-serif; font-weight: normal; margin-top: 10px; font-size: 0.8em;">
         No upcoming song . . .
       </div>
     `;
-
-    nowBoxEl.classList.add("glow");   // box glows with title
 
     notifyShowTimeout = setTimeout(() => {
       showNotify("No upcoming song");
@@ -1610,9 +1606,19 @@ function updateNowPlaying() {
   } else {
     // Update the title with glow
     nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
-    nowBoxEl.classList.add("glow");   // box glows when playing
     hideNotify();
+    removeNoUpcoming(); // Remove "No upcoming song" immediately
     startProgressChecker();
+  }
+}
+
+// =====================
+// Remove "No upcoming song" text
+// =====================
+function removeNoUpcoming() {
+  const noUpcomingEl = document.getElementById("noUpcoming");
+  if (noUpcomingEl) {
+    noUpcomingEl.remove();
   }
 }
 
@@ -1695,6 +1701,35 @@ function scheduleNextSongNotify(duration, currentTime) {
   }
   return false;
 }
+
+// =====================
+// Reactive Queue Proxy
+// Automatically update Now Playing whenever a song is added
+// Also removes "No upcoming song" immediately
+// =====================
+queue = new Proxy(queue, {
+  get(target, prop) {
+    if (prop === 'push') {
+      return function(...songs) {
+        const result = Array.prototype.push.apply(target, songs);
+        removeNoUpcoming();   // hide "No upcoming song" immediately
+        updateNowPlaying();   // update glow/title/notify
+        return result;
+      }
+    }
+    return target[prop];
+  },
+  set(target, prop, value) {
+    target[prop] = value;
+    if (prop !== 'length') {
+      removeNoUpcoming();   // hide "No upcoming song" immediately
+      updateNowPlaying();
+    }
+    return true;
+  }
+});
+
+
     
 // =====================
 // PopUps 
