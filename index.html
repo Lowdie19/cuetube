@@ -875,35 +875,37 @@
     
 
     
-/*  ===========================================
-    Custom Tooltip Style for Paste Button -- s 
-    ===========================================  */
-#pasteButton {
+/* ===========================================
+   Universal Tooltip Style
+   =========================================== */
+[data-tooltip] {
   position: relative;
 }
 
-#pasteButton::after {
+/* Tooltip base style */
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 120%; /* Show tooltip above button */
+  bottom: 120%;       /* above button */
   left: 50%;
   transform: translateX(-50%);
-  background: #111;         /* chamfered black background */
-  color: cyan;              /* cyan text */
+  background: #111;
+  color: cyan;
   padding: 6px 10px;
-  border-radius: 8px;       /* chamfered corners */
+  border-radius: 8px;
   white-space: nowrap;
   font-size: 13px;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease-in-out;
-  box-shadow: 0px 0px 8px rgba(0, 255, 255, 0.4); /* subtle glow */
+  opacity: 0;         /* hidden by default */
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
+  transition: opacity 0.5s ease-in-out;       /* smooth fade */
 }
 
-#pasteButton:hover::after {
+/* Show tooltip when class is added */
+[data-tooltip].show-tooltip::after {
   opacity: 1;
 }
-/* Custom Tooltip Style for Paste Button -- e   ================  */ 
+/* Universal Tooltip Style --end   ================  */ 
    
 
 
@@ -957,14 +959,14 @@
   
   <div class="url-group">
     <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-    <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste" onclick="pasteFromClipboard()">
+    <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste (Ctrl + V)" onclick="pasteFromClipboard()">
       <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
     </button>
   </div>
   
   <div class="bottom-buttons inside">
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button class="cyan-btn" id="nextBtnDrawer" onclick="showNextConfirm()">Next</button>
+    <button id="nextBtnDrawer" class="cyan-btn" data-tooltip="Next Song (Ctrl + →)" onclick="showNextConfirm()">Next</button>
   </div>
 </div>
   
@@ -1203,6 +1205,13 @@ document.addEventListener('keydown', async (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
     e.preventDefault(); // prevent default paste
     await pasteFromClipboard();
+  }
+
+  // Ctrl + Right Arrow → Next button in drawer
+  if (e.ctrlKey && e.key === "ArrowRight") {
+    e.preventDefault();
+    const nextBtnDrawer = document.getElementById("nextBtnDrawer");
+    if (nextBtnDrawer) nextBtnDrawer.click();
   }
 
   // Enter: confirm active modal
@@ -1775,7 +1784,38 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
 addRubberBandEffect(drawer, "X");          // Left drawer stretch
 addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
 
-// Rubber Band Stretch Effect ----e // 
+    
+// =====================
+// Universal Tooltip
+// =====================
+// note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button>
+    
+// Select all elements with data-tooltip
+const tooltipElements = document.querySelectorAll("[data-tooltip]");
+
+tooltipElements.forEach(el => {
+  let tooltipTimeout;
+
+  // Desktop hover
+  el.addEventListener("mouseenter", () => {
+    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 5000);
+  });
+  el.addEventListener("mouseleave", () => {
+    clearTimeout(tooltipTimeout);
+    el.classList.remove("show-tooltip");
+  });
+
+  // Mobile/Android touch
+  el.addEventListener("touchstart", () => {
+    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 5000);
+  });
+  el.addEventListener("touchend", () => {
+    clearTimeout(tooltipTimeout);
+    el.classList.remove("show-tooltip");
+  });
+});
+
+// Universal Tooltip ----e // 
 
     
 
@@ -1857,8 +1897,10 @@ addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
 }
 
 function hideNextConfirm() {
+  setTimeout(() => {
   document.getElementById("nextConfirmOverlay").style.display = "none";
   document.getElementById("nextConfirmModal").style.display = "none";
+  }, 300); // 0.3s delay
 }
 
 function confirmPlayNext() {
@@ -2070,6 +2112,7 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
       youtubeInput.classList.remove("glow");
     }
   });
+
 
 
   </script>
