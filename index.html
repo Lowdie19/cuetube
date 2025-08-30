@@ -1866,17 +1866,24 @@ function confirmPlayNext() {
   playNextFromQueue();
 }
 
-// Show Exit Modal
+
+// ======================================
+// Exit Modal
+// ======================================
+    
+  // Show Modal
   function showExitConfirm() {
     document.getElementById("exitConfirmOverlay").style.display = "block";
     document.getElementById("exitConfirmModal").style.display = "block";
     playErrorSound();
   }
 
-  // Hide Exit Modal
+  // Hide Modal
   function hideExitConfirm() {
-    document.getElementById("exitConfirmOverlay").style.display = "none";
-    document.getElementById("exitConfirmModal").style.display = "none";
+    setTimeout(() => {
+      document.getElementById("exitConfirmOverlay").style.display = "none";
+      document.getElementById("exitConfirmModal").style.display = "none";
+    }, 300); // 0.3s delay
   }
 
   // Android/WebView Back Button Handler
@@ -1894,9 +1901,9 @@ function confirmPlayNext() {
     e.preventDefault();
     e.returnValue = "";
   });
+// Exit Modal ----e // 
 
     
-
   // Play click sound
 function playClickSound() {
   const click = document.getElementById("clickSound");
