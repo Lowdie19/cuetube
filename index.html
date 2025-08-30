@@ -109,8 +109,8 @@
     .drawer {
       position: fixed;
       top: 0;
-      left: -70%; /* Default for mobile */
-      width: 70%;  /* Default for mobile */
+      left: -80%; /* Default for mobile */
+      width: 80%;  /* Default for mobile */
       height: 100%;
       background: linear-gradient(
         to bottom,
@@ -694,7 +694,7 @@
               0 0 10px 0.5px rgba(255, 0, 255, .8),  /* outer glow */
         inset 0 0 10px 0.5px rgba(255, 0, 255, .5);  /* inner glow */
       background-color: black !important; /* stay black when focused */
-      color: cyan !important;
+      color: white !important;
     }
 
     /* for Suggested URL - Normal focus */
@@ -711,8 +711,8 @@
       -webkit-box-shadow: 0 0 10px 0.5px rgba(255, 0, 255, .8),
                           inset 0 0 10px 0.5px rgba(255, 0, 255, .5),
                           0 0 0px 1000px black inset !important;
-      -webkit-text-fill-color: cyan !important;
-      caret-color: cyan;
+      -webkit-text-fill-color: white !important;
+      caret-color: white;
       border: 1px solid magenta;
     }
 /*  URL box -- e ==========================  */
@@ -881,7 +881,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease-in-out;
-  box-shadow: 0px 2px 6px rgba(0, 255, 255, 0.4); /* subtle glow */
+  box-shadow: 0px 0px 8px rgba(0, 255, 255, 0.4); /* subtle glow */
 }
 
 #pasteButton:hover::after {
