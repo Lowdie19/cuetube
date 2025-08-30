@@ -395,12 +395,15 @@
       flex: 1;
       padding: 14px;
       background: black;/*#121212;*/
-      border: 2px solid cyan;
       border-radius: 10px;
       color: white;
       font-size: 1em;
       cursor: pointer;
       transition: 0.3s;
+      border: 1px solid cyan;
+      box-shadow: 
+              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
 
     .cyan-btn:hover {
@@ -678,16 +681,39 @@
       padding: 10px;
       font-size: 16px;
       background-color: black; /*#121212;*/
-      color: white;
+      color: black;
       box-shadow: none;
       transition: box-shadow 0.3s ease;
     }
     
     input[type="text"]:focus {
+      outline: 1px;
+      border-color: solid magenta;
+      border: 1px solid magenta;
+      box-shadow: 
+              0 0 10px 0.5px rgba(255, 0, 255, .8),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);  /* inner glow */
+      background-color: black !important; /* stay black when focused */
+      color: cyan !important;
+    }
+
+    /* for Suggested URL - Normal focus */
+    input[type="text"]:focus {
       outline: none;
-      box-shadow: 0 0 2px magenta, 0 0 9px magenta;
-      border-color: magenta;
-      border: 2px solid magenta;
+      border: 1px solid magenta;
+      box-shadow: 
+        0 0 10px 0.5px rgba(255, 0, 255, .8),
+        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);
+    }
+    
+    /* Autofill fix */
+    input[type="text"]:-webkit-autofill {
+      -webkit-box-shadow: 0 0 10px 0.5px rgba(255, 0, 255, .8),
+                          inset 0 0 10px 0.5px rgba(255, 0, 255, .5),
+                          0 0 0px 1000px black inset !important;
+      -webkit-text-fill-color: cyan !important;
+      caret-color: cyan;
+      border: 1px solid magenta;
     }
 /*  URL box -- e ==========================  */
     
