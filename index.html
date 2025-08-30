@@ -215,34 +215,49 @@
     }
 
 
-    
+/*  =============================
+    Nowplaying-box 
+    =============================  */
+    /* Box */
     .nowplaying-box {
       border: 1.5px solid cyan;
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 35px 10px 15px 10px;  /* top | right | bottom | left */
-    
-      /* Glow effect (both inner + outer) with opacity */
-      box-shadow: 
+      margin: 35px 10px 15px 10px;                    /* top | right | bottom | left */
+      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
               0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
         inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
     
+    /* Label "Now playing" */
     .nowplaying-box .label {
       font-size: 0.7em;
       color: #aaa;
       margin-bottom: 15px;
     }
 
+    /* Label "Title of actual songs" */
     .nowplaying-box .title {
       font-family: Arial, sans-serif;
       font-size: 1.1em;
       margin: 5px 0;
       word-wrap: break-word;
-      font-weight: bold;
+      font-weight: bold;  
     }
-
+    
+   /* Glowing effect for Now Playing title */
+    .now-playing-glow {
+      color: white;
+      text-shadow: 0 0 5px magenta, 0 0 10px magenta, 0 0 20px magenta, 0 0 30px magenta;
+      animation: glowPulse 2s infinite alternate;
+    }
+    
+    @keyframes glowPulse {
+       from { text-shadow: 0 0 4px magenta, 0 0 6px magenta, 0 0 12px magenta; }
+      to { text-shadow: 0 0 12px magenta, 0 0 14px magenta, 0 0 18px magenta; }
+    }
+/*  Nowplaying-box -- end ===========  */
 
     
     .next-box {
@@ -926,8 +941,8 @@
     <div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">...</div>
-      </div>
+        <div class="title" id="nowTitle">. . .</div>
+      </div>  
       <div class="next-box hidden">
         <div class="label">NEXT</div>
         <div id="nextList"></div>
@@ -1525,7 +1540,7 @@ function onPlayerStateChange(event) {
 
     
 // =====================
-// Notify Animation 
+// Notify Animation & Now Playing
 // =====================    
 let progressChecker = null;
 let nextSongNotifyShown = false;
@@ -1538,15 +1553,9 @@ function updateNowPlaying() {
   const nowTitleEl = document.getElementById("nowTitle");
   const current = queue[currentIndex];
 
-  // Cancel any pending notify timers when switching songs
-  if (notifyShowTimeout) {
-    clearTimeout(notifyShowTimeout);
-    notifyShowTimeout = null;
-  }
-  if (notifyHideTimeout) {
-    clearTimeout(notifyHideTimeout);
-    notifyHideTimeout = null;
-  }
+  // Cancel any pending notify timers
+  if (notifyShowTimeout) { clearTimeout(notifyShowTimeout); notifyShowTimeout = null; }
+  if (notifyHideTimeout) { clearTimeout(notifyHideTimeout); notifyHideTimeout = null; }
 
   if (!current) return;
 
@@ -1554,35 +1563,34 @@ function updateNowPlaying() {
   let remaining = queue.length - (currentIndex + 1);
 
   if (remaining === 0) {
-    // Show in title area
+    // No upcoming song
     nowTitleEl.innerHTML = `
-      <span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>
+      <span class="now-playing-glow">${title}</span>
       <div style="color: rgba(91, 24, 194, 1); font-family: Arial, sans-serif; font-weight: regular; margin-top: 10px; font-size: 0.8em;">
         No upcoming song . . .
       </div>
     `;
 
-    // Delay 10s before showing notify
     notifyShowTimeout = setTimeout(() => {
-      showNotify("No upcoming song"); // 🔊 sound plays here
+      showNotify("No upcoming song");
 
-      // Auto-hide after 10s of being visible
       notifyHideTimeout = setTimeout(() => {
-        hideNotify(); // 🔊 sound plays when hiding starts
+        hideNotify();
       }, 10000);
-
     }, 10000);
 
     stopProgressChecker();
   } else {
-    // Update the title only
-    nowTitleEl.innerHTML = `<span style="text-shadow: 0 0 8px magenta, 0 0 16px magenta;">${title}</span>`;
+    // Update the title with glow
+    nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
     hideNotify();
     startProgressChecker();
   }
 }
 
+// =====================
 // Notify helper functions
+// =====================
 function showNotify(message) {
   hideNotify(); // remove any existing notify first
   document.getElementById("nowPlayingCopy").innerHTML = `
@@ -1608,6 +1616,7 @@ function hideNotify() {
   }
 }
 
+// =====================
 // Progress checking for "Up next"
 function startProgressChecker() {
   if (progressChecker) return; // already running
@@ -1658,7 +1667,6 @@ function scheduleNextSongNotify(duration, currentTime) {
   }
   return false;
 }
-
     
 // =====================
 // PopUps 
