@@ -419,25 +419,41 @@
     .cyan-btn {
       flex: 1;
       padding: 14px;
-      background: black;/*#121212;*/
+      background: black;
       border-radius: 10px;
       color: white;
       font-size: 1em;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
       border: 1px solid cyan;
       box-shadow: 
-              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
         inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
-
+    
+    /* Hover effect */
     .cyan-btn:hover {
+      background: rgba(0, 255, 255, 0.2);
+      color: white;
+      text-shadow: 0 0 16px cyan;
+    }
+    
+    /* Press / click effect */
+    .cyan-btn:active {
+      transform: scale(0.9); /* shrink when pressed */
+      box-shadow: 0 0 5px cyan, 0 0 20px cyan inset; /* temporary glow */
       background: cyan;
       color: black;
+      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
     }
-    .cyan-btn:active {
-      transform: scale(0.9); /* shrink a bit when pressed */
-      box-shadow: 0 0 5px cyan, 0 0 20px cyan inset;
+    
+    /* Reset hover/glow after click */
+    .cyan-btn.clicked {
+      transform: scale(1);
+      box-shadow: 
+        0 0 10px 0.5px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     /*  Buttons for Reserve, Next and Confirm's -- e ===========  */
 
