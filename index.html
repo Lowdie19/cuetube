@@ -1806,8 +1806,20 @@ document.body.addEventListener("click", () => {
 });
 
 
+Got it 👍 You want your left drawer to behave like the ChatGPT mobile app drawer:
+
+The drawer sticks to the left edge of the screen.
+
+When you drag it, it should have the rubber band stretch effect, but still anchored to the left side.
+
+
+Right now your code offsets the whole drawer with translateX, which makes it “detach” from the left edge.
+Instead, we’ll anchor it with translateX(-100%) when closed, and translateX(0) when open, while applying extra stretch only beyond that boundary.
+
+Here’s the adjusted version:
+
 // =====================
-// Rubber Band Stretch Effect
+// Rubber Band Stretch Effect (anchored left like ChatGPT app)
 // =====================
 
 function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
@@ -1827,15 +1839,23 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
     let delta = 0;
     if (axis === "X") {
       delta = e.touches[0].clientX - startPos;
-      if (delta > 0) { // pulling right
+
+      if (delta > 0) { // pull right (stretch)
         const stretch = Math.min(delta, maxStretch);
-        drawerEl.style.transform = `translateX(${stretch}px)`;
+        drawerEl.style.transform = `translateX(${stretch}px)`; 
+      } else {
+        // keep it fixed at open state
+        drawerEl.style.transform = `translateX(0)`;
       }
+
     } else if (axis === "Y") {
       delta = e.touches[0].clientY - startPos;
-      if (delta < 0) { // pulling up
+
+      if (delta < 0) { // pull up (stretch)
         const stretch = Math.max(delta, -maxStretch);
-        drawerEl.style.transform = `translateY(${stretch}px)`;
+        drawerEl.style.transform = `translateY(${stretch}px)`; 
+      } else {
+        drawerEl.style.transform = `translateY(0)`;
       }
     }
   });
@@ -1843,18 +1863,35 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   drawerEl.addEventListener("touchend", () => {
     if (!isDragging) return;
     isDragging = false;
-    drawerEl.style.transition = "transform 0.1s ease-out";
-    drawerEl.style.transform = "translate(0, 0)"; // snap back
+
+    // Snap back to fixed open position
+    drawerEl.style.transition = "transform 0.15s ease-out";
+    drawerEl.style.transform = axis === "X" ? "translateX(0)" : "translateY(0)";
 
     setTimeout(() => {
-      drawerEl.style.transition = ""; // clear for smooth future drags
-    }, 100);
+      drawerEl.style.transition = ""; // reset for future drags
+    }, 150);
   });
 }
 
-// Attach to your drawers
-addRubberBandEffect(drawer, "X");          // Left drawer stretch
-addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
+// Usage
+addRubberBandEffect(drawer, "X");          // Left drawer anchored
+addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer anchored
+
+🔑 What Changed
+
+For the left drawer (axis = "X"), it always snaps back to translateX(0) (anchored open).
+
+Stretch only applies when dragging to the right.
+
+No shifting to the left (prevents detaching from screen).
+
+
+👉 With this, your left drawer will stick to the screen edge like ChatGPT’s, but still give that nice “rubber band” stretch when dragged.
+
+Do you also want me to add the same behavior when the drawer is closed (like dragging from the edge to open it, also with stretch)?
+
+
 
     
 // =====================
