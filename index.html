@@ -116,7 +116,7 @@
   position: fixed;
   top: 0;
   left: -100%; /* hidden off-screen */
-  width: 100%; /* default width */
+  width: 100%; /* always full width */
   height: 100%;
   background: linear-gradient(
     to bottom,
@@ -126,7 +126,7 @@
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0,0,0,0.5);
   z-index: 99;
-  transition: left 0.3s ease, width 0.3s ease;
+  transition: left 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -152,8 +152,7 @@
 
 /* When open */
 .drawer.open {
-  left: 0;      /* fully visible */
-  width: 80%;   /* shrink to 80% */
+  left: -20%; /* stop 20% before the right edge → looks like 80% */
 }
     
     /* On wider screens (like PC), use 40% width */
