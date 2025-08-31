@@ -715,7 +715,7 @@
 
     
 /*  ==========================
-    URL box -- s 
+    URL box
     ==========================  */
     input[type="text"]::placeholder {
       color: white;
@@ -762,7 +762,7 @@
       caret-color: white;
       border: 1px solid magenta;
     }
-/*  URL box -- e ==========================  */
+/*  URL box -- end ==========================  */
     
 
     
@@ -806,7 +806,7 @@
 
     
 /*  =====================
-    Notify text-line --e 
+    Notify text-line
     =====================  */
     .notify-box {
       height: 60px;
@@ -902,7 +902,7 @@
     .Notify.hide .text {
       animation: slideIn 1.2s forwards;
     }
-/*  Notify text-line --e =====================  */
+/*  Notify text-line --end =====================  */
     
 
     
@@ -1652,6 +1652,7 @@ function hideNotify() {
 
 // =====================
 // Progress checking for "Up next"
+// =====================
 function startProgressChecker() {
   if (progressChecker) return; // already running
   nextSongNotifyShown = false;
@@ -1842,12 +1843,12 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   drawerEl.addEventListener("touchend", () => {
     if (!isDragging) return;
     isDragging = false;
-    drawerEl.style.transition = "transform 0.3s ease-out";
+    drawerEl.style.transition = "transform 0.1s ease-out";
     drawerEl.style.transform = "translate(0, 0)"; // snap back
 
     setTimeout(() => {
       drawerEl.style.transition = ""; // clear for smooth future drags
-    }, 300);
+    }, 100);
   });
 }
 
