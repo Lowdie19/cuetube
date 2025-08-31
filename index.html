@@ -111,51 +111,48 @@
 /*  CueTube Title -- e ===========  */
 
     
-    .drawer {
-  position: fixed;
-  top: 0;
-  left: 0; /* Always anchored to screen */
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(13, 14, 14, 0.6) 0%,
-    #000000 100%
-  );
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-  z-index: 99;
-  transition: transform 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 25px;
-
-  /* Start hidden off-screen */
-  transform: translateX(-100%);
-}
-
-.drawer::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(13, 14, 14, 0) 0%,
-    rgba(13, 14, 14, 0.6) 60%,
-    #000000 100%
-  );
-  z-index: 10;
-  pointer-events: none;
-}
-
-.drawer.open {
-  transform: translateX(0); /* Slide in */
-}
     
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -100%; /* Default for mobile */
+      width: 100%;  /* Default for mobile */
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 25px;
+    }
+    .drawer::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%; /* adjust as needed */
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.6) 60%,  
+        #000000 100%                
+      );
+      z-index: 10;
+      pointer-events: none; /* let clicks/scroll pass through */
+    }
+    
+    /* When open, slide to visible */
+    .drawer.open {
+      left: -10;
+    }
     
     /* On wider screens (like PC), use 40% width */
     @media (min-width: 768px) {
@@ -1809,9 +1806,8 @@ document.body.addEventListener("click", () => {
 });
 
 
-
 // =====================
-// Rubber Band Stretch Effect (anchored left like ChatGPT app)
+// Rubber Band Stretch Effect
 // =====================
 
 function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
@@ -1831,23 +1827,15 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
     let delta = 0;
     if (axis === "X") {
       delta = e.touches[0].clientX - startPos;
-
-      if (delta > 0) { // pull right (stretch)
+      if (delta > 0) { // pulling right
         const stretch = Math.min(delta, maxStretch);
-        drawerEl.style.transform = `translateX(${stretch}px)`; 
-      } else {
-        // keep it fixed at open state
-        drawerEl.style.transform = `translateX(0)`;
+        drawerEl.style.transform = `translateX(${stretch}px)`;
       }
-
     } else if (axis === "Y") {
       delta = e.touches[0].clientY - startPos;
-
-      if (delta < 0) { // pull up (stretch)
+      if (delta < 0) { // pulling up
         const stretch = Math.max(delta, -maxStretch);
-        drawerEl.style.transform = `translateY(${stretch}px)`; 
-      } else {
-        drawerEl.style.transform = `translateY(0)`;
+        drawerEl.style.transform = `translateY(${stretch}px)`;
       }
     }
   });
@@ -1855,22 +1843,18 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   drawerEl.addEventListener("touchend", () => {
     if (!isDragging) return;
     isDragging = false;
-
-    // Snap back to fixed open position
-    drawerEl.style.transition = "transform 0.15s ease-out";
-    drawerEl.style.transform = axis === "X" ? "translateX(0)" : "translateY(0)";
+    drawerEl.style.transition = "transform 0.1s ease-out";
+    drawerEl.style.transform = "translate(0, 0)"; // snap back
 
     setTimeout(() => {
-      drawerEl.style.transition = ""; // reset for future drags
-    }, 150);
+      drawerEl.style.transition = ""; // clear for smooth future drags
+    }, 100);
   });
 }
 
-// Usage
-addRubberBandEffect(drawer, "X");          // Left drawer anchored
-addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer anchored
-
-
+// Attach to your drawers
+addRubberBandEffect(drawer, "X");          // Left drawer stretch
+addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
 
     
 // =====================
