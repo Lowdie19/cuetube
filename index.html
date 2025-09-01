@@ -1809,16 +1809,19 @@ document.body.addEventListener("click", () => {
 
 
 // =====================
-// Rubber Band Stretch Effect
+// Rubber Band Stretch Effect with Threshold
 // =====================
 
-function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
+function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPercent = 0.3) {
   let startPos = 0;
   let isDragging = false;
+  let thresholdReached = false;
 
   drawerEl.addEventListener("touchstart", (e) => {
     if (!drawerEl.classList.contains("open")) return;
     isDragging = true;
+    thresholdReached = false;
+
     if (axis === "X") startPos = e.touches[0].clientX;
     if (axis === "Y") startPos = e.touches[0].clientY;
   });
@@ -1827,16 +1830,24 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
     if (!isDragging || !drawerEl.classList.contains("open")) return;
 
     let delta = 0;
+    let screenSize = axis === "X" ? window.innerWidth : window.innerHeight;
+    let threshold = screenSize * thresholdPercent;
+
     if (axis === "X") {
       delta = e.touches[0].clientX - startPos;
-      if (delta > 0) { // pulling right
-        const stretch = Math.min(delta, maxStretch);
+
+      // Only start rubber band effect after threshold
+      if (delta > threshold) {
+        thresholdReached = true;
+        const stretch = Math.min(delta - threshold, maxStretch);
         drawerEl.style.transform = `translateX(${stretch}px)`;
       }
     } else if (axis === "Y") {
       delta = e.touches[0].clientY - startPos;
-      if (delta < 0) { // pulling up
-        const stretch = Math.max(delta, -maxStretch);
+
+      if (-delta > threshold) { // upward swipe
+        thresholdReached = true;
+        const stretch = Math.max(-(Math.abs(delta) - threshold), -maxStretch);
         drawerEl.style.transform = `translateY(${stretch}px)`;
       }
     }
@@ -1845,18 +1856,20 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50) {
   drawerEl.addEventListener("touchend", () => {
     if (!isDragging) return;
     isDragging = false;
-    drawerEl.style.transition = "transform 0.05s ease-out";
-    drawerEl.style.transform = "translate(0, 0)"; // snap back
 
-    setTimeout(() => {
-      drawerEl.style.transition = ""; // clear for smooth future drags
-    }, 50);
+    if (thresholdReached) {
+      drawerEl.style.transition = "transform 0.15s ease-out";
+      drawerEl.style.transform = "translate(0, 0)"; // snap back
+      setTimeout(() => {
+        drawerEl.style.transition = "";
+      }, 150);
+    }
   });
 }
 
 // Attach to your drawers
-addRubberBandEffect(drawer, "X");          // Left drawer stretch
-addRubberBandEffect(bottomDrawer, "Y");    // Bottom drawer stretch
+addRubberBandEffect(drawer, "X", 50, 0.3);       // 30% threshold for left drawer
+addRubberBandEffect(bottomDrawer, "Y", 50, 0.3); // 30% threshold for bottom drawer
 
     
 // =====================
