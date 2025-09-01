@@ -158,8 +158,12 @@
     /* On wider screens (like PC), use 40% width */
     @media (min-width: 768px) {
       .drawer {
-        width: 40%;
-        left: -40%;
+        width: 45%;
+        left: -45%; /* hidden off-screen */
+      }
+    
+      .drawer.open {
+        left: -6%; /* fully visible */
       }
     }
 
@@ -950,7 +954,7 @@
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
-  <span class="title-text">CueTube</span>
+  <span class="title-text">CueTube :)</span>
 </div>
   
   <!-- Drawer -->
