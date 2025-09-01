@@ -60,7 +60,7 @@
       padding: 15px 0;
       color: cyan;
       background-color: black;
-      position: relative;
+      position: absolute;
       animation: neon-text 3.0s ease-in-out infinite alternate;
       display: flex;
       align-items: center;
@@ -123,8 +123,8 @@
     rgba(13, 14, 14, 0.6) 0%,
     #000000 100%
   );
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+  padding: 35px 10px 15px 95px;                    /* top | right | bottom | left */
+  box-shadow: none;
   z-index: 99;
   transition: left 0.3s ease;
   display: flex;
@@ -225,8 +225,7 @@
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 35px 10px 15px 80px;                    /* top | right | bottom | left */
-      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
+      margin-bottom: 15px; box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
               0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
         inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
     }
@@ -270,7 +269,6 @@
       border-radius: none;
       padding: 10px;
       background: none;
-      margin-left: 80px;
       flex: 1;
       min-height: 0;
       overscroll-behavior: contain;          /* keeps scroll contained */
@@ -950,7 +948,7 @@
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
-  <span class="title-text">CueTube! A1(a)</span>
+  <span class="title-text">CueTube! A1(b)</span>
 </div>
   
   <!-- Drawer -->
