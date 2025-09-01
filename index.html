@@ -56,7 +56,7 @@
     ===================== */
     .title-bar {
       text-align: center;
-      font-size: 1.5em;
+      font-size: 1.2em;
       padding: 20px 0 10px 0;
       color: cyan;
       background-color: black;
@@ -112,63 +112,56 @@
 
     
     
-.drawer {
-  position: fixed;
-  top: 0;
-  left: 0; /* stay anchored to left */
-  width: 100%;  /* default: mobile full width */
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(13, 14, 14, 0.6) 0%,
-    #000000 100%
-  );
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-  z-index: 99;
-  transition: transform 0.3s ease; /* smooth sliding */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 25px;
+ .drawer {
+      position: fixed;
+      top: 0;
+      left: -100%; /* hidden off-screen */
+      width: 100%; /* always full width */
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      z-index: 99;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 25px;
+    }
 
-  /* hidden by default */
-  transform: translateX(-100%);
-}
-
-/* Gradient overlay */
-.drawer::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(13, 14, 14, 0) 0%,     
-    rgba(13, 14, 14, 0.6) 60%,  
-    #000000 100%
-  );
-  z-index: 10;
-  pointer-events: none;
-}
-
-/* When open (mobile) → show 80% */
-.drawer.open {
-  transform: translateX(-20%);
-}
-
-/* On wider screens (desktop) */
-@media (min-width: 768px) {
-  .drawer {
-    width: 40%; /* fixed 40% width */
-  }
-  .drawer.open {
-    transform: translateX(0); /* slide fully in */
-  }
-}
-
+    .drawer::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.6) 60%,  
+        #000000 100%
+      );
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    /* When open */
+    .drawer.open {
+      left: -20%; /* stop 20% before the right edge → looks like 80% */
+    }
+    
+    /* On wider screens (like PC), use 40% width */
+    @media (min-width: 768px) {
+      .drawer {
+        width: 40%;
+        left: -40%;
+      }
+    }
 
     
     .drawer-handle {
@@ -232,7 +225,7 @@
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 40px 10px 15px 10px;                    /* top | right | bottom | left */
+      margin: 40px 10px 15px 90px;                    /* top | right | bottom | left */
       box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
               0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
         inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
@@ -277,7 +270,7 @@
       border-radius: none;
       padding: 10px;
       background: none;
-      /*margin-left: 90px;*/
+      margin-left: 90px;
       flex: 1;
       min-height: 0;
       overscroll-behavior: contain;          /* keeps scroll contained */
