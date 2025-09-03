@@ -361,14 +361,14 @@
       width: 100%;
       height: 50vh; /* 50% of the screen height */
       padding: 0;
-      margin-bottom: 200px;
+      margin: 0;
     }
     
     .youtube-wrapper iframe {
       width: 100%;
-      aspect-ratio: 16/9;
+      height: 100%;
       border: none;
-      flex-grow: 1;
+      display: block;
     }
 
     .url-group {
@@ -623,6 +623,20 @@
           drop-shadow(0 0 15px magenta);
 }
     
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 75vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+    }
+    
     @media screen and (orientation: landscape) and (max-width: 900px) {
       .title-bar {
         display: none !important;
@@ -639,11 +653,6 @@
       .url-group {
         margin-bottom: 5px !important;
       }
-      .youtube-wrapper {
-        height: 30vh;
-        justify-content: center;
-        align-items: center;
-        margin: 30 10px;
     }
     
     @media (max-height: 500px) {
