@@ -580,6 +580,7 @@
     }
     
     .paste-btn-icon:active img {
+      filter: grayscale(100%) brightness(200%);
       filter: drop-shadow(0 0 2px magenta)
               drop-shadow(0 0 6.5px magenta)
               drop-shadow(0 0 15px magenta);
@@ -949,34 +950,7 @@
   opacity: 1;
 }
 
-    
-/* ===========================================
-   Mobile simulated popup
-   =========================================== */ 
-.youtubepopup-modal {
-  display: none; /* hidden by default */
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;  /* full width or you can use 1/4 for “split screen” */
-  height: 100%; /* full height */
-  background-color: rgba(0,0,0,0.8);
-  z-index: 9999;
-  backdrop-filter: blur(5px); /* optional blur */
-}
-
-.youtubepopup-modal .popup-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 5px;
-}
-
-#youtube-iframe {
-  width: 100%;
-  height: calc(100% - 40px); /* adjust for header */
-  border: none;
-}
-/*  Mobile simulated popup --end   ================  */ 
+/*  Universal Tooltip Style --end   ================  */ 
    
 
 
@@ -1077,14 +1051,6 @@
       <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
   </div>
-</div>
-
-<!-- Mobile simulated popup -->
-<div id="youtube-popup" class="youtubepopup-modal">
-  <div class="popup-header">
-    <button id="popup-close">✖</button>
-  </div>
-  <iframe id="youtube-iframe" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
@@ -2088,8 +2054,9 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new YouTube tab (desktop/mobile popup)
-// 3s cooldown, no click animation
+// Add new YouTube tab / app (3s cooldown, no click animation)
+// Desktop: popup window
+// Mobile: YouTube app or browser fallback
 // ======================================
 const titleIcon = document.querySelector(".title-icon");
 let canClick = true;
@@ -2099,30 +2066,30 @@ titleIcon.addEventListener("click", () => {
   canClick = false;
   titleIcon.style.pointerEvents = "none";
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const youtubeSearchURL = "https://www.youtube.com/results?search_query=karaoke";
 
-  if (isMobile) {
-    // Mobile → show in-page modal instead of new tab
-    const modal = document.getElementById("youtube-popup");
-    const iframe = document.getElementById("youtube-iframe");
-    modal.className = "youtubepopup-modal"; // updated class name
-    iframe.src = "https://www.youtube.com/results?search_query=karaoke";
-    modal.style.display = "block";
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // Close button
-    document.getElementById("popup-close").onclick = () => {
-      iframe.src = "";
-      modal.style.display = "none";
-    };
+  if (isAndroid) {
+    // Android → try to open YouTube app via intent
+    window.location.href = 
+      "intent://www.youtube.com/results?search_query=karaoke#Intent;scheme=https;package=com.google.android.youtube;end";
+  } else if (isIOS) {
+    // iOS → try to open YouTube app via URL scheme, fallback to browser
+    window.location.href = "youtube://www.youtube.com/results?search_query=karaoke";
+    setTimeout(() => {
+      window.location.href = youtubeSearchURL; // fallback
+    }, 500);
   } else {
-    // Desktop → normal popup window
-    const w = window.screen.width / 2;
-    const h = window.screen.height;
-    const left = window.screen.width - w;
-    const top = 0;
+    // Desktop → custom popup window
+    const w = window.screen.width / 2;   // 1/2 of screen width
+    const h = window.screen.height;      // full height
+    const left = window.screen.width - w; // right side
+    const top = 0;                        // top
 
     window.open(
-      "https://www.youtube.com/results?search_query=karaoke",
+      youtubeSearchURL,
       "_blank",
       `width=${w},height=${h},top=${top},left=${left}`
     );
@@ -2134,7 +2101,7 @@ titleIcon.addEventListener("click", () => {
     titleIcon.style.pointerEvents = "auto";
   }, 3000);
 });
-// Add new YouTube tab ----end //
+// Add new YouTube tab / app ----end //
 
 
     
