@@ -111,11 +111,12 @@
         drop-shadow(0 0 4px var(--glow-color))
         drop-shadow(0 0 8px var(--glow-color));
     }
-/*  CueTube Title -- end ===========  */
 
-    
-    
- .drawer {
+
+/*  =====================
+    Left Drawer
+    ===================== */
+   .drawer {
       position: fixed;
       top: 0;
       left: -100%; /* hidden off-screen */
@@ -152,19 +153,40 @@
       pointer-events: none;
     }
     
-    /* When open --start */
+    /* When Left drawer open --start */
     .drawer.open {
       left: -20%; /* stop 20% before the right edge → looks like 80% */
       animation: shadowFloat 5s infinite ease-in-out;
     }
     
-    /* Shadow moves up and down */
     @keyframes shadowFloat {
       0%   { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
       50%  { box-shadow: 0  10px 80px rgba(0, 255, 255, 0.1); }  
       100% { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
     }
-    /* When open --end */
+    /* When Left drawer open --end */
+
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+      display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+
+    .youtube-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 50vh; /* 50% of the screen height */
+      padding: 0;
+      margin: 0;
+    }
     
     /* On wider screens (like PC), use 40% width */
     @media (min-width: 768px) {
@@ -178,7 +200,7 @@
       }
     }
 
-    
+    /* Left drawer-handle --start */
     .drawer-handle {
       position: absolute;
       top: 7px;
@@ -217,10 +239,10 @@
         0 0 24px cyan;
       /*transform: scale(1.05);  enlarge a bit */
     }
-
+/* Left drawer-handle --end*/
 
 /*  =============================
-    Nowplaying-box 
+    Nowplaying-box
     =============================  */
     /* Box */
     .nowplaying-box {
@@ -261,9 +283,11 @@
        from { text-shadow: 0 0 4px magenta, 0 0 6px magenta, 0 0 12px magenta; }
       to { text-shadow: 0 0 12px magenta, 0 0 14px magenta, 0 0 18px magenta; }
     }
-/*  Nowplaying-box -- end ===========  */
 
-    
+
+/*  =============================
+    Next-box
+    =============================  */
     .next-box {
       position: relative;
       overflow-y: auto;
@@ -305,7 +329,7 @@
       display: none !important;
     }
 
-    
+    /*  Next-box -- end ?????????????????????  */
    
     .drawer > div {
       flex: 1;
@@ -341,27 +365,7 @@
       padding: 5px;
     }
     
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
-      z-index: 90;
-      display: none;
-    }
-    .drawer-overlay.visible { display: block; }
 
-    .youtube-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 50vh; /* 50% of the screen height */
-      padding: 0;
-      margin: 0;
-    }
     
     .youtube-wrapper iframe {
       width: 100%;
@@ -416,51 +420,6 @@
       gap: 10px;
       z-index: 5;
     }
-
-
-/*  ===============================================
-    Buttons for Reserve, Next and Confirm's -- s 
-    ===============================================  */
-    .cyan-btn {
-      flex: 1;
-      padding: 14px;
-      background: black;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
-      border: 1px solid cyan;
-      box-shadow: 
-        0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
-    }
-    
-    /* Hover effect */
-    .cyan-btn:hover {
-      background: rgba(0, 255, 255, 0.2);
-      color: white;
-      text-shadow: 0 0 16px cyan;
-    }
-    
-    /* Press / click effect */
-    .cyan-btn:active {
-      transform: scale(0.9); /* shrink when pressed */
-      box-shadow: 0 0 5px cyan, 0 0 20px cyan inset; /* temporary glow */
-      background: cyan;
-      color: black;
-      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
-    }
-    
-    /* Reset hover/glow after click */
-    .cyan-btn.clicked {
-      transform: scale(1);
-      box-shadow: 
-        0 0 10px 0.5px rgba(0, 255, 255, 0.5),
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    /*  Buttons for Reserve, Next and Confirm's -- e ===========  */
 
     
     .bottom-drawer {
@@ -724,6 +683,89 @@
       box-shadow: 0 0 10px red;
     }
 
+
+
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .youtube-wrapper {
+        height: 100vh;
+        margin: 0;
+      }
+      body, html {
+        overflow: hidden;
+      }
+    }
+    .nextConfirmModal {
+      /* only one display here */
+      display: inline-block;  /* size to content */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      padding: 20px 30px;
+      z-index: 1000;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,255,255,0.5), 0 0 20px rgba(0,255,255,0.3);
+      white-space: nowrap;
+    }
+    
+    .nextConfirmOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    
+/*  ===============================================================================================================================  */
+/*  ===============================================
+    Buttons for Reserve, Next and Confirm's -- s 
+    ===============================================  */
+    .cyan-btn {
+      flex: 1;
+      padding: 14px;
+      background: black;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
+      border: 1px solid cyan;
+      box-shadow: 
+        0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
+    }
+    
+    /* Hover effect */
+    .cyan-btn:hover {
+      background: rgba(0, 255, 255, 0.2);
+      color: white;
+      text-shadow: 0 0 16px cyan;
+    }
+    
+    /* Press / click effect */
+    .cyan-btn:active {
+      transform: scale(0.9); /* shrink when pressed */
+      box-shadow: 0 0 5px cyan, 0 0 20px cyan inset; /* temporary glow */
+      background: cyan;
+      color: black;
+      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
+    }
+    
+    /* Reset hover/glow after click */
+    .cyan-btn.clicked {
+      transform: scale(1);
+      box-shadow: 
+        0 0 10px 0.5px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
     
 /*  ==========================
     URL box
@@ -774,47 +816,6 @@
       caret-color: white;
       border: 1px solid magenta;
     }
-/*  URL box -- end ==========================  */
-    
-
-    
-    @media screen and (orientation: landscape) and (max-width: 900px) {
-      .youtube-wrapper {
-        height: 100vh;
-        margin: 0;
-      }
-      body, html {
-        overflow: hidden;
-      }
-    }
-    .nextConfirmModal {
-      /* only one display here */
-      display: inline-block;  /* size to content */
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      border: 2px solid cyan;
-      border-radius: 10px;
-      padding: 20px 30px;
-      z-index: 1000;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(0,255,255,0.5), 0 0 20px rgba(0,255,255,0.3);
-      white-space: nowrap;
-    }
-    
-    .nextConfirmOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-    }
-
 
     
 /*  =====================
@@ -915,9 +916,7 @@
     .Notify.hide .text {
       animation: slideIn 1.2s forwards;
     }
-/*  Notify text-line --end =====================  */
     
-
     
 /* ===========================================
    Universal Tooltip Style
@@ -949,7 +948,35 @@
 [data-tooltip].show-tooltip::after {
   opacity: 1;
 }
-/* Universal Tooltip Style --end   ================  */ 
+
+    
+/* ===========================================
+   Mobile simulated popup
+   =========================================== */ 
+.youtubepopup-modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;  /* full width or you can use 1/4 for “split screen” */
+  height: 100%; /* full height */
+  background-color: rgba(0,0,0,0.8);
+  z-index: 9999;
+  backdrop-filter: blur(5px); /* optional blur */
+}
+
+.youtubepopup-modal .popup-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 5px;
+}
+
+#youtube-iframe {
+  width: 100%;
+  height: calc(100% - 40px); /* adjust for header */
+  border: none;
+}
+/*  Mobile simulated popup --end   ================  */ 
    
 
 
@@ -970,7 +997,7 @@
     <div>
       <div class="nowplaying-box">
         <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle">. . .</div>
+        <div class="title" id="nowTitle"></div>
       </div>  
       <div class="next-box hidden">
         <div class="label">NEXT</div>
@@ -1050,6 +1077,14 @@
       <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
     </div>
   </div>
+</div>
+
+<!-- Mobile simulated popup -->
+<div id="youtube-popup" class="youtubepopup-modal">
+  <div class="popup-header">
+    <button id="popup-close">✖</button>
+  </div>
+  <iframe id="youtube-iframe" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
@@ -2053,34 +2088,37 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new YouTube tab (desktop popup / mobile new tab)
+// Add new YouTube tab (desktop/mobile popup)
 // 3s cooldown, no click animation
 // ======================================
 const titleIcon = document.querySelector(".title-icon");
 let canClick = true;
 
 titleIcon.addEventListener("click", () => {
-  if (!canClick) return; // prevent double clicks
-
+  if (!canClick) return;
   canClick = false;
-  titleIcon.style.pointerEvents = "none"; // disable click + no :active animation
+  titleIcon.style.pointerEvents = "none";
 
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // Mobile → use temporary <a> to open real new tab
-    const a = document.createElement("a");
-    a.href = "https://www.youtube.com/results?search_query=karaoke";
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Mobile → show in-page modal instead of new tab
+    const modal = document.getElementById("youtube-popup");
+    const iframe = document.getElementById("youtube-iframe");
+    modal.className = "youtubepopup-modal"; // updated class name
+    iframe.src = "https://www.youtube.com/results?search_query=karaoke";
+    modal.style.display = "block";
+
+    // Close button
+    document.getElementById("popup-close").onclick = () => {
+      iframe.src = "";
+      modal.style.display = "none";
+    };
   } else {
-    // Desktop → custom popup window
-    const w = window.screen.width / 2;   // half of screen width
-    const h = window.screen.height;      // full height
-    const left = window.screen.width - w; // right side
+    // Desktop → normal popup window
+    const w = window.screen.width / 2;
+    const h = window.screen.height;
+    const left = window.screen.width - w;
     const top = 0;
 
     window.open(
@@ -2097,6 +2135,8 @@ titleIcon.addEventListener("click", () => {
   }, 3000);
 });
 // Add new YouTube tab ----end //
+
+
     
   // Play click sound
 function playClickSound() {
