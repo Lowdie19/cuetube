@@ -2218,6 +2218,31 @@ const youtubeInput = document.getElementById("youtubeInputDrawer");
 
 
   </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://www.youtube.com/iframe_api">
+/* ==== Fix: Missing goFullscreenIfLandscape() ====
+   This function requests fullscreen when the device is in landscape.
+   It is only triggered on user click (per your existing event listener),
+   which satisfies browser autoplay/fullscreen policies.
+*/
+function goFullscreenIfLandscape() {
+  try {
+    const isLandscape = (window.screen && window.screen.orientation && window.screen.orientation.type) 
+      ? window.screen.orientation.type.startsWith('landscape')
+      : (window.innerWidth > window.innerHeight);
+
+    if (!isLandscape) return;
+
+    const el = document.documentElement;
+    const request = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
+    if (request) {
+      request.call(el);
+    }
+  } catch (e) {
+    // Fail silently to avoid breaking UX
+    // console.warn('Fullscreen request failed:', e);
+  }
+}
+
+</script>
 </body>
 </html>
