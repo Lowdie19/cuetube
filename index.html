@@ -2053,7 +2053,8 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new youtube tab (3s cooldown, no click animation)
+// Add new youtube tab (desktop popup / mobile new tab)
+// 3s cooldown, no click animation
 // ======================================
 const titleIcon = document.querySelector(".title-icon");
 let canClick = true;
@@ -2061,24 +2062,36 @@ let canClick = true;
 titleIcon.addEventListener("click", () => {
   if (!canClick) return; // prevent double clicks
 
-  canClick = false; // lock
+  canClick = false; 
   titleIcon.style.pointerEvents = "none"; // disable click + no :active animation
 
-  const w = window.screen.width / 2;   // 1/2 of screen width (1 to 10 sizes) 10 is smallest
-  const h = window.screen.height;      // full height
-  const left = window.screen.width - w; // anchor to right side
-  const top = 0;                        // anchor to top
+  // Detect if user is on mobile
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  window.open(
-    "https://www.youtube.com/results?search_query=karaoke",
-    "_blank",
-    `width=${w},height=${h},top=${top},left=${left}`
-  );
+  if (isMobile) {
+    // Mobile → open in a real new tab
+    window.open(
+      "https://www.youtube.com/results?search_query=karaoke",
+      "_blank"
+    );
+  } else {
+    // Desktop → custom popup anchored right side
+    const w = window.screen.width / 2;   // 1/2 of screen width
+    const h = window.screen.height;      // full height
+    const left = window.screen.width - w; // anchor to right
+    const top = 0;                        // anchor to top
 
-  // unlock after 3 seconds
+    window.open(
+      "https://www.youtube.com/results?search_query=karaoke",
+      "_blank",
+      `width=${w},height=${h},top=${top},left=${left}`
+    );
+  }
+
+  // Unlock after 3s
   setTimeout(() => {
     canClick = true;
-    titleIcon.style.pointerEvents = "auto"; // re-enable click
+    titleIcon.style.pointerEvents = "auto";
   }, 3000);
 });
 // Add new youtube tab ----end //
