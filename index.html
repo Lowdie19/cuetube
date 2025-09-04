@@ -184,9 +184,9 @@
       right: -55px;
       width: 50px;
       height: 50px;
-      background: rgba(0, 0, 0, 0.0);
+      background: none;
       color: magenta;
-      font-size: 1.7em; /* bigger text */
+      font-size: 1.8em; /* bigger text */
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
       display: flex;
@@ -201,32 +201,19 @@
                   -webkit-text-stroke 0.1s ease,
                   transform 0.1s ease-in-out;
     }
-    
-    /* Hover effect */
-    .drawer-handle:hover {
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 15px cyan,
-        0 0 40px cyan,
-        0 0 80px cyan,
-        0 0 150px cyan; /* 💡 BIG bright glow */
-      transform: scale(1.05); /* enlarge a bit */
-    }
-    
-    /* Focus-visible (keyboard navigation) */
+
+    /* Hover + Focus-visible share same effect */
+    .drawer-handle:hover,
     .drawer-handle:focus-visible {
-      outline: none; /* remove default dotted outline */
+      outline: none; /* remove dotted outline for keyboard */
       color: cyan;
       -webkit-text-stroke: 0px cyan;
       text-shadow:
-        0 0 15px cyan,
-        0 0 40px cyan,
-        0 0 80px cyan,
-        0 0 150px cyan;
-      transform: scale(1.05);
-      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); /* clear cyan ring */
-      border-radius: 10px;
+        0 0 8px cyan,
+        0 0 8px cyan,
+        0 0 12px cyan,
+        0 0 24px cyan;
+      /*transform: scale(1.05);  enlarge a bit */
     }
 
 
@@ -528,31 +515,18 @@
                   transform 0.1s ease-in-out;
     }
     
-    /* Hover: Cyan glowing pop */
-    .bottom-drawer-handle:hover {
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 15px cyan,
-        0 0 40px cyan,
-        0 0 80px cyan,
-        0 0 150px cyan;
-      transform: translateX(-50%) scale(1.05);
-    }
-    
-    /* Focus (keyboard navigation): same as hover + strong outline */
+    /* Hover + Focus-visible share same effect */
+    .bottom-drawer-handle:hover,
     .bottom-drawer-handle:focus-visible {
-      outline: none; /* remove default dotted outline */
+      outline: none; /* remove dotted outline for keyboard */
       color: cyan;
       -webkit-text-stroke: 0px cyan;
       text-shadow:
-        0 0 15px cyan,
-        0 0 40px cyan,
-        0 0 80px cyan,
-        0 0 150px cyan;
-      transform: translateX(-50%) scale(1.05);
-      box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); /* clear cyan ring */
-      border-radius: 6px; /* round focus ring */
+        0 0 8px cyan,
+        0 0 8px cyan,
+        0 0 12px cyan,
+        0 0 24px cyan;
+      /*transform: scale(1.05);  enlarge a bit */
     }
     
     .bottom-drawer-handle[style*="display: none"] {
