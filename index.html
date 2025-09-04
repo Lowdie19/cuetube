@@ -2053,7 +2053,7 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new youtube tab (desktop popup / mobile new tab)
+// Add new YouTube tab (desktop popup / mobile new tab)
 // 3s cooldown, no click animation
 // ======================================
 const titleIcon = document.querySelector(".title-icon");
@@ -2062,24 +2062,26 @@ let canClick = true;
 titleIcon.addEventListener("click", () => {
   if (!canClick) return; // prevent double clicks
 
-  canClick = false; 
+  canClick = false;
   titleIcon.style.pointerEvents = "none"; // disable click + no :active animation
 
-  // Detect if user is on mobile
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isMobile) {
-    // Mobile → open in a real new tab
-    window.open(
-      "https://www.youtube.com/results?search_query=karaoke",
-      "_blank"
-    );
+    // Mobile → use temporary <a> to open real new tab
+    const a = document.createElement("a");
+    a.href = "https://www.youtube.com/results?search_query=karaoke";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } else {
-    // Desktop → custom popup anchored right side
-    const w = window.screen.width / 2;   // 1/2 of screen width
+    // Desktop → custom popup window
+    const w = window.screen.width / 2;   // half of screen width
     const h = window.screen.height;      // full height
-    const left = window.screen.width - w; // anchor to right
-    const top = 0;                        // anchor to top
+    const left = window.screen.width - w; // right side
+    const top = 0;
 
     window.open(
       "https://www.youtube.com/results?search_query=karaoke",
@@ -2088,14 +2090,13 @@ titleIcon.addEventListener("click", () => {
     );
   }
 
-  // Unlock after 3s
+  // Re-enable after 3 seconds
   setTimeout(() => {
     canClick = true;
     titleIcon.style.pointerEvents = "auto";
   }, 3000);
 });
-// Add new youtube tab ----end //
-
+// Add new YouTube tab ----end //
     
   // Play click sound
 function playClickSound() {
