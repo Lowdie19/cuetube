@@ -208,7 +208,7 @@
       width: 50px;
       height: 50px;
       background: none;
-      color: magenta;
+      color: #840072;
       font-size: 1.8em; /* bigger text */
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
@@ -259,7 +259,7 @@
     /* Label "Now playing" */
     .nowplaying-box .label {
       font-size: 0.7em;
-      color: #aaa;
+      color: cyan;
       margin-bottom: 15px;
     }
 
@@ -351,7 +351,7 @@
     
     .next-box .label {
       font-size: 0.7em;
-      color: cyan;
+      color: grey;
     }
     
     .next-box .title {
@@ -464,7 +464,7 @@
       transform: translateX(-50%);
       background: none;
       border: none;
-      color: magenta; /* default text color */
+      color: #840072; /* default color */
       font-size: 2.0em;
       cursor: pointer;
       text-shadow: none; /* 🚫 no glow */
@@ -850,7 +850,7 @@
     .Notify .line {
       width: 3px;
       height: 100%;
-      background-color: #840072;
+      background-color: #7f95e4;
         /*rgba(91, 24, 194, 1);*/
       opacity: 0;
       position: absolute;
@@ -1606,7 +1606,7 @@ function updateNowPlaying() {
     // No upcoming song
     nowTitleEl.innerHTML = `
       <span class="now-playing-glow">${title}</span>
-      <div id="noUpcoming" style="color: #840072; font-family: Arial, sans-serif; font-weight: normal; margin-top: 10px; font-size: 0.8em;">
+      <div id="noUpcoming" style="color: #7f95e4; font-family: Arial, sans-serif; font-weight: normal; margin-top: 10px; font-size: 0.8em;">
         No upcoming song . . .
       </div>
     `;
@@ -1702,7 +1702,7 @@ function scheduleNextSongNotify(duration, currentTime) {
           font-family: Arial, sans-serif;
           font-weight: normal;
           font-size: 0.7em; 
-          color: grey; 
+          color: #7f95e4; 
           margin-bottom: 4px;
         ">Up next:</span>
         <span style="
