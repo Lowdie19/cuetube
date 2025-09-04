@@ -62,6 +62,7 @@
       align-items: center;
       justify-content: center;
       gap: 20px;
+      user-select: none; /* prevent text selection */
     }
     
     .title-icon {
@@ -194,6 +195,7 @@
       justify-content: center;
       cursor: pointer;
       z-index: 80;
+      user-select: none; /* prevent text selection */
       text-shadow: none; /* no glow by default */
       -webkit-text-stroke: 0px transparent;
       transition: opacity 0.2s ease,
@@ -509,6 +511,7 @@
       text-shadow: none; /* 🚫 no glow */
       -webkit-text-stroke: 0px transparent; /* no stroke initially */
       z-index: 99;
+      user-select: none; /* prevent text selection */
       transition: opacity 0.2s ease,
                   color 0.2s ease,
                   -webkit-text-stroke 0.1s ease,
@@ -604,6 +607,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      user-select: none; /* prevent text selection */
     }
     
     .paste-btn-icon:active {
