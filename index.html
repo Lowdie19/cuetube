@@ -67,7 +67,13 @@
     .title-icon {
       height: 30px;
       width: 30px;
+      cursor: pointer;   /* clickable */
+      user-select: none; /* prevent text selection */
       animation: neon-glow 3.0s ease-in-out infinite alternate;
+    }
+    .title-icon:active {
+      transform: scale(0.9);  /* shrink slightly */
+      opacity: 0.7;           /* fade */
     }
     
     /* Neon text animation */
@@ -2061,7 +2067,38 @@ function confirmPlayNext() {
     e.preventDefault();
     e.returnValue = "";
   });
-// Exit Modal ----e // 
+
+
+// ======================================
+// Add new youtube tab (3s cooldown, no click animation)
+// ======================================
+const titleIcon = document.querySelector(".title-icon");
+let canClick = true;
+
+titleIcon.addEventListener("click", () => {
+  if (!canClick) return; // prevent double clicks
+
+  canClick = false; // lock
+  titleIcon.style.pointerEvents = "none"; // disable click + no :active animation
+
+  const w = window.screen.width / 2;   // 1/2 of screen width (1 to 10 sizes) 10 is smallest
+  const h = window.screen.height;      // full height
+  const left = window.screen.width - w; // anchor to right side
+  const top = 0;                        // anchor to top
+
+  window.open(
+    "https://www.youtube.com/results?search_query=karaoke",
+    "_blank",
+    `width=${w},height=${h},top=${top},left=${left}`
+  );
+
+  // unlock after 3 seconds
+  setTimeout(() => {
+    canClick = true;
+    titleIcon.style.pointerEvents = "auto"; // re-enable click
+  }, 3000);
+});
+// Add new youtube tab ----end //
 
     
   // Play click sound
