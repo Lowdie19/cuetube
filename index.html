@@ -2054,9 +2054,10 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new YouTube tab / app (3s cooldown, no click animation)
+// Add new YouTube search (karaoke) - hybrid
 // Desktop: popup window
 // Mobile: YouTube app or browser fallback
+// 3s cooldown, no click animation
 // ======================================
 const titleIcon = document.querySelector(".title-icon");
 let canClick = true;
@@ -2066,27 +2067,28 @@ titleIcon.addEventListener("click", () => {
   canClick = false;
   titleIcon.style.pointerEvents = "none";
 
-  const youtubeSearchURL = "https://www.youtube.com/results?search_query=karaoke";
+  const searchQuery = "karaoke";
+  const youtubeSearchURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
 
   const isAndroid = /Android/i.test(navigator.userAgent);
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Android → try to open YouTube app via intent
+    // Android → open YouTube app via intent with search
     window.location.href = 
-      "intent://www.youtube.com/results?search_query=karaoke#Intent;scheme=https;package=com.google.android.youtube;end";
+      `intent://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}#Intent;scheme=https;package=com.google.android.youtube;end`;
   } else if (isIOS) {
-    // iOS → try to open YouTube app via URL scheme, fallback to browser
-    window.location.href = "youtube://www.youtube.com/results?search_query=karaoke";
+    // iOS → open YouTube app via URL scheme, fallback to browser
+    window.location.href = `youtube://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
     setTimeout(() => {
-      window.location.href = youtubeSearchURL; // fallback
+      window.location.href = youtubeSearchURL; // fallback to browser
     }, 500);
   } else {
     // Desktop → custom popup window
-    const w = window.screen.width / 2;   // 1/2 of screen width
+    const w = window.screen.width / 2;   // half screen width
     const h = window.screen.height;      // full height
     const left = window.screen.width - w; // right side
-    const top = 0;                        // top
+    const top = 0;
 
     window.open(
       youtubeSearchURL,
@@ -2101,7 +2103,7 @@ titleIcon.addEventListener("click", () => {
     titleIcon.style.pointerEvents = "auto";
   }, 3000);
 });
-// Add new YouTube tab / app ----end //
+// Add new YouTube search ----end //
 
 
     
