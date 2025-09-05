@@ -1070,10 +1070,12 @@ let touchStartX = 0;
 
 // Drawer elements
 const drawer = document.getElementById('drawer');
-addRubberBandEffect(drawer, "X", 50, 0.3); // Left drawer, max 50px stretch, threshold 30% of screen
-const overlay = document.getElementById('drawerOverlay');
-const popupOverlay = document.getElementById("popupOverlay");
+  addRubberBandEffect(drawer, "left", 50, 0.3); // Left drawer rubber-band
 const bottomDrawer = document.getElementById("bottomDrawer");
+  addRubberBandEffect(bottomDrawer, "bottom", 50, 0.3);
+const overlay = document.getElementById('drawerOverlay'); // Bottom drawer rubber-band
+const popupOverlay = document.getElementById("popupOverlay");
+
 
 // =====================
 // Touch Handlers
@@ -1821,16 +1823,18 @@ document.body.addEventListener("click", () => {
 
 
 // =====================
-// Rubber Band Stretch Effect for Left Drawer
+// Flexible Rubber Band Stretch Effect
+// for Left or Bottom Drawer
 // =====================
-
-function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPercent = 0.3) {
+function addRubberBandEffect(drawerEl, direction = "left", maxStretch = 50, thresholdPercent = 0.3) {
   let startPos = 0;
   let isDragging = false;
   let thresholdReached = false;
+  let axis = direction === "left" ? "X" : "Y";
 
-  // Initialize transform origin
-  drawerEl.style.transformOrigin = axis === "X" ? "left center" : "center top";
+  // Set transform origin based on drawer direction
+  if (direction === "left") drawerEl.style.transformOrigin = "left center";
+  else if (direction === "bottom") drawerEl.style.transformOrigin = "center bottom";
 
   drawerEl.addEventListener("touchstart", (e) => {
     if (!drawerEl.classList.contains("open")) return;
@@ -1843,25 +1847,24 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPer
   drawerEl.addEventListener("touchmove", (e) => {
     if (!isDragging || !drawerEl.classList.contains("open")) return;
 
-    let delta = axis === "X" 
-                ? e.touches[0].clientX - startPos 
-                : e.touches[0].clientY - startPos;
+    let delta = axis === "X"
+      ? e.touches[0].clientX - startPos
+      : startPos - e.touches[0].clientY; // swipe up for bottom drawer
 
     let screenSize = axis === "X" ? window.innerWidth : window.innerHeight;
     let threshold = screenSize * thresholdPercent;
 
-    if ((axis === "X" && delta > threshold) || (axis === "Y" && -delta > threshold)) {
+    if (delta > threshold) {
       thresholdReached = true;
 
-      if (axis === "X") {
-        const stretch = Math.min(delta - threshold, maxStretch);
-        const scale = 1 + stretch / drawerEl.offsetWidth;
-        drawerEl.style.transform = `scaleX(${scale})`;
-      } else {
-        const stretch = Math.min(-delta - threshold, maxStretch);
-        const scale = 1 + stretch / drawerEl.offsetHeight;
-        drawerEl.style.transform = `scaleY(${scale})`;
-      }
+      const stretch = Math.min(delta - threshold, maxStretch);
+      const scale = axis === "X"
+        ? 1 + stretch / drawerEl.offsetWidth
+        : 1 + stretch / drawerEl.offsetHeight;
+
+      drawerEl.style.transform = axis === "X"
+        ? `scaleX(${scale})`
+        : `scaleY(${scale})`;
     }
   });
 
