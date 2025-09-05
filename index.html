@@ -996,7 +996,7 @@
   />
   
   <button 
-    id="pasteButton" 
+    id="pasteBtn" 
     class="paste-btn-icon" 
     data-tooltip="Paste (Ctrl + V)"
   >
@@ -2177,6 +2177,7 @@ window.addEventListener("load", () => {
   try {
     const text = await navigator.clipboard.readText();
     const input = document.getElementById("youtubeInputDrawer");
+    input.focus();  // optional
     input.value = text;
 
     const videoId = extractVideoId(text);
@@ -2195,7 +2196,7 @@ window.addEventListener("load", () => {
     console.error("Clipboard error:", err);
   }
 }
-
+document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
 
 
 
