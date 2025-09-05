@@ -329,7 +329,7 @@
       display: none !important;
     }
 
-    /*  Next-box -- end ?????????????????????  */
+  
    
     .drawer > div {
       flex: 1;
@@ -557,36 +557,41 @@
       padding-right: 48px;
     }
 
-    .paste-btn-icon {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 11px; /* You can adjust this for hit area */
-      margin-left: 15px; /* Spacing from URL box */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none; /* prevent text selection */
-    }
     
-    .paste-btn-icon:active {
-      transform: scale(0.95);   /* slightly shrink to look pressed */
-      transform: translateY(2px); /* or push it down */
-    }
+.paste-btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 11px;
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.paste-btn-icon:active {
+  transform: scale(0.95);
+  transform: translateY(2px);
+}
+
+.paste-icon-image {
+  width: 22px;
+  height: 22px;
+  content: url("Paste Icon.png"); /* default icon */
+}
+
+
+/* Optional glow & Change imagewhen pressed */
+.paste-btn-icon:active img {
+  content: url("Paste Icon 2.png"); /* works here */
+  filter: 
+    drop-shadow(0 0 2px magenta)
+    drop-shadow(0 0 6.5px magenta)
+    drop-shadow(0 0 15px magenta);
+}
+
     
-    .paste-icon-image {
-      width: 22px;
-      height: 22px;
-    }
-    
-    .paste-btn-icon:active img {
-      filter: 
-        grayscale(100%) 
-        brightness(200%) 
-        drop-shadow(0 0 2px magenta)
-        drop-shadow(0 0 6.5px magenta)
-        drop-shadow(0 0 15px magenta);
-    }
     
     @media (orientation: landscape) {
       .youtube-wrapper {
@@ -1005,12 +1010,26 @@
 <div class="bottom-drawer" id="bottomDrawer">
   <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
   
-  <div class="url-group">
-    <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-    <button id="pasteButton" class="paste-btn-icon" data-tooltip="Paste (Ctrl + V)" onclick="pasteFromClipboard()">
-      <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
-    </button>
-  </div>
+<div class="url-group">
+  <input 
+    type="text" 
+    class="url-input" 
+    placeholder="Paste the YouTube URL here" 
+    id="youtubeInputDrawer" 
+  />
+  
+  <button 
+    id="pasteButton" 
+    class="paste-btn-icon" 
+    data-tooltip="Paste (Ctrl + V)"
+  >
+    <img 
+      src="Paste Icon.png" 
+      alt="Paste" 
+      class="paste-icon-image" 
+    />
+  </button>
+</div>
   
   <div class="bottom-buttons inside">
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
@@ -1824,7 +1843,7 @@ document.body.addEventListener("click", () => {
 
 
 // =====================
-// Rubber Band Stretch Effect with Threshold
+// Rubber Band Stretch Effect for Left Drawer
 // =====================
 
 function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPercent = 0.3) {
@@ -1832,38 +1851,38 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPer
   let isDragging = false;
   let thresholdReached = false;
 
+  // Initialize transform origin
+  drawerEl.style.transformOrigin = axis === "X" ? "left center" : "center top";
+
   drawerEl.addEventListener("touchstart", (e) => {
     if (!drawerEl.classList.contains("open")) return;
     isDragging = true;
     thresholdReached = false;
 
-    if (axis === "X") startPos = e.touches[0].clientX;
-    if (axis === "Y") startPos = e.touches[0].clientY;
+    startPos = axis === "X" ? e.touches[0].clientX : e.touches[0].clientY;
   });
 
   drawerEl.addEventListener("touchmove", (e) => {
     if (!isDragging || !drawerEl.classList.contains("open")) return;
 
-    let delta = 0;
+    let delta = axis === "X" 
+                ? e.touches[0].clientX - startPos 
+                : e.touches[0].clientY - startPos;
+
     let screenSize = axis === "X" ? window.innerWidth : window.innerHeight;
     let threshold = screenSize * thresholdPercent;
 
-    if (axis === "X") {
-      delta = e.touches[0].clientX - startPos;
+    if ((axis === "X" && delta > threshold) || (axis === "Y" && -delta > threshold)) {
+      thresholdReached = true;
 
-      // Only start rubber band effect after threshold
-      if (delta > threshold) {
-        thresholdReached = true;
+      if (axis === "X") {
         const stretch = Math.min(delta - threshold, maxStretch);
-        drawerEl.style.transform = `translateX(${stretch}px)`;
-      }
-    } else if (axis === "Y") {
-      delta = e.touches[0].clientY - startPos;
-
-      if (-delta > threshold) { // upward swipe
-        thresholdReached = true;
-        const stretch = Math.max(-(Math.abs(delta) - threshold), -maxStretch);
-        drawerEl.style.transform = `translateY(${stretch}px)`;
+        const scale = 1 + stretch / drawerEl.offsetWidth;
+        drawerEl.style.transform = `scaleX(${scale})`;
+      } else {
+        const stretch = Math.min(-delta - threshold, maxStretch);
+        const scale = 1 + stretch / drawerEl.offsetHeight;
+        drawerEl.style.transform = `scaleY(${scale})`;
       }
     }
   });
@@ -1874,17 +1893,13 @@ function addRubberBandEffect(drawerEl, axis = "X", maxStretch = 50, thresholdPer
 
     if (thresholdReached) {
       drawerEl.style.transition = "transform 0.15s ease-out";
-      drawerEl.style.transform = "translate(0, 0)"; // snap back
+      drawerEl.style.transform = axis === "X" ? "scaleX(1)" : "scaleY(1)";
       setTimeout(() => {
         drawerEl.style.transition = "";
       }, 150);
     }
   });
 }
-
-// Attach to your drawers
-addRubberBandEffect(drawer, "X", 50, 0.25);       // 25% threshold for left drawer
-addRubberBandEffect(bottomDrawer, "Y", 50, 0.15); // 15% threshold for bottom drawer
 
     
 // =====================
@@ -2057,8 +2072,7 @@ function confirmPlayNext() {
 
 
 // ======================================
-// Add new YouTube search (karaoke) - hybrid
-// Desktop: popup window
+// Desktop: popup window tab
 // Mobile: YouTube app or browser fallback
 // 3s cooldown, no click animation
 // ======================================
@@ -2106,7 +2120,8 @@ titleIcon.addEventListener("click", () => {
     titleIcon.style.pointerEvents = "auto";
   }, 3000);
 });
-// Add new YouTube search ----end //
+// Desktop: popup window tab ----end //
+
 
 
     
@@ -2199,6 +2214,7 @@ window.addEventListener("load", () => {
     console.error("Clipboard error:", err);
   }
 }
+
 
 
 
