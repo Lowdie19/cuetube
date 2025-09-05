@@ -119,8 +119,8 @@
    .drawer {
       position: fixed;
       top: 0;
-      left: -100%; /* hidden off-screen */
-      width: 100%; /* always full width */
+      left: -80%; /* hidden off-screen */
+      width: 80%; /* always full width */
       height: 100%;
       background: linear-gradient(
         to bottom,
@@ -155,7 +155,7 @@
     
     /* When Left drawer open --start */
     .drawer.open {
-      left: -20%; /* stop 20% before the right edge → looks like 80% */
+      left: 0%; /* stop 20% before the right edge → looks like 80% */
       animation: shadowFloat 5s infinite ease-in-out;
     }
     
@@ -196,7 +196,7 @@
       }
     
       .drawer.open {
-        left: -6%; /* fully visible */
+        left: 0; /* fully visible */
       }
     }
 
@@ -250,7 +250,7 @@
       border-radius: 10px;
       padding: 18px;
       background: black;
-      margin: 40px 10px 15px 90px;                    /* top | right | bottom | left */
+      margin: 50px 10px 15px 15px;                    /* top | right | bottom | left */
       box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
               0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
         inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
@@ -269,7 +269,7 @@
       font-size: 1.1em;
       margin: 5px 0;
       word-wrap: break-word;
-      font-weight: bold;  
+      font-weight: regular;  
     }
     
    /* Glowing effect for Now Playing title */
@@ -280,8 +280,8 @@
     }
     
     @keyframes glowPulse {
-       from { text-shadow: 0 0 4px magenta, 0 0 6px magenta, 0 0 12px magenta; }
-      to { text-shadow: 0 0 12px magenta, 0 0 14px magenta, 0 0 18px magenta; }
+       from { text-shadow: 0 0 2px magenta, 0 0 2px magenta, 0 0 2px magenta; }
+      to { text-shadow: 0 0 12px magenta, 0 0 20px magenta, 0 0 20px magenta; }
     }
 
 
@@ -297,7 +297,7 @@
       border-radius: none;
       padding: 10px;
       background: none;
-      margin-left: 90px;
+      margin-left: 15px;
       flex: 1;
       min-height: 0;
       overscroll-behavior: contain;          /* keeps scroll contained */
@@ -595,7 +595,7 @@
     
     @media (orientation: landscape) {
       .youtube-wrapper {
-        height: 75vh;
+        height: 65vh;
       }
       .drawer {
         height: 100vh; /* Full screen height in landscape */
@@ -611,22 +611,9 @@
       .title-bar {
         display: none !important;
       }
-      .drawer-handle {
-        display: none !important;
-      }
-      .bottom-drawer-handle {
-        display: none !important;
-      }
-      .bottom-drawer {
-        bottom: -170px !important;
-      }
       .url-group {
         margin-bottom: 5px !important;
       }
-    }
-    
-    @media (max-height: 500px) {
-      .bottom-buttons { position: static; margin-top: 20px; }
     }
     
     #popupOverlay {
@@ -692,16 +679,6 @@
     }
 
 
-
-    @media screen and (orientation: landscape) and (max-width: 900px) {
-      .youtube-wrapper {
-        height: 100vh;
-        margin: 0;
-      }
-      body, html {
-        overflow: hidden;
-      }
-    }
     .nextConfirmModal {
       /* only one display here */
       display: inline-block;  /* size to content */
@@ -1093,6 +1070,7 @@ let touchStartX = 0;
 
 // Drawer elements
 const drawer = document.getElementById('drawer');
+addRubberBandEffect(drawer, "X", 50, 0.3); // Left drawer, max 50px stretch, threshold 30% of screen
 const overlay = document.getElementById('drawerOverlay');
 const popupOverlay = document.getElementById("popupOverlay");
 const bottomDrawer = document.getElementById("bottomDrawer");
