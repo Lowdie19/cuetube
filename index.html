@@ -47,7 +47,7 @@
 
 
 /*  =====================
-    CueTube Title
+    CueTube Title +++++++
     ===================== */
     .title-bar {
       text-align: center;
@@ -110,73 +110,11 @@
         drop-shadow(0 0 4px var(--glow-color))
         drop-shadow(0 0 8px var(--glow-color));
     }
-
-
-/*  =====================
-    Left Drawer
-    ===================== */
-   .drawer {
-      position: fixed;
-      top: 0;
-      left: -80%; /* hidden off-screen */
-      width: 80%; /* always full width */
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.6) 0%,
-        #000000 100%
-      );
-      padding: 20px;
-      z-index: 99;
-      transition: left 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 25px;
-    }
-
-    .drawer::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0) 0%,     
-        rgba(13, 14, 14, 0.6) 60%,  
-        #000000 100%
-      );
-      z-index: 10;
-      pointer-events: none;
-    }
     
-    /* When Left drawer open --start */
-    .drawer.open {
-      left: 0%; /* stop 20% before the right edge → looks like 80% */
-      animation: shadowFloat 5s infinite ease-in-out;
-    }
-    
-    @keyframes shadowFloat {
-      0%   { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
-      50%  { box-shadow: 0  10px 80px rgba(0, 255, 255, 0.1); }  
-      100% { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
-    }
-    /* When Left drawer open --end */
 
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
-      z-index: 90;
-      display: none;
-    }
-    .drawer-overlay.visible { display: block; }
-
+/*  =============================
+    YOUTUBE SCREEN ++++++++++++++
+    =============================  */
     .youtube-wrapper {
       display: flex;
       justify-content: center;
@@ -185,6 +123,14 @@
       height: 50vh; /* 50% of the screen height */
       padding: 0;
       margin: 0;
+    }
+    
+    .youtube-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none !important;
+      display: block;
     }
     
     /* On wider screens (like PC), use 40% width */
@@ -198,685 +144,11 @@
         left: 0; /* fully visible */
       }
     }
-
-    /* Left drawer-handle --start */
-    .drawer-handle {
-      position: absolute;
-      top: 7px;
-      right: -55px;
-      width: 50px;
-      height: 50px;
-      background: none;
-      color: #840072;
-      font-size: 1.8em; /* bigger text */
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 80;
-      user-select: none; /* prevent text selection */
-      text-shadow: none; /* no glow by default */
-      -webkit-text-stroke: 0px transparent;
-      transition: opacity 0.2s ease,
-                  color 0.2s ease,
-                  -webkit-text-stroke 0.1s ease,
-                  transform 0.1s ease-in-out;
-    }
-
-    /* Hover + Focus-visible share same effect */
-    .drawer-handle:hover,
-    .drawer-handle:focus-visible {
-      outline: none; /* remove dotted outline for keyboard */
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 8px cyan,
-        0 0 8px cyan,
-        0 0 12px cyan,
-        0 0 24px cyan;
-      /*transform: scale(1.05);  enlarge a bit */
-    }
-/* Left drawer-handle --end*/
-
-/*  =============================
-    Nowplaying-box
-    =============================  */
-    /* Box */
-    .nowplaying-box {
-      border: 1.5px solid cyan;
-      border-radius: 10px;
-      padding: 18px;
-      background: black;
-      margin: 50px 10px 15px 15px;                    /* top | right | bottom | left */
-      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
-              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
-    }
-    
-    /* Label "Now playing" */
-    .nowplaying-box .label {
-      font-size: 0.7em;
-      color: cyan;
-      margin-bottom: 15px;
-    }
-
-    /* Label "Title of actual songs" */
-    .nowplaying-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 1.1em;
-      margin: 5px 0;
-      word-wrap: break-word;
-      font-weight: regular;  
-    }
-    
-   /* Glowing effect for Now Playing title */
-    .now-playing-glow {
-      color: white;
-      text-shadow: 0 0 5px magenta, 0 0 10px magenta, 0 0 20px magenta, 0 0 30px magenta;
-      animation: glowPulse 2s infinite alternate;
-    }
-    
-    @keyframes glowPulse {
-       from { text-shadow: 0 0 2px magenta, 0 0 2px magenta, 0 0 2px magenta; }
-      to { text-shadow: 0 0 12px magenta, 0 0 20px magenta, 0 0 20px magenta; }
-    }
-
-
-/*  =============================
-    Next-box
-    =============================  */
-    .next-box {
-      position: relative;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      border: none;
-      border-radius: none;
-      padding: 10px;
-      background: none;
-      margin-left: 15px;
-      flex: 1;
-      min-height: 0;
-      overscroll-behavior: contain;          /* keeps scroll contained */
-      -webkit-overflow-scrolling: touch;     /* smooth scrolling on iOS */
-      scroll-padding-bottom: 40px;
-      touch-action: pan-y;
-      cursor: grab;
-      
-      /* Android / Mobile fixes */
-      -webkit-tap-highlight-color: transparent; /* removes red highlight on touch */
-      -webkit-touch-callout: none;              /* disables long press menu */
-      
-      scrollbar-width: none; /* hide scrollbar for Firefox */
-    }
-    
-    /* Hide scrollbar for WebKit browsers */
-    .next-box::-webkit-scrollbar {
-      display: none;
-    }
-    .next-box::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    
-    .next-box.dragging {
-      cursor: grabbing;
-    }
-    
-    .next-box.hidden {
-      display: none !important;
-    }
-
-  
-   
-    .drawer > div {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .drawer.open {
-      display: flex;
-    }
-
-    #overflowCounter {
-    text-align: center;
-    font-size: 0.7em;
-    color: #888;
-    margin-top: 5px;
-    display: none;
-    }
-    
-    .next-box .label {
-      font-size: 0.7em;
-      color: grey;
-    }
-    
-    .next-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 0.9em;
-      margin: 10px 0;
-      text-align: left;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-weight: normal;
-      padding: 5px;
-    }
-    
-
-    
-    .youtube-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      outline: none !important;
-      display: block;
-    }
-
-    .url-group {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-        
-    .url-input {
-      flex: 1;
-      min-width: 260px;
-      max-width: 420px;
-      height: 36px;
-      border-radius: 8px;
-      border: none;
-      background-color: #1a1a1a;
-      color: white;
-      font-size: 14px;
-      padding: 0 12px;
-
-      line-height: 36px;
-      display: inline-block;
-      vertical-align: middle;
-      text-align: center;
-    }
-    
-    .url-input.glow {
-      box-shadow: 
-        0 0 4px #ff00ff, 
-        0 0 8px #ff00ff, 
-        0 0 16px #ff00ff, 
-        0 0 24px #ff00ff;
-      border: 1px solid #ff00ff;
-    }
-
-    .bottom-buttons {
-      position: flex;
-      bottom: 15px;
-      width: 100%;
-      padding: 0 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      z-index: 5;
-    }
-
-    
-    .bottom-drawer {
-      position: fixed;
-      bottom: -160px;
-      left: 0;
-      width: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.6) 0%,
-        #000000 100%
-      );
-      padding: 20px 15px 15px 25px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-      transition: bottom 0.3s ease;
-      z-index: 98;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 15px 25px; /* bottom is 25px default */
-    }
-    
-    /* bottom-drawer When open --start */
-    .bottom-drawer.open {
-      bottom: 0;
-      animation: shadowFloat 5s infinite ease-in-out;
-    }
-    
-    /* Shadow moves up and down */
-    @keyframes shadowFloat {
-      0%   { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
-      50%  { box-shadow: 10px 0 80px rgba(0, 255, 255, 0.1); }  
-      100% { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
-    }
-    /* bottom-drawer When open --end */
-
-    
-    .bottom-drawer-handle {
-      position: absolute;
-      top: -80px;
-      left: 49%;
-      transform: translateX(-50%);
-      background: none;
-      border: none;
-      color: #840072; /* default color */
-      font-size: 2.0em;
-      cursor: pointer;
-      text-shadow: none; /* 🚫 no glow */
-      -webkit-text-stroke: 0px transparent; /* no stroke initially */
-      z-index: 99;
-      user-select: none; /* prevent text selection */
-      transition: opacity 0.2s ease,
-                  color 0.2s ease,
-                  -webkit-text-stroke 0.1s ease,
-                  transform 0.1s ease-in-out;
-    }
-    
-    /* Hover + Focus-visible share same effect */
-    .bottom-drawer-handle:hover,
-    .bottom-drawer-handle:focus-visible {
-      outline: none; /* remove dotted outline for keyboard */
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 8px cyan,
-        0 0 8px cyan,
-        0 0 12px cyan,
-        0 0 24px cyan;
-      /*transform: scale(1.05);  enlarge a bit */
-    }
-    
-    .bottom-drawer-handle[style*="display: none"] {
-      opacity: 0;
-    }
-
-    .bot-drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: invisible;
-      z-index: 90;
-      display: none;
-    }
-    .bot-drawer-overlay.visible { display: block; }
-    
-    /* Default: portrait or small screens */
-    .bottom-buttons.inside {
-      display: flex;
-      justify-content: center; /* center the buttons */
-      align-items: center;
-      gap: 15px;               /* spacing between items */
-      margin-bottom: 0px;
-    }
-    
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0) 0%,     
-        rgba(13, 14, 14, 0.5) 60%,  
-        #000000 100%                
-      );
-      z-index: 999;
-    }
-    
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      border: 2px solid red;
-      border-radius: 10px;
-      padding: 20px;
-      z-index: 1000;
-      text-align: center;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 0 20px red;
-    }
-    
-    .single-btn {
-      width: 45%;
-      max-width: 200px;
-    }
-    
-    .url-input {
-      width: 100%;
-      padding-right: 48px;
-    }
-
-    
-.paste-btn-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 11px;
-  margin-left: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-}
-
-.paste-btn-icon:active {
-  transform: scale(0.95);
-  transform: translateY(2px);
-}
-
-.paste-icon-image {
-  width: 22px;
-  height: 22px;
-  content: url("Paste Icon.png"); /* default icon */
-}
-
-
-/* Optional glow & Change imagewhen pressed */
-.paste-btn-icon:active img {
-  content: url("Paste Icon 2.png"); /* works here */
-  filter: 
-    drop-shadow(0 0 2px magenta)
-    drop-shadow(0 0 6.5px magenta)
-    drop-shadow(0 0 15px magenta);
-}
-
     
     
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 65vh;
-      }
-      .drawer {
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      .url-input, .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-    }
-    
-    @media screen and (orientation: landscape) and (max-width: 900px) {
-      .title-bar {
-        display: none !important;
-      }
-
-      .url-group {
-        margin: 5px !important;
-      }
-
-      .nowplaying-box {
-        margin-top: 15px !important;
-      }
-
-      .notify-box {
-        position: fixed;
-        top: 13vh;
-        left: 45vw;
-        width: 50vw;
-        transform: translateX(-50%);
-        z-index: 1;
-      }
-          
-      .Notify {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        width: 50vw;
-        height: 100%;
-        background: linear-gradient(
-          to left,
-          rgba(13, 14, 14, 0.05) 0,
-          rgba(0, 0, 0, 0.70) 0 0%
-        );
-        backdrop-filter: blur(3px);
-      }
-          
-      .youtube-wrapper {
-        position: fixed;
-        left: 50vw !important;
-        transform: translateX(-50%)!important;
-        width: 100vw !important;
-        height: 100vh !important;
-        padding: 15px !important;
-      }
-      
-      #popupModal {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-      }
-      
-      .url-group {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        z-index: 10;
-      }
-
-      .bottom-buttons.inside {
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        gap: 170px; !important;
-      }
-      .bottom-drawer {
-        bottom: -100px;
-        width: 100vw !important;
-        height: 100px !important;
-      }
-    }
-    
-    
-    
-    
-    
-    
-    
-    #popupOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.4) 0%,
-        #000000 80%
-      );  /* Dimming effect */
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-      z-index: 9998;
-    }
-    
-    #popupOverlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    #popupModal {
-      position: fixed;
-      top: 75%; left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      background: none !important; /* #222; */
-      border: none !important; /* 2px solid cyan; */
-      border-radius: 10px;
-      padding: 0 !important; /* 15px 25px; */
-      color: inherit; /* white; */
-      font-weight: bold;
-      text-align: center !important;
-      text-shadow: inherit;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-      max-width: 90vw;
-      box-shadow: none !important; /* 0 0 20px cyan; */
-      user-select: none;
-      font-size: 1.8em !important;
-    }
-    
-    #popupModal.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    #confirmDelete {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-    }
-    
-    #confirmDelete.show {
-      opacity: 1;
-    }
-    
-    .long-pressing {
-      background: red;
-      box-shadow: 0 0 10px red;
-    }
-
-
-    .nextConfirmModal {
-      /* only one display here */
-      display: inline-block;  /* size to content */
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      border: 2px solid cyan;
-      border-radius: 10px;
-      padding: 20px 30px;
-      z-index: 1000;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(0,255,255,0.5), 0 0 20px rgba(0,255,255,0.3);
-      white-space: nowrap;
-    }
-    
-    .nextConfirmOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-    }
-    
-/*  ===============================================================================================================================  */
-/*  ===============================================
-    Buttons for Reserve, Next and Confirm's -- s 
-    ===============================================  */
-    .cyan-btn {
-      flex: 1;
-      padding: 14px;
-      background: black;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
-      border: 1px solid cyan;
-      box-shadow: 
-        0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
-    }
-    
-    /* Hover effect */
-    .cyan-btn:hover {
-      background: rgba(0, 255, 255, 0.2);
-      color: white;
-      text-shadow: 0 0 16px cyan;
-    }
-    
-    /* Press / click effect */
-    .cyan-btn:active {
-      transform: scale(0.9); /* shrink when pressed */
-      box-shadow: 0 0 5px cyan, 0 0 20px cyan inset; /* temporary glow */
-      background: cyan;
-      color: black;
-      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
-    }
-    
-    /* Reset hover/glow after click */
-    .cyan-btn.clicked {
-      transform: scale(1);
-      box-shadow: 
-        0 0 10px 0.5px rgba(0, 255, 255, 0.5),
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    
-/*  ==========================
-    URL box
-    ==========================  */
-    input[type="text"]::placeholder {
-      color: white;
-      opacity: .3;
-    }
-    
-    input[type="text"] {
-      width: 60%;
-      border: 2px magenta;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 1em;
-      background-color: black; /*#121212;*/
-      color: black;
-      box-shadow: none;
-      transition: box-shadow 0.3s ease;
-    }
-    
-    input[type="text"]:focus {
-      outline: 1px;
-      border-color: solid magenta;
-      border: 1px solid magenta;
-      box-shadow: 
-              0 0 10px 0.5px rgba(255, 0, 255, .8),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);  /* inner glow */
-      background-color: black !important; /* stay black when focused */
-      color: white !important;
-    }
-
-    /* for Suggested URL - Normal focus */
-    input[type="text"]:focus {
-      outline: none;
-      border: 1px solid magenta;
-      box-shadow: 
-        0 0 10px 0.5px rgba(255, 0, 255, .8),
-        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);
-    }
-    
-    /* Autofill fix */
-    input[type="text"]:-webkit-autofill {
-      -webkit-box-shadow: 0 0 10px 0.5px rgba(255, 0, 255, .8),
-                          inset 0 0 10px 0.5px rgba(255, 0, 255, .5),
-                          0 0 0px 1000px black inset !important;
-      -webkit-text-fill-color: white !important;
-      caret-color: white;
-      border: 1px solid magenta;
-    }
-
-    
-/*  =====================
-    Notify text-line
-    =====================  */
+/*  ============================
+    NOTIFICATION +++++++++++++++
+    ============================ */
     .notify-box {
       display: flex;
       height: 60px;
@@ -975,41 +247,831 @@
     }
     
     
+/*  ==============================
+    LEFT DRAWER ++++++++++++++++++
+    ============================== */
+   /* Left Drawer body */ 
+   .drawer {
+      position: fixed;
+      top: 0;
+      left: -80%; /* hidden off-screen */
+      width: 80%; /* always full width */
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
+      padding: 20px;
+      z-index: 99;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 25px;
+    }
+
+    .drawer::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.6) 60%,  
+        #000000 100%
+      );
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .drawer.open {
+      left: 0%; /* stop 20% before the right edge → looks like 80% */
+      animation: shadowFloat 5s infinite ease-in-out;
+    }
+    
+    @keyframes shadowFloat {
+      0%   { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
+      50%  { box-shadow: 0  10px 80px rgba(0, 255, 255, 0.1); }  
+      100% { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
+    }
+    
+/* =============================
+    Left Drawer Handle
+    =============================  */ 
+    .drawer-handle {
+      position: absolute;
+      top: 7px;
+      right: -55px;
+      width: 50px;
+      height: 50px;
+      background: none;
+      color: #840072;
+      font-size: 1.8em; /* bigger text */
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 80;
+      user-select: none; /* prevent text selection */
+      text-shadow: none; /* no glow by default */
+      -webkit-text-stroke: 0px transparent;
+      transition: opacity 0.2s ease,
+                  color 0.2s ease,
+                  -webkit-text-stroke 0.1s ease,
+                  transform 0.1s ease-in-out;
+    }
+
+    /* Hover + Focus-visible share same effect */
+    .drawer-handle:hover,
+    .drawer-handle:focus-visible {
+      outline: none; /* remove dotted outline for keyboard */
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
+      text-shadow:
+        0 0 8px cyan,
+        0 0 8px cyan,
+        0 0 12px cyan,
+        0 0 24px cyan;
+      /*transform: scale(1.05);  enlarge a bit */
+    }
+    
+    
+    /* Overlay for Left and Bottom drawer ??? */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+      display: none;
+    }
+    .drawer-overlay.visible { display: block; }
+
+    .drawer > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .drawer.open {
+      display: flex;
+    }
+    
+
+/*  =================
+    Nowplaying-box
+    ================= */
+    /* Box */
+    .nowplaying-box {
+      border: 1.5px solid cyan;
+      border-radius: 10px;
+      padding: 18px;
+      background: black;
+      margin: 50px 10px 15px 15px;                    /* top | right | bottom | left */
+      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
+              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
+    }
+    
+    /* Label text inside Nowplaying-box (Now playing) */
+    .nowplaying-box .label {
+      font-size: 0.7em;
+      color: cyan;
+      margin-bottom: 15px;
+    }
+
+    /* Song titles inside Nowplaying-box */
+    .nowplaying-box .title {
+      font-family: Arial, sans-serif;
+      font-size: 1.1em;
+      margin: 5px 0;
+      word-wrap: break-word;
+      font-weight: regular;  
+    }
+    
+   /* Glowing effect for Now Playing title */
+    .now-playing-glow {
+      color: white;
+      text-shadow: 0 0 5px magenta, 0 0 10px magenta, 0 0 20px magenta, 0 0 30px magenta;
+      animation: glowPulse 2s infinite alternate;
+    }
+    
+    @keyframes glowPulse {
+       from { text-shadow: 0 0 2px magenta, 0 0 2px magenta, 0 0 2px magenta; }
+      to { text-shadow: 0 0 12px magenta, 0 0 20px magenta, 0 0 20px magenta; }
+    }
+
+
+/*  =============
+    Next-box 
+    ============= */
+    /* Box */
+    .next-box {
+      position: relative;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: none;
+      padding: 10px;
+      background: none;
+      margin-left: 15px;
+      flex: 1;
+      min-height: 0;
+      overscroll-behavior: contain;          /* keeps scroll contained */
+      -webkit-overflow-scrolling: touch;     /* smooth scrolling on iOS */
+      scroll-padding-bottom: 40px;
+      touch-action: pan-y;
+      cursor: grab;
+
+      /* Android / Mobile fixes */
+      -webkit-tap-highlight-color: transparent; /* removes red highlight on touch */
+      -webkit-touch-callout: none;              /* disables long press menu */
+
+      scrollbar-width: none; /* hide scrollbar for Firefox */
+    }
+
+    /* Hide scrollbar for WebKit browsers */
+    .next-box::-webkit-scrollbar {
+      display: none;
+    }
+    .next-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .next-box.dragging {
+      cursor: grabbing;
+    }
+
+    .next-box.hidden {
+      display: none !important;
+    }
+
+    #overflowCounter {
+      text-align: center;
+      font-size: 0.7em;
+      color: #888;
+      margin-top: 5px;
+      display: none;
+    }
+
+    /* Label text inside Next-box (Next) */
+    .next-box .label {
+      font-size: 0.7em;
+      color: grey;
+    }
+
+    /* Song titles inside Next-box */
+    .next-box .songtitle {
+      font-family: Arial, sans-serif;
+      font-size: 0.9em;
+      margin: 10px 0;
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-weight: normal;
+      padding: 5px;
+
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    /* Ripple overlay (base) */
+    .next-box .songtitle::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(128, 128, 128, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease; /* fade out speed */
+    }
+
+    /* Click ripple */
+    .next-box .songtitle.ripple::after {
+      opacity: 1;
+      transition: opacity 0s; /* show instantly */
+    }
+
+    /* Hover flash */
+    .next-box .songtitle.hover-flash::after {
+      opacity: 1;
+      transition: opacity 0s; /* appear instantly */
+    }
+
+    /* Long press red */
+    .next-box .songtitle.long-pressing {
+      background-color: rgba(255, 0, 0, 0.3);
+    }
+
+
+ /* =============================
+    BOTTOM DRAWER +++++++++++++++
+    =============================  */
+    /* Bottom Drawer body */
+   .bottom-drawer {
+      position: fixed;
+      bottom: -160px;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.6) 0%,
+        #000000 100%
+      );
+      padding: 20px 15px 15px 25px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+      transition: bottom 0.3s ease;
+      z-index: 98;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 15px 25px; /* bottom is 25px default */
+    }
+    
+    /* bottom-drawer When open --start */
+    .bottom-drawer.open {
+      bottom: 0;
+      animation: shadowFloat 5s infinite ease-in-out;
+    }
+    
+    /* Shadow moves up and down */
+    @keyframes shadowFloat {
+      0%   { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
+      50%  { box-shadow: 10px 0 80px rgba(0, 255, 255, 0.1); }  
+      100% { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
+    }
+  
+      
+ /* =============================
+    Bottom drawer Handle
+    =============================  */  
+    .bottom-drawer-handle {
+      position: absolute;
+      top: -80px;
+      left: 49%;
+      transform: translateX(-50%);
+      background: none;
+      border: none;
+      color: #840072; /* default color */
+      font-size: 2.0em;
+      cursor: pointer;
+      text-shadow: none; /* 🚫 no glow */
+      -webkit-text-stroke: 0px transparent; /* no stroke initially */
+      z-index: 99;
+      user-select: none; /* prevent text selection */
+      transition: opacity 0.2s ease,
+                  color 0.2s ease,
+                  -webkit-text-stroke 0.1s ease,
+                  transform 0.1s ease-in-out;
+    }
+    
+    /* Hover + Focus-visible share same effect */
+    .bottom-drawer-handle:hover,
+    .bottom-drawer-handle:focus-visible {
+      outline: none; /* remove dotted outline for keyboard */
+      color: cyan;
+      -webkit-text-stroke: 0px cyan;
+      text-shadow:
+        0 0 8px cyan,
+        0 0 8px cyan,
+        0 0 12px cyan,
+        0 0 24px cyan;
+      /*transform: scale(1.05);  enlarge a bit */
+    }
+    
+    .bottom-drawer-handle[style*="display: none"] {
+      opacity: 0;
+    }
+    
+ /* =============================
+    Url box + Paste button Group
+    =============================  */
+    .url-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+ /* =============================
+    Url box
+    =============================  */   
+    .url-input {
+      flex: 1;
+      min-width: 260px;
+      max-width: 420px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background-color: #1a1a1a;
+      color: white;
+      font-size: 14px;
+      padding: 0 12px;
+
+      line-height: 36px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+    }
+    
+    .url-input {
+      width: 100%;
+      padding-right: 48px;
+    }
+    
+    .url-input.glow {
+      box-shadow: 
+        0 0 4px #ff00ff, 
+        0 0 8px #ff00ff, 
+        0 0 16px #ff00ff, 
+        0 0 24px #ff00ff;
+      border: 1px solid #ff00ff;
+    }
+    
+    input[type="text"]::placeholder {
+      color: white;
+      opacity: .3;
+    }
+    
+    input[type="text"] {
+      width: 60%;
+      border: 2px magenta;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 1em;
+      background-color: black; /*#121212;*/
+      color: black;
+      box-shadow: none;
+      transition: box-shadow 0.3s ease;
+    }
+    
+    input[type="text"]:focus {
+      outline: 1px;
+      border-color: solid magenta;
+      border: 1px solid magenta;
+      box-shadow: 
+              0 0 10px 0.5px rgba(255, 0, 255, .8),  /* outer glow */
+        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);  /* inner glow */
+      background-color: black !important; /* stay black when focused */
+      color: white !important;
+    }
+
+    /* for Suggested URL - Normal focus */
+    input[type="text"]:focus {
+      outline: none;
+      border: 1px solid magenta;
+      box-shadow: 
+        0 0 10px 0.5px rgba(255, 0, 255, .8),
+        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);
+    }
+    
+    /* Autofill fix */
+    input[type="text"]:-webkit-autofill {
+      -webkit-box-shadow: 0 0 10px 0.5px rgba(255, 0, 255, .8),
+                          inset 0 0 10px 0.5px rgba(255, 0, 255, .5),
+                          0 0 0px 1000px black inset !important;
+      -webkit-text-fill-color: white !important;
+      caret-color: white;
+      border: 1px solid magenta;
+    }
+    
+    
+ /* =============================
+    Paste button
+    =============================  */
+   .paste-btn-icon {
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 11px;
+     margin-left: 15px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     user-select: none;
+   }
+
+   .paste-btn-icon:active {
+     transform: scale(0.95);
+     transform: translateY(2px);
+   }
+
+   .paste-icon-image {
+     width: 22px;
+     height: 22px;
+     content: url("Paste Icon.png"); /* default icon */
+   }
+
+
+   /* Optional glow & Change imagewhen pressed */
+   .paste-btn-icon:active img {
+     content: url("Paste Icon 2.png"); /* works here */
+     filter: 
+       drop-shadow(0 0 2px magenta)
+       drop-shadow(0 0 6.5px magenta)
+       drop-shadow(0 0 15px magenta);
+   }
+
+
+ /* =============================
+    Bottom buttons
+    =============================  */
+    .bottom-buttons {
+      position: flex;
+      bottom: 15px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    
+    /* Default: portrait or small screens */
+    .bottom-buttons.inside {
+      display: flex;
+      justify-content: center; /* center the buttons */
+      align-items: center;
+      gap: 15px;               /* spacing between items */
+      margin-bottom: 0px;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0) 0%,     
+        rgba(13, 14, 14, 0.5) 60%,  
+        #000000 100%                
+      );
+      z-index: 999;
+    }
+    
+  /* Invisible overlay for Tap/close */
+    .bot-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: invisible;
+      z-index: 90;
+      display: none;
+    }
+    .bot-drawer-overlay.visible { display: block; }
+
+/*  ===============================================
+    Typical Buttons (Bottom buttons and Confirm's)
+    ===============================================  */
+    /* Note: Button Style (color is dynamic via CSS vars) */
+    .cyan-btn {
+      flex: 1;
+      padding: 14px;
+      background: black;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
+      border: 1px solid var(--btn-glow, cyan);
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, cyan),     /* outer glow */
+        inset 0 0 10px 0.5px var(--btn-glow, cyan);/* inner glow */
+    }
+
+    /* Hover effect */
+    .cyan-btn:hover {
+      background: var(--btn-hover-bg, rgba(0, 255, 255, 0.2)); /* set by JS */
+      color: white;
+      text-shadow: 0 0 16px var(--btn-glow, cyan);
+    }
+
+    /* Press / click effect */
+    .cyan-btn:active {
+      transform: scale(0.9); /* shrink when pressed */
+      box-shadow: 0 0 5px var(--btn-glow, cyan), 0 0 20px var(--btn-glow, cyan) inset; /* temporary glow */
+      background: var(--btn-glow, cyan);
+      color: black;
+      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
+    }
+
+    /* Reset hover/glow after click (if you toggle this class in your code) */
+    .cyan-btn.clicked {
+      transform: scale(1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    
+ /* =========================
+    Exit Modal
+    =========================  */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border: 2px solid red;
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 0 20px red;
+    }
+    
+    .single-btn {
+      width: 45%;
+      max-width: 200px;
+    }
+
+    
+
+ /* =============================
+    Landscape Mode
+    ============================ */
+    @media (orientation: landscape) {
+      .youtube-wrapper {
+        height: 65vh;
+      }
+      .drawer {
+        height: 100vh; /* Full screen height in landscape */
+        justify-content: space-between; /* Keep space for top + bottom parts */
+        padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .url-input, .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+    }
+    
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      .title-bar {
+        display: none !important;
+      }
+
+      .nowplaying-box {
+        margin-top: 15px !important;
+      }
+
+      .notify-box {
+        position: fixed;
+        top: 13vh;
+        left: 45vw;
+        width: 50vw;
+        transform: translateX(-50%);
+        z-index: 1;
+      }
+          
+      .Notify {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 50vw;
+        height: 100%;
+        background: linear-gradient(
+          to left,
+          rgba(13, 14, 14, 0.05) 0,
+          rgba(0, 0, 0, 0.70) 0 0%
+        );
+        backdrop-filter: blur(3px);
+      }
+          
+      .youtube-wrapper {
+        position: fixed;
+        left: 50vw !important;
+        transform: translateX(-50%)!important;
+        width: 100vw !important;
+        height: 100vh !important;
+        padding: 15px !important;
+      }
+      
+      #popupModal {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+      }
+      
+      .url-group {
+        margin: 10px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        z-index: 10;
+      }
+      
+      .paste-btn-icon {
+          margin-left: 5px !important;
+      }
+
+      .bottom-buttons.inside {
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        gap: 170px; !important;
+      }
+      
+      .bottom-drawer {
+        bottom: -100px;
+        width: 100vw !important;
+        height: 100px !important;
+      }
+    }         
+
+
+ /* ======================================
+    Popups Text with glow (Reserve, etc.)
+    ======================================  */
+    #popupOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(
+        to bottom,
+        rgba(13, 14, 14, 0.4) 0%,
+        #000000 80%
+      );  /* Dimming effect */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 9998;
+    }
+    
+    #popupOverlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    #popupModal {
+      position: fixed;
+      top: 75%; left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      background: none !important; /* #222; */
+      border: none !important; /* 2px solid cyan; */
+      border-radius: 10px;
+      padding: 0 !important; /* 15px 25px; */
+      color: inherit; /* white; */
+      font-weight: bold;
+      text-align: center !important;
+      text-shadow: inherit;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      max-width: 90vw;
+      box-shadow: none !important; /* 0 0 20px cyan; */
+      user-select: none;
+      font-size: 1.8em !important;
+    }
+    
+    #popupModal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    #confirmDelete {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    }
+    
+    #confirmDelete.show {
+      opacity: 1;
+    }
+    
+   /* .long-pressing { pansamantala
+      background: red;
+      box-shadow: 0 0 10px red;
+    }*/
+
+
 /* ===========================================
-   Universal Tooltip Style
+   Typical Tooltip Style
    =========================================== */
-[data-tooltip] {
-  position: relative;
-}
+    [data-tooltip] {
+      position: relative;
+    }
 
-/* Tooltip base style */
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 120%;       /* above button */
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111;
-  color: cyan;
-  padding: 6px 10px;
-  border-radius: 8px;
-  white-space: nowrap;
-  font-size: 13px;
-  pointer-events: none;
-  opacity: 0;         /* hidden by default */
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
-  transition: opacity 0.3s ease-in-out;       /* smooth fade */
-}
+    /* Tooltip base style */
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 120%;       /* above button */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: cyan;
+      padding: 6px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;         /* hidden by default */
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
+      transition: opacity 0.3s ease-in-out;       /* smooth fade */
+    }
 
-/* Show tooltip when class is added */
-[data-tooltip].show-tooltip::after {
-  opacity: 1;
-}
+    /* Show tooltip when class is added */
+    [data-tooltip].show-tooltip::after {
+      opacity: 1;
+    }
 
-/*  Universal Tooltip Style --end   ================  */ 
-   
+/*  Typical Tooltip Style +++++ end +++++ */ 
 
+/* =============================
+   Generic Modal Base
+   ============================= */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
 
+    .modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      border-radius: 10px;
+      padding: 20px 30px;
+      z-index: 1000;
+      text-align: center;
+      min-width: 260px;
+      border: 1px solid cyan;                 /* will be overridden by JS */
+      box-shadow: 0 0 10px 0.5px cyan;        /* will be overridden by JS */
+    }
+
+    .modal-content p {
+      margin: 8px 0;
+      font-size: 1em;
+      color: white;
+    }
     
   </style>
 </head>
@@ -1094,40 +1156,19 @@
   <div id="popupOverlay"></div>
   <div id="popupModal">Reserved!</div>
 
-  <!-- Delete Confirm Box -->
-  <div id="confirmDelete" style="display:none; background: #222; position:absolute; box-shadow: 0 0 10px red; border:2px solid red; padding:10px; border-radius:6px; z-index:999; margin-top:5px;">
-    <div style="color:#ff4c4c; font-size:1em; margin-bottom:15px; text-align:center;">Delete?</div>
-    <div style="display:flex; gap:5px; margin-bottom:5px;">
-      <button id="yesBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-left: 15px;">Confirm</button>
-      <button id="noBtn" style="font-family:Arial,sans-serif; font-size:0.7em; font-weight:regular; background-color:#121212; color:white; padding: 10 20px; border-radius:7px; border:2px solid cyan; cursor:pointer; margin-right: 15px;">Cancel</button>
-    </div>
-  </div>
   
-  <!-- Next Confirmation Modal -->
-  <div class="nextConfirmOverlay" id="nextConfirmOverlay" style="display:none;">
-  <div class="nextConfirmModal" id="nextConfirmModal" style="display:none;">
-    <div id="nextConfirmText" style="font-size: 1.0em; color: white; margin-bottom: 25px;"></div>
-    <div style="display: flex; justify-content: center; gap: 10px;">
-      <button class="cyan-btn" style="flex: none; min-width: 100px;" onclick="confirmPlayNext()">Confirm</button>
-      <button class="cyan-btn" style="flex: none; min-width: 100px;" onclick="hideNextConfirm()">Cancel</button>
-    </div>
-  </div>
-</div>
-    
-<!-- Exit Confirmation Modal -->
-<div id="exitConfirmOverlay" class="overlay" style="display:none;"></div>
-<div id="exitConfirmModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <p style="color: white; margin: 5px 0 2px;">Are you sure you want to exit?</p>
-    <p style="color: white; margin: 0 0 18px;">All reserved will be deleted.</p>
-    <p style="color: #ff4c4c; margin: 22px 0 26px;">click back button to exit</p>
-    
-    <div class="modal-buttons" style="justify-content: center;">
-      <button class="cyan-btn single-btn" onclick="hideExitConfirm()">Cancel</button>
-    </div>
-  </div>
-</div>
+  <!-- Generic Overlay -->
+  <!-- Overlay -->
+  <div id="genericOverlay" class="overlay" style="display:none;"></div>
 
+  <!-- Modal -->
+  <div id="genericModal" class="modal" style="display:none;">
+    <div class="modal-content" id="genericContent">
+      <!-- Dynamic content is injected by showModal(...) -->
+    </div>
+  </div>
+
+  
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="successSound" src="success.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.wav" preload="auto"></audio>
@@ -1146,9 +1187,9 @@ let touchStartX = 0;
 
 // Drawer elements
 const drawer = document.getElementById('drawer');
-  addRubberBandEffect(drawer, "left", 40, 0.25); // Left drawer rubber-band
+  addRubberBandEffect(drawer, "left", 70, 0.25); // Left drawer rubber-band
 const bottomDrawer = document.getElementById("bottomDrawer");
-  addRubberBandEffect(bottomDrawer, "bottom", 15, 0.15);
+  addRubberBandEffect(bottomDrawer, "bottom", 15, 0.0);
 const overlay = document.getElementById('drawerOverlay'); // Bottom drawer rubber-band
 const popupOverlay = document.getElementById("popupOverlay");
 
@@ -1497,28 +1538,7 @@ function onPlayerStateChange(event) {
   }
   }
 
-  function showDeleteConfirm(e, index) {
-    const confirmBox = document.getElementById("confirmDelete");
-    const x = e.clientX || (e.touches && e.touches[0].clientX);
-    const y = e.clientY || (e.touches && e.touches[0].clientY);
-    confirmBox.style.left = `${x + 10}px`;
-    confirmBox.style.top = `${y}px`;
-    confirmBox.style.display = "block";
 
-    const yes = document.getElementById("yesBtn");
-    const no = document.getElementById("noBtn");
-
-    yes.onclick = () => {
-      queue.splice(index, 1);
-      confirmBox.style.display = "none";
-      updateQueueDisplay();
-      playTrashSound();
-    };
-
-    no.onclick = () => {
-      confirmBox.style.display = "none";
-    };
-  }
 
   function playNextFromQueue() {
   if (queue.length === 0 || currentIndex + 1 >= queue.length) {
@@ -1542,35 +1562,43 @@ function onPlayerStateChange(event) {
   }, 600);
 }
 
-  function updateQueueDisplay() {
+
+// ==============================
+//  QUEUE
+// ==============================
+function updateQueueDisplay() {
   const list = document.getElementById("nextList");
   const overflow = document.getElementById("overflowCounter");
   list.innerHTML = "";
 
   for (let i = currentIndex + 1; i < queue.length; i++) {
+    // Create item
     const div = document.createElement("div");
-    div.className = "title";
+    div.className = "songtitle"; // renamed
     div.textContent = queue[i].title;
     div.style.cursor = "pointer";
 
     let longPressTimer;
     let longPressTriggered = false;
 
+    // Long Press (touch or left mouse)
     const startHandler = (e) => {
-      e.preventDefault();
       longPressTriggered = false;
-      div.classList.add("long-pressing");
 
-      longPressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        navigator.vibrate?.(50);
-        showDeleteConfirm(e, i);
-      }, 500);
+      // only for touch or left mouse button
+      if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
+        longPressTimer = setTimeout(() => {
+          longPressTriggered = true;
+          div.classList.add("long-pressing"); // highlight red after 2s
+          navigator.vibrate?.(50);
+          showDeleteConfirm(i); // ✅ pass only index
+        }, 2000);
+      }
     };
 
     const endHandler = () => {
+      clearTimeout(longPressTimer);
       if (!longPressTriggered) {
-        clearTimeout(longPressTimer);
         div.classList.remove("long-pressing");
       }
     };
@@ -1580,25 +1608,53 @@ function onPlayerStateChange(event) {
       div.classList.remove("long-pressing");
     };
 
-    // Events for both mouse and touch
+    // Ripple Effect (tap/click)
+    div.addEventListener("click", () => {
+      div.classList.add("ripple");
+      setTimeout(() => div.classList.remove("ripple"), 100);
+    });
+
+    // Hover flash effect (desktop pointer)
+    div.addEventListener("mouseenter", () => {
+      div.classList.add("hover-flash");
+      // Remove after next repaint so CSS fade can run
+      requestAnimationFrame(() => {
+        div.classList.remove("hover-flash");
+      });
+    });
+
+    // Optional: Right-click support for desktop
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      div.classList.add("long-pressing"); // stay red until confirm closes
+      showDeleteConfirm(i); // ✅ pass only index
+      // remove red highlight after modal closes
+      setTimeout(() => div.classList.remove("long-pressing"), 300);
+    });
+
+    // Event Handlers
     div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: false });
+    div.addEventListener("touchstart", startHandler, { passive: true });
 
     div.addEventListener("mouseup", endHandler);
     div.addEventListener("mouseleave", cancelHandler);
     div.addEventListener("touchend", endHandler);
     div.addEventListener("touchcancel", cancelHandler);
 
-    // Optional: Right-click support for desktop
+    // Right-Click Support (desktop) — (already handled above, but keeping for safety)
     div.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      showDeleteConfirm(e, i);
+      showDeleteConfirm(i); // ✅ pass only index
     });
 
+    // Add item to the list
     list.appendChild(div);
   }
 
   updateOverflowCounter();
+  
+  
+  
 
   const nextBtn = document.getElementById("nextBtnDrawer");
   const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
@@ -2060,57 +2116,11 @@ tooltipElements.forEach(el => {
     hideNextConfirm();
   };
     
-  function showNextConfirm() {
-  const messages = [
-    "Ready to jump to the next song?",
-    "Skip this one and move on?",
-    "Next up? Let's go!",
-    "Want to move to the next jam?",
-    "Time to switch it up?"
-  ];
-  const random = messages[Math.floor(Math.random() * messages.length)];
-
-  const textEl = document.getElementById("nextConfirmText");
-  const overlay = document.getElementById("nextConfirmOverlay");
-  const modal = document.getElementById("nextConfirmModal");
-
-  textEl.innerText = random;
-  overlay.style.display = "block";
-  modal.style.display = "inline-block";  // show modal sized to content
-}
-
-function hideNextConfirm() {
-  setTimeout(() => {
-  document.getElementById("nextConfirmOverlay").style.display = "none";
-  document.getElementById("nextConfirmModal").style.display = "none";
-  }, 300); // 0.3s delay
-}
-
-function confirmPlayNext() {
-  hideNextConfirm();
-  playNextFromQueue();
-}
 
 
 // ======================================
 // Exit Modal
 // ======================================
-    
-  // Show Modal
-  function showExitConfirm() {
-    document.getElementById("exitConfirmOverlay").style.display = "block";
-    document.getElementById("exitConfirmModal").style.display = "block";
-    playErrorSound();
-  }
-
-  // Hide Modal
-  function hideExitConfirm() {
-    setTimeout(() => {
-      document.getElementById("exitConfirmOverlay").style.display = "none";
-      document.getElementById("exitConfirmModal").style.display = "none";
-    }, 300); // 0.3s delay
-  }
-
   // Android/WebView Back Button Handler
   window.addEventListener("load", () => {
     history.pushState(null, document.title, location.href);
@@ -2273,6 +2283,230 @@ window.addEventListener("load", () => {
   }
 }
 document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
+
+
+/* =========================================================
+   GENERIC MODAL SYSTEM
+   ========================================================= */
+let __modal_onClose = null;
+let __modal_keydownHandler = null;
+let __modal_prevActive = null;
+
+function showModal(settings) {
+  const overlay = document.getElementById("genericOverlay");
+  const modal   = document.getElementById("genericModal");
+  const content = document.getElementById("genericContent");
+
+  if (!overlay || !modal || !content) {
+    console.error("[Modal] Missing genericOverlay/genericModal/genericContent in HTML.");
+    return;
+  }
+
+  const {
+    glowColor      = "cyan",
+    title          = "",
+    titleColor     = "white", // NEW
+    messages       = [],      // [{ text, color?, style? }]
+    buttons        = [],      // [{ label, onClick?, className? }]
+    closeOnOverlay = true,
+    onClose        = null
+  } = settings || {};
+
+  __modal_onClose = (typeof onClose === "function") ? onClose : null;
+  __modal_prevActive = document.activeElement;
+
+  let html = "";
+  if (title) {
+    html += `<p class="gm-title" style="font-weight:bold; font-size:1.1em; margin-bottom:10px; color:${titleColor};">${_escapeHtml(title)}</p>`;
+  }
+  for (const msg of messages) {
+    const color = msg?.color || "white";
+    const text  = msg?.text  || "";
+    const extraStyle = msg?.style || "";
+    html += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
+  }
+  if (buttons.length > 0) {
+    html += `<div class="modal-buttons" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">`;
+    buttons.forEach((btn, i) => {
+      const extra = btn?.className ? " " + btn.className : "";
+      const label = btn?.label || "OK";
+      html += `<button id="modalBtn${i}" class="cyan-btn${extra}">${_escapeHtml(label)}</button>`;
+    });
+    html += `</div>`;
+  }
+  content.innerHTML = html;
+
+  _applyModalGlow(modal, glowColor);
+
+  overlay.style.display = "block";
+  modal.style.display   = "inline-block";
+
+  buttons.forEach((btn, i) => {
+    const el = document.getElementById(`modalBtn${i}`);
+    if (!el) return;
+    el.addEventListener("click", () => {
+      try { if (typeof btn.onClick === "function") btn.onClick(); }
+      finally { hideModal(); }
+    }, { once: true });
+  });
+
+  overlay.onclick = closeOnOverlay ? hideModal : null;
+
+  __modal_keydownHandler = (ev) => {
+    if (ev.key === "Escape") hideModal();
+  };
+  document.addEventListener("keydown", __modal_keydownHandler);
+
+  const firstBtn = content.querySelector("button");
+  if (firstBtn) firstBtn.focus();
+}
+
+function hideModal() {
+  const overlay = document.getElementById("genericOverlay");
+  const modal   = document.getElementById("genericModal");
+
+  if (overlay) overlay.style.display = "none";
+  if (modal)   modal.style.display   = "none";
+
+  if (__modal_keydownHandler) {
+    document.removeEventListener("keydown", __modal_keydownHandler);
+    __modal_keydownHandler = null;
+  }
+
+  if (__modal_prevActive?.focus) {
+    try { __modal_prevActive.focus(); } catch (_) {}
+  }
+  __modal_prevActive = null;
+
+  if (__modal_onClose) {
+    const cb = __modal_onClose;
+    __modal_onClose = null;
+    try { cb(); } catch (err) { console.error(err); }
+  }
+}
+
+/* ---------- Helpers ---------- */
+function _escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function _applyModalGlow(modalEl, glowColor) {
+  modalEl.style.border    = `1px solid ${glowColor}`;
+  modalEl.style.boxShadow = `0 0 10px 0.5px ${glowColor}`;
+  modalEl.style.setProperty("--btn-glow", glowColor);
+
+  const rgba020 = _colorToRGBA(glowColor, 0.2);
+  modalEl.style.setProperty("--btn-hover-bg", rgba020);
+}
+
+function _colorToRGBA(colorStr, alpha) {
+  const tmp = document.createElement("span");
+  tmp.style.color = colorStr;
+  tmp.style.display = "none";
+  document.body.appendChild(tmp);
+
+  const rgb = getComputedStyle(tmp).color;
+  document.body.removeChild(tmp);
+
+  const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!m) return `rgba(0, 255, 255, ${alpha || 1})`;
+  const r = Number(m[1]), g = Number(m[2]), b = Number(m[3]);
+  const a = (typeof alpha === "number") ? alpha : 1;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+/* =========================================================
+   EXIT MODAL
+   ========================================================= */
+    function showExitConfirm() {
+      showModal({
+        glowColor: "magenta",
+        title: "Exit CueTube?",
+        titleColor: "magenta",
+        messages: [
+          { text: "All reserved will be deleted.", color: "white", style: "font-family: Arial, sans-serif;" },
+          { text: "Double-tap the back button to confirm exit", color: "#ff4c4c", style: "font-family: Arial, sans-serif;" }
+        ],
+        buttons: [
+          { label: "Cancel" }
+        ]
+      });
+      playErrorSound();
+    }
+
+/* =========================================================
+   NEXT MODAL
+   ========================================================= */
+    function showNextConfirm() {
+      const nextSong = queue[currentIndex + 1];
+      showModal({
+        glowColor: "cyan",
+        title: "Next?",
+        titleColor: "cyan",
+        messages: [
+          {
+            text: "Up next:",
+            color: "gray",
+            style: "font-family: Arial, sans-serif;" },
+          { 
+            text: nextSong
+              ? `"${nextSong.title}"`
+              : "No song available.",
+            color: "white",
+            style: "font-family: Arial, sans-serif; font-weight: normal;"
+          }
+        ],
+        buttons: [
+          { label: "Confirm", onClick: confirmPlayNext },
+          { label: "Cancel", onClick: hideModal }
+        ]
+      });
+    }
+
+    function confirmPlayNext() {
+      hideModal();
+      playNextFromQueue();
+    }
+
+/* =========================================================
+   DELETE MODAL
+   ========================================================= */
+    function showDeleteConfirm(index) {
+      const songTitle = queue[index]?.title || "Unknown Song"; // fallback if no title
+
+      showModal({
+        glowColor: "red",
+        title: "Delete?",
+        titleColor: "red",
+        messages: [
+          {
+            text: `"${songTitle}"`,
+            color: "white",
+            style: "font-family: Arial, sans-serif; font-weight: normal;" },
+          { 
+            text: "This action cannot be undone!", 
+            color: "#ff4c4c", 
+            style: "font-family: Arial, sans-serif;" 
+          }
+        ],
+        buttons: [
+          { 
+            label: "Confirm", 
+            onClick: () => {
+              queue.splice(index, 1);
+              updateQueueDisplay();
+              playTrashSound();
+            } 
+          },
+          { label: "Cancel" }
+        ]
+      });
+    }
 
 
 
