@@ -509,15 +509,17 @@
     /* Hover flash */
     .next-box .songtitle.hover-flash::after {
       opacity: 1;
-      transition: opacity 0s; /* appear instantly */
+      transition: opacity 0.5s ease; /* fade out over 0.5s */
     }
 
-    /* Long press red */
+    /* Long press / Right-click red highlight */
     .next-box .songtitle.long-pressing {
-      background-color: rgba(255, 0, 0, 0.3);
+      background-color: rgba(255, 0, 0, 0.25) !important; /* semi-transparent red */
+      color: #ff4c4c !important; /* optional: red text */
+      transition: background-color 0.3s ease !important;
     }
-
-
+    
+    
  /* =============================
     BOTTOM DRAWER +++++++++++++++
     =============================  */
@@ -1563,7 +1565,7 @@ function onPlayerStateChange(event) {
 }
 
 
-// ==============================
+// ============================== 
 //  QUEUE
 // ==============================
 function updateQueueDisplay() {
@@ -1581,7 +1583,9 @@ function updateQueueDisplay() {
     let longPressTimer;
     let longPressTriggered = false;
 
+    // ==============================
     // Long Press (touch or left mouse)
+    // ==============================
     const startHandler = (e) => {
       longPressTriggered = false;
 
@@ -1591,7 +1595,11 @@ function updateQueueDisplay() {
           longPressTriggered = true;
           div.classList.add("long-pressing"); // highlight red after 2s
           navigator.vibrate?.(50);
-          showDeleteConfirm(i); // ✅ pass only index
+
+          // 🔴 Pass a callback to remove highlight when modal closes
+          showDeleteConfirm(i, () => {
+            div.classList.remove("long-pressing");
+          });
         }, 2000);
       }
     };
@@ -1608,31 +1616,38 @@ function updateQueueDisplay() {
       div.classList.remove("long-pressing");
     };
 
+    // ==============================
     // Ripple Effect (tap/click)
+    // ==============================
     div.addEventListener("click", () => {
       div.classList.add("ripple");
-      setTimeout(() => div.classList.remove("ripple"), 100);
+      setTimeout(() => div.classList.remove("ripple"), 500);
     });
 
-    // Hover flash effect (desktop pointer)
+    // ==============================
+    // Hover Ripple Effect (desktop pointer)
+    // ==============================
     div.addEventListener("mouseenter", () => {
       div.classList.add("hover-flash");
-      // Remove after next repaint so CSS fade can run
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         div.classList.remove("hover-flash");
+      }, 500); // stay for 0.5s
+    });
+
+    // ==============================
+    // Right-click support (desktop)
+    // ==============================
+    div.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      div.classList.add("long-pressing"); // highlight red
+      showDeleteConfirm(i, () => {
+        div.classList.remove("long-pressing"); // remove highlight when modal closes
       });
     });
 
-    // Optional: Right-click support for desktop
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      div.classList.add("long-pressing"); // stay red until confirm closes
-      showDeleteConfirm(i); // ✅ pass only index
-      // remove red highlight after modal closes
-      setTimeout(() => div.classList.remove("long-pressing"), 300);
-    });
-
+    // ==============================
     // Event Handlers
+    // ==============================
     div.addEventListener("mousedown", startHandler);
     div.addEventListener("touchstart", startHandler, { passive: true });
 
@@ -1640,12 +1655,6 @@ function updateQueueDisplay() {
     div.addEventListener("mouseleave", cancelHandler);
     div.addEventListener("touchend", endHandler);
     div.addEventListener("touchcancel", cancelHandler);
-
-    // Right-Click Support (desktop) — (already handled above, but keeping for safety)
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      showDeleteConfirm(i); // ✅ pass only index
-    });
 
     // Add item to the list
     list.appendChild(div);
@@ -2446,7 +2455,7 @@ function _colorToRGBA(colorStr, alpha) {
       const nextSong = queue[currentIndex + 1];
       showModal({
         glowColor: "cyan",
-        title: "Next?",
+        title: "Next  ▶",
         titleColor: "cyan",
         messages: [
           {
@@ -2476,38 +2485,39 @@ function _colorToRGBA(colorStr, alpha) {
 /* =========================================================
    DELETE MODAL
    ========================================================= */
-    function showDeleteConfirm(index) {
-      const songTitle = queue[index]?.title || "Unknown Song"; // fallback if no title
+function showDeleteConfirm(index, onCloseCallback) {
+  const songTitle = queue[index]?.title || "Unknown Song";
 
-      showModal({
-        glowColor: "red",
-        title: "Delete?",
-        titleColor: "red",
-        messages: [
-          {
-            text: `"${songTitle}"`,
-            color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;" },
-          { 
-            text: "This action cannot be undone!", 
-            color: "#ff4c4c", 
-            style: "font-family: Arial, sans-serif;" 
-          }
-        ],
-        buttons: [
-          { 
-            label: "Confirm", 
-            onClick: () => {
-              queue.splice(index, 1);
-              updateQueueDisplay();
-              playTrashSound();
-            } 
-          },
-          { label: "Cancel" }
-        ]
-      });
+  showModal({
+    glowColor: "red",
+    title: "Delete?",
+    titleColor: "red",
+    messages: [
+      {
+        text: `"${songTitle}"`,
+        color: "white",
+        style: "font-family: Arial, sans-serif; font-weight: normal;" },
+      {
+        text: " ",
+        color: "#ff4c4c",
+        style: "font-family: Arial, sans-serif;" }
+    ],
+    buttons: [
+      {
+        label: "Confirm",
+        onClick: () => {
+          queue.splice(index, 1);
+          updateQueueDisplay();
+          playTrashSound();
+        }
+      },
+      { label: "Cancel" }
+    ],
+    onClose: () => {
+      if (typeof onCloseCallback === "function") onCloseCallback();
     }
-
+  });
+}
 
 
   </script>
