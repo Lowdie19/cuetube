@@ -47,7 +47,7 @@
 
 
 /*  =====================
-    CueTube Title +++++++
+    CUETUBE TITLE +++++++
     ===================== */
     .title-bar {
       text-align: center;
@@ -184,14 +184,16 @@
       transform: translateY(-50%);
       z-index: 10;
       animation: fadeIn 3s forwards;
+      box-shadow: 5px 0 15px #7f95e4;
     }
     
     /* Text */
     .Notify .text {
       color: white;
       font-family: Arial, sans-serif;
-      font-weight: bold;
+      font-weight: regular;
       font-size: 1.0em;
+      letter-spacing: 0.1em;
       word-wrap: break-word;
       opacity: 0;
       transform: translateX(-100%);
@@ -371,14 +373,14 @@
     ================= */
     /* Box */
     .nowplaying-box {
-      border: 1.5px solid cyan;
       border-radius: 10px;
       padding: 18px;
       background: black;
       margin: 50px 10px 15px 15px;                    /* top | right | bottom | left */
-      box-shadow:                                     /* Glow effect (both inner + outer) with opacity */
-              0 0 10px 0.5px rgba(0, 255, 255, 0.5),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(0, 255, 255, 0.5);  /* inner glow */
+      border: 1px solid var(--btn-glow, cyan);
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, cyan),     /* outer glow */
+        inset 0 0 10px 0.5px var(--btn-glow, cyan);/* inner glow */
     }
     
     /* Label text inside Nowplaying-box (Now playing) */
@@ -603,47 +605,46 @@
     Url box + Paste button Group
     =============================  */
     .url-group {
+      width: 60vw;
       display: flex;
-      justify-content: center;
+      justify-content: center; /* space between grandchildren */
       align-items: center;
       position: relative;
+      min-width: 300px;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
     
- /* =============================
+  /* =============================
     Url box
     =============================  */   
     .url-input {
       flex: 1;
-      min-width: 260px;
-      max-width: 420px;
-      height: 36px;
-      border-radius: 8px;
+      width: 100%;
+      min-width: 210px;
+      max-width: 50vw;
+      height: 40px;
+      border-radius: 10px;
       border: none;
       background-color: #1a1a1a;
-      color: white;
-      font-size: 14px;
-      padding: 0 12px;
-
-      line-height: 36px;
-      display: inline-block;
-      vertical-align: middle;
       text-align: center;
+      
+      cursor: pointer;
+      transition: transform 1s, box-shadow 0.3s;
+    }
+
+    /* Hover effect */
+    .url-input:hover {
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, #222);     /* outer glow */
     }
     
-    .url-input {
-      width: 100%;
-      padding-right: 48px;
-    }
     
     .url-input.glow {
-      box-shadow: 
-        0 0 4px #ff00ff, 
-        0 0 8px #ff00ff, 
-        0 0 16px #ff00ff, 
-        0 0 24px #ff00ff;
-      border: 1px solid #ff00ff;
+      border: 1px solid var(--btn-glow, white);
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
+        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
     }
     
     input[type="text"]::placeholder {
@@ -656,7 +657,7 @@
       border: 2px magenta;
       border-radius: 8px;
       padding: 10px;
-      font-size: 1em;
+      font-size: .9em;
       background-color: black; /*#121212;*/
       color: black;
       box-shadow: none;
@@ -665,11 +666,11 @@
     
     input[type="text"]:focus {
       outline: 1px;
-      border-color: solid magenta;
-      border: 1px solid magenta;
-      box-shadow: 
-              0 0 10px 0.5px rgba(255, 0, 255, .8),  /* outer glow */
-        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);  /* inner glow */
+      border-color: solid white;
+      border: 1px solid var(--btn-glow, white);
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
+        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
       background-color: black !important; /* stay black when focused */
       color: white !important;
     }
@@ -677,20 +678,21 @@
     /* for Suggested URL - Normal focus */
     input[type="text"]:focus {
       outline: none;
-      border: 1px solid magenta;
-      box-shadow: 
-        0 0 10px 0.5px rgba(255, 0, 255, .8),
-        inset 0 0 10px 0.5px rgba(255, 0, 255, .5);
+      border: 1px solid var(--btn-glow, white);
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
+        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
     }
     
     /* Autofill fix */
     input[type="text"]:-webkit-autofill {
-      -webkit-box-shadow: 0 0 10px 0.5px rgba(255, 0, 255, .8),
-                          inset 0 0 10px 0.5px rgba(255, 0, 255, .5),
-                          0 0 0px 1000px black inset !important;
+      border: 1px solid white;
+      -webkit-box-shadow:
+        0 0 10px 0.5px var(--btn-glow, magenta),
+        inset 0 0 10px 0.5px var(--btn-glow, magenta),
+        0 0 0px 1000px black inset !important;
       -webkit-text-fill-color: white !important;
       caret-color: white;
-      border: 1px solid magenta;
     }
     
     
@@ -707,6 +709,11 @@
      align-items: center;
      justify-content: center;
      user-select: none;
+     filter: 
+       drop-shadow(0 0 2px black)
+       drop-shadow(0 0 6.5px black);
+     cursor: pointer;
+     transition: transform 1s, filter 0.3s;
    }
 
    .paste-btn-icon:active {
@@ -729,30 +736,25 @@
        drop-shadow(0 0 6.5px magenta)
        drop-shadow(0 0 15px magenta);
    }
+    
+   .paste-btn-icon:hover {
+     filter: 
+       drop-shadow(0 0 2px black)
+       drop-shadow(0 0 4px black)
+       drop-shadow(0 0 6px #222);
+   }
 
-
- /* =============================
+/* =============================
     Bottom buttons
     =============================  */
     .bottom-buttons {
-      position: flex;
-      bottom: 15px;
+      justify-content: center;  /* center buttons */
+      gap: 15px;                /* spacing between buttons */
       width: 100%;
-      padding: 0 10px;
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      z-index: 5;
-    }
-
-    
-    /* Default: portrait or small screens */
-    .bottom-buttons.inside {
-      display: flex;
-      justify-content: center; /* center the buttons */
+      justify-content: space-between; /* default: spread buttons apart */
       align-items: center;
-      gap: 15px;               /* spacing between items */
-      margin-bottom: 0px;
+      z-index: 5;
     }
     
     .overlay {
@@ -783,11 +785,13 @@
     }
     .bot-drawer-overlay.visible { display: block; }
 
+
 /*  ===============================================
     Typical Buttons (Bottom buttons and Confirm's)
     ===============================================  */
     /* Note: Button Style (color is dynamic via CSS vars) */
     .cyan-btn {
+      margin: 0;
       flex: 1;
       padding: 14px;
       background: black;
@@ -850,9 +854,8 @@
     }
 
     
-
- /* =============================
-    Landscape Mode
+/*  ============================
+     Landscape Mode
     ============================ */
     @media (orientation: landscape) {
       .youtube-wrapper {
@@ -902,12 +905,12 @@
       }
           
       .youtube-wrapper {
-        position: fixed;
+        position: fixed !important;
         left: 50vw !important;
         transform: translateX(-50%)!important;
         width: 100vw !important;
         height: 100vh !important;
-        padding: 15px !important;
+        padding: 0px !important;
       }
       
       #popupModal {
@@ -918,7 +921,8 @@
       }
       
       .url-group {
-        margin: 10px !important;
+        width: auto !important;
+        margin: auto!important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -929,12 +933,13 @@
           margin-left: 5px !important;
       }
 
-      .bottom-buttons.inside {
+      .bottom-buttons {
+        width: 90vw !important;
         position: absolute !important;
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-        gap: 170px; !important;
+        gap: 55vw !important;
       }
       
       .bottom-drawer {
@@ -1143,12 +1148,8 @@
   </button>
 </div>
   
-  <div class="bottom-buttons inside">
+  <div class="bottom-buttons">
     <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-
-    <!-- URL group will appear in landscape only -->
-    <div class="url-group"></div>
-
     <button id="nextBtnDrawer" class="cyan-btn" data-tooltip="Next Song (Ctrl + →)" onclick="showNextConfirm()">Next</button>
     </div>
   </div>
@@ -1847,8 +1848,9 @@ function scheduleNextSongNotify(duration, currentTime) {
         ">Up next:</span>
         <span style="
           font-family: Arial, sans-serif;
-          font-weight: bold;
-          font-size: 1.0em;
+          font-weight: regular;
+          letter-spacing: 0.1em;
+          font-size: 1em;
           word-wrap: break-word;
         ">${nextSongTitle}</span>
       </div>
@@ -2435,11 +2437,17 @@ function _colorToRGBA(colorStr, alpha) {
     function showExitConfirm() {
       showModal({
         glowColor: "magenta",
-        title: "Exit CueTube?",
+        title: "Exit CueTube ?",
         titleColor: "magenta",
         messages: [
-          { text: "All reserved will be deleted.", color: "white", style: "font-family: Arial, sans-serif;" },
-          { text: "Double-tap the back button to confirm exit", color: "#ff4c4c", style: "font-family: Arial, sans-serif;" }
+          {
+            text: "This action cannot be undone!",
+            color: "gray",
+            style: "font-family: Arial, sans-serif;" },
+          {
+            text: "Double-tap the back button to confirm exit",
+            color: "white",
+            style: "font-family: Arial, sans-serif;" }
         ],
         buttons: [
           { label: "Cancel" }
@@ -2455,7 +2463,7 @@ function _colorToRGBA(colorStr, alpha) {
       const nextSong = queue[currentIndex + 1];
       showModal({
         glowColor: "cyan",
-        title: "Next  ▶",
+        title: "Next ?",
         titleColor: "cyan",
         messages: [
           {
@@ -2490,7 +2498,7 @@ function showDeleteConfirm(index, onCloseCallback) {
 
   showModal({
     glowColor: "red",
-    title: "Delete?",
+    title: "Delete ?",
     titleColor: "red",
     messages: [
       {
