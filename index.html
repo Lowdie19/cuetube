@@ -2428,7 +2428,9 @@ function showModal(settings) {
     }, { once: true });
   });
 
-  overlay.onclick = closeOnOverlay ? hideModal : null;
+  overlay.onclick = closeOnOverlay
+  ? () => setTimeout(() => hideModal(), 300)  // 0.3s delay for overlay clicks
+  : null;
 
   __modal_keydownHandler = (ev) => {
     if (ev.key === "Escape") hideModal();
@@ -2554,7 +2556,6 @@ function _colorToRGBA(colorStr, alpha) {
 
     function confirmPlayNext() {
       setTimeout(() => {
-        hideModal();
         playNextFromQueue();
       }, 300);
     }
