@@ -168,7 +168,7 @@
       border-radius: 1.5px;
       width: 80%;
       height: 100%;
-      background-color: red;
+      background-color: none;
     }
     
     /* Line */
@@ -190,6 +190,11 @@
     /* Text */
     .Notify .text {
       color: white;
+      text-shadow:
+          0 0 8px black,
+          0 0 8px black,
+          0 0 12px #222,
+          0 0 24px #222;
       font-family: Arial, sans-serif;
       font-weight: regular;
       font-size: 1.0em;
@@ -323,16 +328,21 @@
       user-select: none; /* prevent text selection */
       text-shadow: none; /* no glow by default */
       -webkit-text-stroke: 0px transparent;
-      transition: opacity 0.2s ease,
+      transition: opacity 1.0s ease-in-out,
                   color 0.2s ease,
                   -webkit-text-stroke 0.1s ease,
                   transform 0.1s ease-in-out;
+    }
+    
+    .drawer-handle.idle {
+      opacity: 0.2; /* fade to 20% when idle */
     }
 
     /* Hover + Focus-visible share same effect */
     .drawer-handle:hover,
     .drawer-handle:focus-visible {
       outline: none; /* remove dotted outline for keyboard */
+      opacity: 1 !important; /* ensure visible while interacting */
       color: cyan;
       -webkit-text-stroke: 0px cyan;
       text-shadow:
@@ -574,19 +584,25 @@
       font-size: 2.0em;
       cursor: pointer;
       text-shadow: none; /* 🚫 no glow */
-      -webkit-text-stroke: 0px transparent; /* no stroke initially */
+      -webkit-text-stroke: 0px transparent;
       z-index: 99;
-      user-select: none; /* prevent text selection */
-      transition: opacity 0.2s ease,
+      user-select: none;
+      transition: opacity 1.0s ease-in-out,
                   color 0.2s ease,
                   -webkit-text-stroke 0.1s ease,
                   transform 0.1s ease-in-out;
+      opacity: 1; /* start fully visible */
     }
-    
-    /* Hover + Focus-visible share same effect */
+
+    .bottom-drawer-handle.idle {
+      opacity: 0.2; /* fade to 20% when idle */
+    }
+
+    /* Hover/focus overrides idle */
     .bottom-drawer-handle:hover,
     .bottom-drawer-handle:focus-visible {
-      outline: none; /* remove dotted outline for keyboard */
+      outline: none;
+      opacity: 1 !important;
       color: cyan;
       -webkit-text-stroke: 0px cyan;
       text-shadow:
@@ -594,11 +610,6 @@
         0 0 8px cyan,
         0 0 12px cyan,
         0 0 24px cyan;
-      /*transform: scale(1.05);  enlarge a bit */
-    }
-    
-    .bottom-drawer-handle[style*="display: none"] {
-      opacity: 0;
     }
     
  /* =============================
@@ -910,12 +921,12 @@
         position: relative;
         width: 50vw;
         height: 100%;
-        background: linear-gradient(
+        /*background: linear-gradient(
           to left,
-          rgba(13, 14, 14, 0.05) 0,
-          rgba(0, 0, 0, 0.70) 0 0%
-        );
-        backdrop-filter: blur(3px);
+          rgba(0, 0, 0, 0) 0,
+          rgba(0, 0, 0, 0.050) 0 0%
+        );*/
+        backdrop-filter: blur(5px);
       }
           
       .youtube-wrapper {
@@ -960,6 +971,22 @@
         bottom: -100px;
         width: 100vw !important;
         height: 100px !important;
+      }
+      
+      .bottom-drawer-handle,
+      .drawer-handle {
+        color: white !important;
+        -webkit-text-stroke: 0px magenta;
+        text-shadow:
+          0 0 8px magenta,
+          0 0 8px magenta,
+          0 0 12px magenta,
+          0 0 24px magenta;
+        }
+      
+      .bottom-drawer-handle.idle,
+      .drawer-handle.idle {
+        opacity: .01 !important;
       }
       
       .touchpad {
@@ -1770,10 +1797,15 @@ function updateNowPlaying() {
     // No upcoming song
     nowTitleEl.innerHTML = `
       <span class="now-playing-glow">${title}</span>
-      <div id="noUpcoming" style="color: #7f95e4; font-family: Arial, sans-serif; font-weight: normal; margin-top: 10px; font-size: 0.8em;">
+      <div id="noUpcoming"
+        style="color: #7f95e4;
+        font-family: Arial, sans-serif;
+        font-weight: normal;
+        margin-top: 10px;
+        font-size: 0.8em;
+        ">
         No upcoming song . . .
-      </div>
-    `;
+      </div>`;
 
     notifyShowTimeout = setTimeout(() => {
       showNotify("No upcoming song");
@@ -1867,6 +1899,11 @@ function scheduleNextSongNotify(duration, currentTime) {
           font-weight: normal;
           font-size: 0.7em; 
           color: #7f95e4; 
+          text-shadow:
+            0 0 8px black,
+            0 0 8px black,
+            0 0 12px #222,
+            0 0 24px #222;
           margin-bottom: 4px;
         ">Up next:</span>
         <span style="
@@ -1874,6 +1911,11 @@ function scheduleNextSongNotify(duration, currentTime) {
           font-weight: regular;
           letter-spacing: 0.1em;
           font-size: 1em;
+          text-shadow:
+            0 0 8px black,
+            0 0 8px black,
+            0 0 12px #222,
+            0 0 24px #222;
           word-wrap: break-word;
         ">${nextSongTitle}</span>
       </div>
@@ -2553,8 +2595,34 @@ function showDeleteConfirm(index, onCloseCallback) {
     }
   });
 }
+    
+/* =========================================================
+   Idle Fucntion for Left and Bottom drawer handles
+   ========================================================= */
+    let idleTimer;
+    const idleDelay = 3000; // 3 seconds
+    const idleTargets = document.querySelectorAll('.drawer-handle, .bottom-drawer-handle');
 
+    function setIdle() {
+      idleTargets.forEach(el => el.classList.add('idle'));
+    }
 
+    function resetIdle() {
+      idleTargets.forEach(el => el.classList.remove('idle'));
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(setIdle, idleDelay);
+    }
+
+    // Events that reset idle
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart', 'touchmove'].forEach(event => {
+      window.addEventListener(event, resetIdle, { passive: true });
+    });
+
+    // Start on load
+    resetIdle();
+
+    
+    
   </script>
   <script src="https://www.youtube.com/iframe_api">
 
