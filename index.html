@@ -166,9 +166,9 @@
       overflow: hidden;
       position: relative;
       border-radius: 1.5px;
-      width: 100%;
+      width: 80%;
       height: 100%;
-      background-color: none;
+      background-color: red;
     }
     
     /* Line */
@@ -199,7 +199,7 @@
       transform: translateX(-100%);
       animation: slideOut 0.8s forwards;
       animation-delay: 0.5s;
-      margin-left: 30px;
+      margin-left: 25px;
       position: relative;
       white-space: normal;   /* allow wrapping */
       word-wrap: break-word; /* break long words if needed */
@@ -852,7 +852,21 @@
       width: 45%;
       max-width: 200px;
     }
-
+    
+/*  =============================
+    Touchpad +++++++++++++++++++
+    ============================  */
+      .touchpad {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 35vw;
+        height: 70vh;
+        background: invisible;
+        outline: none; 
+        z-index: 999;
+      }
     
 /*  ============================
      Landscape Mode
@@ -910,7 +924,7 @@
         transform: translateX(-50%)!important;
         width: 100vw !important;
         height: 100vh !important;
-        padding: 0px !important;
+        padding: 5px !important;
       }
       
       #popupModal {
@@ -947,7 +961,13 @@
         width: 100vw !important;
         height: 100px !important;
       }
-    }         
+      
+      .touchpad {
+        display: block !important;
+      }
+    }   
+    
+
 
 
  /* ======================================
@@ -1083,7 +1103,10 @@
   </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-
+    
+  <!-- Invisible touchpad --> 
+  <div class="touchpad"></div>
+  
   <!-- Title -->
 <div class="title-bar">
   <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
@@ -1158,7 +1181,7 @@
   <!-- Popup -->
   <div id="popupOverlay"></div>
   <div id="popupModal">Reserved!</div>
-
+  
   
   <!-- Generic Overlay -->
   <!-- Overlay -->
@@ -2357,7 +2380,9 @@ function showModal(settings) {
     if (!el) return;
     el.addEventListener("click", () => {
       try { if (typeof btn.onClick === "function") btn.onClick(); }
-      finally { hideModal(); }
+      finally { 
+        setTimeout(() => hideModal(), 300); // <-- delay 0.3s
+      }
     }, { once: true });
   });
 
@@ -2486,8 +2511,10 @@ function _colorToRGBA(colorStr, alpha) {
     }
 
     function confirmPlayNext() {
-      hideModal();
-      playNextFromQueue();
+      setTimeout(() => {
+        hideModal();
+        playNextFromQueue();
+      }, 300);
     }
 
 /* =========================================================
