@@ -1395,6 +1395,25 @@ document.body.addEventListener("touchmove", evt => {
 document.addEventListener('keydown', async (e) => {
   // Ignore shortcuts when typing in input or textarea
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  
+  
+  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
+    e.preventDefault(); // prevent default paste
+    await pasteFromClipboard();
+  }
+  
+  
+  // Ctrl + Right Arrow → Next button
+  if (e.ctrlKey && e.key === "ArrowRight") {
+    e.preventDefault();
+    const nextBtnDrawer = document.getElementById("nextBtnDrawer");
+    if (nextBtnDrawer) {
+      nextBtnDrawer.click();
+    }
+    return; // stop here so openDrawer() doesn’t also run
+  }
+  
 
   // Drawer arrow controls
   if (e.key === "ArrowUp") toggleBottomDrawer();     // Open/close bottom drawer
@@ -1406,6 +1425,7 @@ document.addEventListener('keydown', async (e) => {
     closeBottomDrawer();
   }
 
+  
   // Spacebar: Play / Pause YouTube video
   if (e.code === "Space") {
     e.preventDefault(); // prevent page scroll
@@ -1418,19 +1438,7 @@ document.addEventListener('keydown', async (e) => {
     }
   }
 
-  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
-    e.preventDefault(); // prevent default paste
-    await pasteFromClipboard();
-  }
-
-  // Ctrl + Right Arrow → Next button in drawer
-  if (e.ctrlKey && e.key === "ArrowRight") {
-    e.preventDefault();
-    const nextBtnDrawer = document.getElementById("nextBtnDrawer");
-    if (nextBtnDrawer) nextBtnDrawer.click();
-  }
-
+  
   // Enter: confirm active modal
   if (e.key === "Enter") {
     // 1️⃣ Delete confirm
@@ -2423,13 +2431,13 @@ function showModal(settings) {
     el.addEventListener("click", () => {
       try { if (typeof btn.onClick === "function") btn.onClick(); }
       finally { 
-        setTimeout(() => hideModal(), 300); // <-- delay 0.3s
+        setTimeout(() => hideModal(), 200); // <-- delay 0.2s
       }
     }, { once: true });
   });
 
   overlay.onclick = closeOnOverlay
-  ? () => setTimeout(() => hideModal(), 300)  // 0.3s delay for overlay clicks
+  ? () => setTimeout(() => hideModal(), 200)  // 0.2s delay for overlay clicks
   : null;
 
   __modal_keydownHandler = (ev) => {
@@ -2501,6 +2509,40 @@ function _colorToRGBA(colorStr, alpha) {
 }
 
 /* =========================================================
+   NEXT MODAL
+   ========================================================= */
+    function showNextConfirm() {
+      const nextSong = queue[currentIndex + 1];
+      showModal({
+        glowColor: "cyan",
+        title: "Next ?",
+        titleColor: "cyan",
+        messages: [
+          {
+            text: "Up next:",
+            color: "gray",
+            style: "font-family: Arial, sans-serif;" },
+          { 
+            text: nextSong
+              ? `"${nextSong.title}"`
+              : "No song available.",
+            color: "white",
+            style: "font-family: Arial, sans-serif; font-weight: normal;"
+          }
+        ],
+        buttons: [
+          { label: "Confirm", onClick: confirmPlayNext },
+          { label: "Cancel"}
+        ]
+      });
+    }
+
+    function confirmPlayNext() {
+      playNextFromQueue(); // just run the action
+    }
+    
+    
+/* =========================================================
    EXIT MODAL
    ========================================================= */
     function showExitConfirm() {
@@ -2525,40 +2567,6 @@ function _colorToRGBA(colorStr, alpha) {
       playErrorSound();
     }
 
-/* =========================================================
-   NEXT MODAL
-   ========================================================= */
-    function showNextConfirm() {
-      const nextSong = queue[currentIndex + 1];
-      showModal({
-        glowColor: "cyan",
-        title: "Next ?",
-        titleColor: "cyan",
-        messages: [
-          {
-            text: "Up next:",
-            color: "gray",
-            style: "font-family: Arial, sans-serif;" },
-          { 
-            text: nextSong
-              ? `"${nextSong.title}"`
-              : "No song available.",
-            color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;"
-          }
-        ],
-        buttons: [
-          { label: "Confirm", onClick: confirmPlayNext },
-          { label: "Cancel", onClick: hideModal }
-        ]
-      });
-    }
-
-    function confirmPlayNext() {
-      setTimeout(() => {
-        playNextFromQueue();
-      }, 300);
-    }
 
 /* =========================================================
    DELETE MODAL
@@ -2596,6 +2604,7 @@ function showDeleteConfirm(index, onCloseCallback) {
     }
   });
 }
+    
     
 /* =========================================================
    Idle Fucntion for Left and Bottom drawer handles
