@@ -136,12 +136,15 @@
     /* On wider screens (like PC), use 40% width */
     @media (min-width: 768px) {
       .drawer {
-        width: 45%;
-        left: -45%; /* hidden off-screen */
+        width: 40% !important;
+        left: -40% !important;
       }
     
       .drawer.open {
-        left: 0; /* fully visible */
+        left: 0 !important;
+      }
+      .bottom-buttons {
+        width: 70vw !important;
       }
     }
     
@@ -422,114 +425,137 @@
     }
 
 
-/*  =============
-    Next-box 
-    ============= */
-    /* Box */
-    .next-box {
-      position: relative;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      border: none;
-      border-radius: none;
-      padding: 10px;
-      background: none;
-      margin-left: 15px;
-      flex: 1;
-      min-height: 0;
-      overscroll-behavior: contain;          /* keeps scroll contained */
-      -webkit-overflow-scrolling: touch;     /* smooth scrolling on iOS */
-      scroll-padding-bottom: 40px;
-      touch-action: pan-y;
-      cursor: grab;
+/* ===============================
+   Next-box Base Styles
+   =============================== */
+.next-box {
+  position: relative;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-left: 15px;
+  flex: 1;
+  min-height: 0;
 
-      /* Android / Mobile fixes */
-      -webkit-tap-highlight-color: transparent; /* removes red highlight on touch */
-      -webkit-touch-callout: none;              /* disables long press menu */
+  /* Native-like scroll */
+  overscroll-behavior: contain;      
+  -webkit-overflow-scrolling: touch; 
+  scroll-padding-bottom: 40px;
+  touch-action: pan-y;
 
-      scrollbar-width: none; /* hide scrollbar for Firefox */
-    }
+  scrollbar-width: none; /* Firefox hide scrollbar */
+}
 
-    /* Hide scrollbar for WebKit browsers */
-    .next-box::-webkit-scrollbar {
-      display: none;
-    }
-    .next-box::-webkit-scrollbar-track {
-      background: transparent;
-    }
+/* ===============================
+   Hide Scrollbar for WebKit Browsers
+   =============================== */
+.next-box::-webkit-scrollbar {
+  display: none;
+}
+.next-box::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-    .next-box.dragging {
-      cursor: grabbing;
-    }
+/* ===============================
+   Hidden Next-box
+   =============================== */
+.next-box.hidden {
+  display: none !important;
+}
 
-    .next-box.hidden {
-      display: none !important;
-    }
+/* ===============================
+   Overflow Counter
+   =============================== */
+#overflowCounter {
+  text-align: center;
+  font-size: 0.7em;
+  color: #888;
+  margin-top: 5px;
+  display: none;
+}
 
-    #overflowCounter {
-      text-align: center;
-      font-size: 0.7em;
-      color: #888;
-      margin-top: 5px;
-      display: none;
-    }
+/* ===============================
+   Label Text inside Next-box
+   =============================== */
+.next-box .label {
+  font-size: 0.7em;
+  color: grey;
+}
 
-    /* Label text inside Next-box (Next) */
-    .next-box .label {
-      font-size: 0.7em;
-      color: grey;
-    }
+/* ===============================
+   Song Titles inside Next-box
+   =============================== */
+.next-box .songtitle {
+  font-family: Arial, sans-serif;
+  font-size: 0.9em;
+  margin: 10px 0;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-weight: normal;
+  padding: 5px;
 
-    /* Song titles inside Next-box */
-    .next-box .songtitle {
-      font-family: Arial, sans-serif;
-      font-size: 0.9em;
-      margin: 10px 0;
-      text-align: left;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-weight: normal;
-      padding: 5px;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+}
 
-      position: relative;
-      overflow: hidden;
-      user-select: none;
-      cursor: pointer;
-    }
+/* ===============================
+   Ripple Overlay (Base)
+   =============================== */
+.next-box .songtitle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(128, 128, 128, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
 
-    /* Ripple overlay (base) */
-    .next-box .songtitle::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(128, 128, 128, 0.4);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease; /* fade out speed */
-    }
+/* Click Ripple */
+.next-box .songtitle.ripple::after {
+  opacity: 1;
+  transition: opacity 0s;
+}
 
-    /* Click ripple */
-    .next-box .songtitle.ripple::after {
-      opacity: 1;
-      transition: opacity 0s; /* show instantly */
-    }
+/* Hover Flash */
+.next-box .songtitle.hover-flash::after {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
 
-    /* Hover flash */
-    .next-box .songtitle.hover-flash::after {
-      opacity: 1;
-      transition: opacity 0.5s ease; /* fade out over 0.5s */
-    }
+/* Long Press / Right-click Red Highlight */
+.next-box .songtitle.long-pressing {
+  background-color: rgba(255, 0, 0, 0.25) !important;
+  color: #ff4c4c !important;
+  transition: background-color 0.3s ease !important;
+}
 
-    /* Long press / Right-click red highlight */
-    .next-box .songtitle.long-pressing {
-      background-color: rgba(255, 0, 0, 0.25) !important; /* semi-transparent red */
-      color: #ff4c4c !important; /* optional: red text */
-      transition: background-color 0.3s ease !important;
-    }
+/* ===============================
+   Bounce Animations
+   =============================== */
+@keyframes bounceTop {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(var(--bounce-top, 25px)); }
+  50%  { transform: translateY(-10px); }
+  75%  { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
+@keyframes bounceBottom {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(calc(var(--bounce-bottom, -15px))); }
+  50%  { transform: translateY(7px); }
+  75%  { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+.next-box.bounce-top    { animation: bounceTop 0.5s ease; }
+.next-box.bounce-bottom { animation: bounceBottom 0.4s ease; }
     
     
  /* =============================
@@ -750,9 +776,10 @@
     
    .paste-btn-icon:hover {
      filter: 
-       drop-shadow(0 0 2px black)
-       drop-shadow(0 0 4px black)
-       drop-shadow(0 0 6px #222);
+       drop-shadow(0 0 3px black)
+       drop-shadow(0 0 5px black)
+       drop-shadow(0 0 1.5px #222)
+       drop-shadow(0 0 8px #222);
    }
 
 /* =============================
@@ -887,9 +914,14 @@
         height: 65vh;
       }
       .drawer {
+        width: 65% !important;
+        left: -65% !important;
         height: 100vh; /* Full screen height in landscape */
         justify-content: space-between; /* Keep space for top + bottom parts */
         padding-bottom: 20px; /* Add some space at the bottom */
+      }
+      .drawer.open {
+        left: 0 !important;
       }
       .url-input, .search-bar {
         display: block; /* Make sure it's visible */
@@ -1449,7 +1481,7 @@ document.addEventListener('keydown', async (e) => {
       e.preventDefault();
       return;
     }
-
+    
     // 2️⃣ Next song confirm
     const nextModal = document.getElementById("nextConfirmModal");
     if (nextModal && nextModal.style.display !== "none") {
@@ -1460,7 +1492,7 @@ document.addEventListener('keydown', async (e) => {
   }
 });
 
-    
+
 // =====================
 // URL Input Enter Key
 // =====================
@@ -1471,19 +1503,26 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
   }
 });
 
-  document.body.addEventListener("click", handleTap);
+// =====================
+// Body click handler
+// =====================
+document.body.addEventListener("click", handleTap);
 
-  let player;
-  let queue = [];
-  let currentIndex = -1;
+// =====================
+// YouTube Player Setup
+// =====================
+let player;
+let queue = [];
+let currentIndex = -1;
 
-  if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 }
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
     events: {
       onReady: () => console.log("Player Ready"),
       onStateChange: onPlayerStateChange
@@ -1501,13 +1540,13 @@ function onPlayerStateChange(event) {
       hideNotify();
       queue = [];
       currentIndex = -1;
-
+      
       updateNowPlaying();
       updateQueueDisplay();
-
+      
       player.stopVideo();
       player.clearVideo();
-
+      
       showPopup("That's the last tune!", "magenta", true, true);
     } else {
       currentIndex++;
@@ -1517,14 +1556,12 @@ function onPlayerStateChange(event) {
     }
   } 
   else if (event.data === YT.PlayerState.PAUSED) {
-    // ⏸️ Delay before showing pause popup (ignore buffering/quick pauses)
     pauseTimeout = setTimeout(() => {
-      showPopup("Paused", "yellow", true, "yellow");
-    }, 500); // 0.5s
+      showPopup("Paused", "purple", true, "purple");
+    }, 500); 
     stopProgressChecker();
   } 
   else if (event.data === YT.PlayerState.PLAYING) {
-    // ▶️ Cancel pause popup if video resumes quickly
     clearTimeout(pauseTimeout);
     clearPersistentPopup();
     startProgressChecker();
@@ -1534,12 +1571,55 @@ function onPlayerStateChange(event) {
   }
 }
 
-  function extractVideoId(url) {
-    const match = url.match(/(?:youtu\.be\/|v=)([0-9A-Za-z_-]{11})/);
-    return match ? match[1] : null;
-  }
+// =====================
+// Extract Video ID (supports standard, shortened, embed URLs)
+// =====================
+function extractVideoId(url) {
+  if (!url) return null;
+  
+  // Remove extra parameters
+  const cleanUrl = url.split('&')[0];
+  
+  // Match standard, shortened, or embed URLs
+  const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([0-9A-Za-z_-]{11})/;
+  const match = cleanUrl.match(regex);
+  return match ? match[1] : null;
+}
 
-  async function reserveFromDrawer() {
+// =====================
+// Song Fetch: Title
+// =====================
+let invalidSongCount = 0; // counter for invalid/untitled songs
+
+function resetInvalidSongCounter() {
+  invalidSongCount = 0;
+}
+
+async function fetchTitle(videoId) {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch video info");
+
+    const data = await res.json();
+
+    // Return title only, or Invalid Song with numbering
+    return data.title || `Invalid Song ${++invalidSongCount}`;
+
+  } catch (err) {
+    invalidSongCount++;
+    showPopup("⚠️ Oops! Try choosing another video.", "red", true, "red");
+    playErrorSound();
+    return `Invalid Song ${invalidSongCount}`;
+  }
+}
+
+// =====================
+// Reserve Video from Drawer
+// =====================
+async function reserveFromDrawer() {
   clearPersistentPopup();
 
   const input = document.getElementById("youtubeInputDrawer");
@@ -1548,114 +1628,96 @@ function onPlayerStateChange(event) {
 
   if (!videoId) {
     input.value = "";
-    // ❌ Delay error popup + sound by 0.6s
     setTimeout(() => {
-      showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
+      // Make error popup persistent
+      showPopup("⚠️ Invalid YouTube URL!", "red", true, "red");
       playErrorSound();
     }, 600);
+    return; // stop further execution
+  }
+
+  const title = await fetchTitle(videoId); // title only
+
+  // If fetchTitle returned an invalid/untitled video, don't show "Reserved!" popup
+  if (title.startsWith("Invalid Song")) {
+    input.value = "";
     return;
   }
 
-  const title = await fetchTitle(videoId);
-
-    
-  // =====================
   // AUTO PLAY FIRST VIDEO
-  // =====================
   if (queue.length === 0 && currentIndex === -1) {
     queue.push({ id: videoId, title });
     currentIndex = 0;
 
-    // Auto-load and play the first video
     player.loadVideoById(videoId);
-    player.playVideo(); // ✅ ensure it auto-plays
+    player.playVideo();
     updateNowPlaying();
   } else {
-    // Add to the end of queue without playing
     queue.push({ id: videoId, title });
   }
 
   updateQueueDisplay();
   input.value = "";
 
-  // ✅ Delay success popup + sound by 0.6s
-  setTimeout(() => {
-    showPopup("Reserved!", "lime", false, "lime");
-    playSuccessSound();
-  }, 600);
+  // ✅ Show success popup only if no persistent popup is active
+  if (!persistentPopupActive) {
+    setTimeout(() => {
+      showPopup("Reserved!", "lime", false, "lime");
+      playSuccessSound();
+    }, 600);
+  }
 
   closeBottomDrawer();
 }
 
-  async function fetchTitle(videoId) {
-    try {
-      const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-      const data = await res.json();
-      return data.title || videoId;
-    } catch (err) {
-    showPopup("⚠️ Oops! Try choosing\nanother video.", "red", false, "red");
-    playErrorSound();
-    return videoId;
-  }
-  }
-
-
-
-  function playNextFromQueue() {
+// =====================
+// Play Next from Queue
+// =====================
+function playNextFromQueue() {
   if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-    // ❌ Error case — delay error popup + sound by 0.8s
     setTimeout(() => {
       showPopup("No next song.", "red", true, true);
       playErrorSound();
     }, 600);
     return;
   }
-
+  
   currentIndex++;
   player.loadVideoById(queue[currentIndex].id);
   updateNowPlaying();
   updateQueueDisplay();
-
-  // ✅ Success case — delay success popup + sound by 0.8s
+  
   setTimeout(() => {
     showPopup("Next song!", "magenta", false, "magenta");
     playSuccessSound();
   }, 600);
 }
 
-
-// ============================== 
-//  QUEUE
-// ==============================
+// =====================
+// Queue Display
+// =====================
 function updateQueueDisplay() {
   const list = document.getElementById("nextList");
   const overflow = document.getElementById("overflowCounter");
   list.innerHTML = "";
 
   for (let i = currentIndex + 1; i < queue.length; i++) {
-    // Create item
     const div = document.createElement("div");
-    div.className = "songtitle"; // renamed
-    div.textContent = queue[i].title;
+    div.className = "songtitle"; 
+    div.textContent = queue[i].title; // Title - Artist
     div.style.cursor = "pointer";
 
     let longPressTimer;
     let longPressTriggered = false;
 
-    // ==============================
-    // Long Press (touch or left mouse)
-    // ==============================
     const startHandler = (e) => {
       longPressTriggered = false;
-
-      // only for touch or left mouse button
       if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
         longPressTimer = setTimeout(() => {
           longPressTriggered = true;
-          div.classList.add("long-pressing"); // highlight red after 2s
+          div.classList.add("long-pressing");
           navigator.vibrate?.(50);
 
-          // 🔴 Pass a callback to remove highlight when modal closes
           showDeleteConfirm(i, () => {
             div.classList.remove("long-pressing");
           });
@@ -1665,9 +1727,7 @@ function updateQueueDisplay() {
 
     const endHandler = () => {
       clearTimeout(longPressTimer);
-      if (!longPressTriggered) {
-        div.classList.remove("long-pressing");
-      }
+      if (!longPressTriggered) div.classList.remove("long-pressing");
     };
 
     const cancelHandler = () => {
@@ -1741,34 +1801,37 @@ function updateQueueDisplay() {
   }
   }
     
-  document.addEventListener("DOMContentLoaded", () => {
+// =====================
+// Overflow Counter
+// =====================
+function updateOverflowCounter() {
+  const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
+  if (!list || !overflow) return;
+
+  const totalHeight = list.scrollHeight;
+  const visibleHeight = list.clientHeight;
+  const scrollable = totalHeight > visibleHeight;
+
+  if (scrollable) {
+    const items = list.children;
+    let shown = 0;
+    let accHeight = 0;
+    for (let i = 0; i < items.length; i++) {
+      accHeight += items[i].offsetHeight;
+      if (accHeight < visibleHeight) shown++;
+    }
+    const remainingCount = items.length - shown;
+    overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
+    overflow.style.display = "block";
+  } else {
+    overflow.style.display = "none";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
   updateQueueDisplay();
 });
-
-  function updateOverflowCounter() {
-    const list = document.getElementById("nextList");
-    const overflow = document.getElementById("overflowCounter");
-    if (!list || !overflow) return;
-
-    const totalHeight = list.scrollHeight;
-    const visibleHeight = list.clientHeight;
-    const scrollable = totalHeight > visibleHeight;
-
-    if (scrollable) {
-      const items = list.children;
-      let shown = 0;
-      let accHeight = 0;
-      for (let i = 0; i < items.length; i++) {
-        accHeight += items[i].offsetHeight;
-        if (accHeight < visibleHeight) shown++;
-      }
-      const remainingCount = items.length - shown;
-      overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-      overflow.style.display = "block";
-    } else {
-      overflow.style.display = "none";
-    }
-  }
 
     
 // ===================== 
@@ -2036,6 +2099,24 @@ document.body.addEventListener("click", () => {
   }
   clearPersistentPopup();
 });
+    
+
+
+// Popup Overlay Close
+document.getElementById("popupOverlay").onclick = () => {
+  const popup = document.getElementById("popupModal");
+  popup.classList.remove("show");
+  document.getElementById("popupOverlay").classList.remove("visible");
+  persistentPopupActive = false;
+};
+
+
+// ===============================
+// On page load
+// ===============================
+window.onload = () => {
+  hideNextConfirm();
+};
 
 
 // =====================
@@ -2102,8 +2183,7 @@ function addRubberBandEffect(drawerEl, direction = "left", maxStretch = 50, thre
 // =====================
 // Universal Tooltip
 // =====================
-// note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button>
-    
+// note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button> 
 // Select all elements with data-tooltip
 const tooltipElements = document.querySelectorAll("[data-tooltip]");
 
@@ -2112,7 +2192,7 @@ tooltipElements.forEach(el => {
 
   // Desktop hover
   el.addEventListener("mouseenter", () => {
-    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 5000);
+    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000);
   });
   el.addEventListener("mouseleave", () => {
     clearTimeout(tooltipTimeout);
@@ -2138,68 +2218,76 @@ tooltipElements.forEach(el => {
   });
 });
 
-// Universal Tooltip ----e // 
 
-    
 
-  (function enableDragScroll() {
-    const box = document.querySelector('.next-box');
-    let isDown = false;
-    let startY, scrollTop;
 
-    box.addEventListener('mousedown', (e) => {
-      isDown = true;
-      box.classList.add('dragging');
-      startY = e.pageY - box.offsetTop;
-      scrollTop = box.scrollTop;
-    });
-    box.addEventListener('mouseleave', () => {
-      isDown = false;
-      box.classList.remove('dragging');
-    });
-    box.addEventListener('mouseup', () => {
-      isDown = false;
-      box.classList.remove('dragging');
-    });
-    box.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const y = e.pageY - box.offsetTop;
-      const walk = (y - startY);
-      box.scrollTop = scrollTop - walk;
-    });
+// ===============================
+// Next-box Momentum + Bounce
+// ===============================
+(function nextBoxScroll() {
+  const box = document.querySelector('.next-box');
+  if (!box) return;
 
-    let startYTouch = 0, scrollTopTouch = 0;
-    box.addEventListener("touchstart", e => {
-      startYTouch = e.touches[0].clientY;
-      scrollTopTouch = box.scrollTop;
-    }, { passive: true });
+  // --- Bounce thresholds ---
+  const threshold = 2; // px
+  const bounceTopDist = 30;   // px (stronger pull-down)
+  const bounceBottomDist = -15; // px (softer push-up)
 
-    box.addEventListener("touchmove", e => {
-      const y = e.touches[0].clientY;
-      const walk = y - startYTouch;
-      box.scrollTop = scrollTopTouch - walk;
-    }, { passive: true });
-  })();
+  // --- Momentum scroll vars ---
+  let velocity = 0;
+  let lastScrollTop = 0;
+  let ticking = false;
 
-  document.getElementById("popupOverlay").onclick = () => {
-    const popup = document.getElementById("popupModal");
-    popup.classList.remove("show");
-    document.getElementById("popupOverlay").classList.remove("visible");
-    persistentPopupActive = false;
-  };
+  // Apply momentum with requestAnimationFrame
+  function momentum() {
+    if (Math.abs(velocity) > 0.5) {
+      box.scrollTop += velocity;
+      velocity *= 0.95; // friction
+      requestAnimationFrame(momentum);
+    }
+  }
 
-  document.body.addEventListener("click", () => {
-    const confirm = document.getElementById("confirmDelete");
-    if (confirm.style.display !== "none") {
-      confirm.style.display = "none";
+  box.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const maxScroll = box.scrollHeight - box.clientHeight;
+        const currentScroll = box.scrollTop;
+
+        // --- Bounce top ---
+        if (currentScroll <= threshold) {
+          box.style.setProperty('--bounce-top', `${bounceTopDist}px`);
+          box.classList.remove('bounce-top');
+          void box.offsetWidth;
+          box.classList.add('bounce-top');
+        }
+        // --- Bounce bottom ---
+        else if (currentScroll >= maxScroll - threshold) {
+          box.style.setProperty('--bounce-bottom', `${bounceBottomDist}px`);
+          box.classList.remove('bounce-bottom');
+          void box.offsetWidth;
+          box.classList.add('bounce-bottom');
+        }
+
+        // --- Momentum detection ---
+        velocity = currentScroll - lastScrollTop;
+        lastScrollTop = currentScroll;
+
+        ticking = false;
+      });
+      ticking = true;
     }
   });
-    
-  window.onload = () => {
-    hideNextConfirm();
-  };
-    
+
+  // When wheel/touch ends, keep scrolling with inertia
+  ['wheel', 'touchend'].forEach(evt => {
+    box.addEventListener(evt, () => {
+      if (Math.abs(velocity) > 1) {
+        requestAnimationFrame(momentum);
+      }
+    });
+  });
+})();
+
 
 
 // ======================================
@@ -2409,6 +2497,8 @@ function showModal(settings) {
     const extraStyle = msg?.style || "";
     html += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
   }
+    html += `<div style="height:0.5px;"></div>`;
+  
   if (buttons.length > 0) {
     html += `<div class="modal-buttons" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">`;
     buttons.forEach((btn, i) => {
@@ -2515,20 +2605,19 @@ function _colorToRGBA(colorStr, alpha) {
       const nextSong = queue[currentIndex + 1];
       showModal({
         glowColor: "cyan",
-        title: "Next ?",
+        title: "Up Next",
         titleColor: "cyan",
         messages: [
-          {
-            text: "Up next:",
-            color: "gray",
-            style: "font-family: Arial, sans-serif;" },
           { 
             text: nextSong
               ? `"${nextSong.title}"`
               : "No song available.",
             color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;"
-          }
+            style: "font-family: Arial, sans-serif; font-weight: normal;"},
+          {
+            text: "Proceed to the next song?",
+            color: "gray",
+            style: "font-family: Arial, sans-serif;" }
         ],
         buttons: [
           { label: "Confirm", onClick: confirmPlayNext },
@@ -2604,6 +2693,13 @@ function showDeleteConfirm(index, onCloseCallback) {
     }
   });
 }
+    // Click outside to hide confirm
+document.body.addEventListener("click", () => {
+  const confirm = document.getElementById("confirmDelete");
+  if (confirm.style.display !== "none") {
+    confirm.style.display = "none";
+  }
+});
     
     
 /* =========================================================
