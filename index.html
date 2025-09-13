@@ -443,7 +443,7 @@
   -webkit-overflow-scrolling: touch; 
   scroll-padding-bottom: 40px;
   touch-action: pan-y;
-
+  cursor: default;
   scrollbar-width: none; /* Firefox hide scrollbar */
 }
 
@@ -537,25 +537,18 @@
   transition: background-color 0.3s ease !important;
 }
 
-/* ===============================
-   Bounce Animations
-   =============================== */
-@keyframes bounceTop {
+/* Bounce animations */
+@keyframes bounce {
   0%   { transform: translateY(0); }
-  25%  { transform: translateY(var(--bounce-top, 25px)); }
-  50%  { transform: translateY(-10px); }
-  75%  { transform: translateY(5px); }
+  30%  { transform: translateY(var(--bounce-distance)); }
+  60%  { transform: translateY(0); }
+  80%  { transform: translateY(calc(var(--bounce-distance) / 2)); }
   100% { transform: translateY(0); }
 }
-@keyframes bounceBottom {
-  0%   { transform: translateY(0); }
-  25%  { transform: translateY(calc(var(--bounce-bottom, -15px))); }
-  50%  { transform: translateY(7px); }
-  75%  { transform: translateY(-3px); }
-  100% { transform: translateY(0); }
+
+.next-box.bounce {
+  animation: bounce 0.4s ease;
 }
-.next-box.bounce-top    { animation: bounceTop 0.5s ease; }
-.next-box.bounce-bottom { animation: bounceBottom 0.4s ease; }
     
     
  /* =============================
@@ -2221,71 +2214,97 @@ tooltipElements.forEach(el => {
 
 
 
-// ===============================
-// Next-box Momentum + Bounce
-// ===============================
-(function nextBoxScroll() {
-  const box = document.querySelector('.next-box');
+/* ===============================
+   Bounce for Scrolling Nextbox
+   =============================== */
+(function unifiedScroll() {
+  const box = document.querySelector(".next-box");
   if (!box) return;
 
-  // --- Bounce thresholds ---
-  const threshold = 2; // px
-  const bounceTopDist = 30;   // px (stronger pull-down)
-  const bounceBottomDist = -15; // px (softer push-up)
-
-  // --- Momentum scroll vars ---
+  let isTouching = false;
+  let startY = 0;
   let velocity = 0;
+  let raf;
   let lastScrollTop = 0;
-  let ticking = false;
 
-  // Apply momentum with requestAnimationFrame
-  function momentum() {
-    if (Math.abs(velocity) > 0.5) {
-      box.scrollTop += velocity;
-      velocity *= 0.95; // friction
-      requestAnimationFrame(momentum);
-    }
+  const threshold = 2;
+  const bounceTopDist = 25;   // strong top pull
+  const bounceBottomDist = -15; // soft bottom push
+  const maxStretch = 60;      // max stretch px
+
+  /* ---------- Bounce helper ---------- */
+  function triggerBounce(distance) {
+    box.style.setProperty("--bounce-distance", distance + "px");
+    box.classList.remove("bounce");
+    void box.offsetWidth; // reflow
+    box.classList.add("bounce");
   }
 
-  box.addEventListener('scroll', () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        const maxScroll = box.scrollHeight - box.clientHeight;
-        const currentScroll = box.scrollTop;
+  /* ---------- Momentum / inertia ---------- */
+  function momentumScroll() {
+    if (isTouching) return;
+    if (Math.abs(velocity) < 0.5) return;
+    box.scrollTop += velocity;
+    velocity *= 0.95; // friction
+    raf = requestAnimationFrame(momentumScroll);
+  }
 
-        // --- Bounce top ---
-        if (currentScroll <= threshold) {
-          box.style.setProperty('--bounce-top', `${bounceTopDist}px`);
-          box.classList.remove('bounce-top');
-          void box.offsetWidth;
-          box.classList.add('bounce-top');
-        }
-        // --- Bounce bottom ---
-        else if (currentScroll >= maxScroll - threshold) {
-          box.style.setProperty('--bounce-bottom', `${bounceBottomDist}px`);
-          box.classList.remove('bounce-bottom');
-          void box.offsetWidth;
-          box.classList.add('bounce-bottom');
-        }
+  /* ---------- Touch Events ---------- */
+  box.addEventListener("touchstart", e => {
+    isTouching = true;
+    startY = e.touches[0].clientY;
+    cancelAnimationFrame(raf);
+  }, { passive: true });
 
-        // --- Momentum detection ---
-        velocity = currentScroll - lastScrollTop;
-        lastScrollTop = currentScroll;
+  box.addEventListener("touchmove", e => {
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+    const maxScroll = box.scrollHeight - box.clientHeight;
 
-        ticking = false;
-      });
-      ticking = true;
+    // ---------- Stretch-on-hold ----------
+    if (box.scrollTop <= 0 && deltaY > 0) {
+      const stretch = Math.min(deltaY / 2, maxStretch);
+      box.style.transform = `translateY(${stretch}px)`;
+      triggerBounce(bounceTopDist); // optional bounce while dragging
+    } else if (box.scrollTop >= maxScroll && deltaY < 0) {
+      const stretch = Math.max(deltaY / 2, -maxStretch);
+      box.style.transform = `translateY(${stretch}px)`;
+      triggerBounce(bounceBottomDist); // optional bounce while dragging
+    } else {
+      box.style.transform = `translateY(0px)`;
     }
+
+    velocity = deltaY;
+    startY = currentY;
+  }, { passive: true });
+
+  box.addEventListener("touchend", () => {
+    isTouching = false;
+    box.style.transition = "transform 0.4s ease";
+    box.style.transform = "translateY(0px)";
+    setTimeout(() => {
+      box.style.transition = "";
+    }, 400);
+    momentumScroll();
   });
 
-  // When wheel/touch ends, keep scrolling with inertia
-  ['wheel', 'touchend'].forEach(evt => {
-    box.addEventListener(evt, () => {
-      if (Math.abs(velocity) > 1) {
-        requestAnimationFrame(momentum);
-      }
-    });
-  });
+  /* ---------- Mouse / Trackpad Wheel ---------- */
+  box.addEventListener("wheel", e => {
+    const maxScroll = box.scrollHeight - box.clientHeight;
+    velocity = e.deltaY;
+
+    // Bounce top
+    if (box.scrollTop <= threshold && velocity < 0) {
+      triggerBounce(bounceTopDist);
+    }
+    // Bounce bottom
+    if (box.scrollTop >= maxScroll - threshold && velocity > 0) {
+      triggerBounce(bounceBottomDist);
+    }
+
+    momentumScroll();
+  }, { passive: true });
+
 })();
 
 
