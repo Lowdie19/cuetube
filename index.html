@@ -2228,9 +2228,8 @@ tooltipElements.forEach(el => {
   let lastScrollTop = 0;
 
   const threshold = 2;
-  const bounceTopDist = 25;   // strong top pull
-  const bounceBottomDist = -15; // soft bottom push
-  const maxStretch = 60;      // max stretch px
+  const bounceDistance = 15; // same for both
+  const maxStretch = 60;     // max stretch px
 
   /* ---------- Bounce helper ---------- */
   function triggerBounce(distance) {
@@ -2265,11 +2264,11 @@ tooltipElements.forEach(el => {
     if (box.scrollTop <= 0 && deltaY > 0) {
       const stretch = Math.min(deltaY / 2, maxStretch);
       box.style.transform = `translateY(${stretch}px)`;
-      triggerBounce(bounceTopDist); // optional bounce while dragging
+      // optional: triggerBounce(bounceDistance) only on release
     } else if (box.scrollTop >= maxScroll && deltaY < 0) {
       const stretch = Math.max(deltaY / 2, -maxStretch);
       box.style.transform = `translateY(${stretch}px)`;
-      triggerBounce(bounceBottomDist); // optional bounce while dragging
+      // optional: triggerBounce(-bounceDistance) only on release
     } else {
       box.style.transform = `translateY(0px)`;
     }
@@ -2293,13 +2292,12 @@ tooltipElements.forEach(el => {
     const maxScroll = box.scrollHeight - box.clientHeight;
     velocity = e.deltaY;
 
-    // Bounce top
+    // Trigger bounce
     if (box.scrollTop <= threshold && velocity < 0) {
-      triggerBounce(bounceTopDist);
+      triggerBounce(bounceDistance);  // top
     }
-    // Bounce bottom
     if (box.scrollTop >= maxScroll - threshold && velocity > 0) {
-      triggerBounce(bounceBottomDist);
+      triggerBounce(-bounceDistance); // bottom (mirror)
     }
 
     momentumScroll();
