@@ -330,6 +330,7 @@
       z-index: 80;
       user-select: none; /* prevent text selection */
       text-shadow: none; /* no glow by default */
+      -webkit-tap-highlight-color: transparent; /* no blue/red flash */
       -webkit-text-stroke: 0px transparent;
       transition: opacity 1.0s ease-in-out,
                   color 0.2s ease,
@@ -438,13 +439,15 @@
   flex: 1;
   min-height: 0;
 
-  /* Native-like scroll */
   overscroll-behavior: contain;      
   -webkit-overflow-scrolling: touch; 
-  scroll-padding-bottom: 40px;
   touch-action: pan-y;
-  cursor: default;
-  scrollbar-width: none; /* Firefox hide scrollbar */
+  scrollbar-width: none;
+}
+/* Inner wrapper for stretch */
+.next-box-inner {
+  will-change: transform;
+  transition: transform 0.3s ease;
 }
 
 /* ===============================
@@ -536,19 +539,6 @@
   color: #ff4c4c !important;
   transition: background-color 0.3s ease !important;
 }
-
-/* Bounce animations */
-@keyframes bounce {
-  0%   { transform: translateY(0); }
-  30%  { transform: translateY(var(--bounce-distance)); }
-  60%  { transform: translateY(0); }
-  80%  { transform: translateY(calc(var(--bounce-distance) / 2)); }
-  100% { transform: translateY(0); }
-}
-
-.next-box.bounce {
-  animation: bounce 0.4s ease;
-}
     
     
  /* =============================
@@ -611,6 +601,8 @@
                   -webkit-text-stroke 0.1s ease,
                   transform 0.1s ease-in-out;
       opacity: 1; /* start fully visible */
+      padding: 10px;       /* bigger tap zone */
+      -webkit-tap-highlight-color: transparent; /* no blue/red flash */
     }
 
     .bottom-drawer-handle.idle {
@@ -890,13 +882,15 @@
       .touchpad {
         display: none;
         position: fixed;
-        top: 0;
-        right: 0;
-        width: 35vw;
-        height: 70vh;
+        top: 45px;
+        right: 45px;
+        width: 40vw;
+        height: 62vh;
         background: invisible;
         outline: none; 
         z-index: 999;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent; /* no blue/red flash */
       }
     
 /*  ============================
@@ -921,7 +915,7 @@
       }
     }
     
-    @media screen and (orientation: landscape) and (max-width: 900px) {
+    @media screen and (orientation: landscape) and (max-width: 915px) {
       .title-bar {
         display: none !important;
       }
@@ -1000,6 +994,7 @@
       
       .bottom-drawer-handle,
       .drawer-handle {
+        z-index: 9999 !important;
         color: white !important;
         -webkit-text-stroke: 0px magenta;
         text-shadow:
@@ -1168,17 +1163,22 @@
   <!-- Drawer -->
 <div class="drawer" id="drawer">
   <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
-      <div class="nowplaying-box">
-        <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle"></div>
-      </div>  
-      <div class="next-box hidden">
+  <div>
+    <!-- Now Playing stays fixed -->
+    <div class="nowplaying-box">
+      <div class="label">NOW PLAYING</div>
+      <div class="title" id="nowTitle"></div>
+    </div>  
+
+    <!-- Next list with smooth stretch -->
+    <div class="next-box hidden">
+      <div class="next-box-inner">
         <div class="label">NEXT</div>
         <div id="nextList"></div>
         <div id="overflowCounter"></div>
       </div>
     </div>
+  </div>
 </div>
   
   <!-- Overlays -->
@@ -1386,34 +1386,89 @@ bottomDrawerOverlay.onclick = function() {
   if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
-    
-// =====================
-// Vertical Swipe Handling
-// =====================
-let startY = 0;
-document.body.addEventListener("touchstart", evt => {
-  startY = evt.touches[0].clientY;
-  handleTouchStart(evt);
-});
 
-document.body.addEventListener("touchmove", evt => {
-  const deltaY = evt.touches[0].clientY - startY;
+/* ===============================
+   Smooth Stretch Overscroll
+   =============================== */
+(function smoothStretchScroll() {
+  const box = document.querySelector(".next-box");
+  const inner = box.querySelector(".next-box-inner");
+  if (!box || !inner) return;
 
-  if (isLeftOverlayOpen) {
-    if (deltaY > 40) closeBottomDrawer();
-    return; // prevent bottom drawer while left is open
-  }
+  let startY = 0;
+  let isTouching = false;
+  let pulling = false;
+  const maxStretch = 60; // px
 
-  if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-    toggleBottomDrawer(); // swipe up to open bottom drawer
-  } else if (deltaY > 40) {
-    closeBottomDrawer(); // swipe down always closes
-  }
+  // Touch start
+  box.addEventListener("touchstart", e => {
+    startY = e.touches[0].clientY;
+    isTouching = true;
+    pulling = false;
+    inner.style.transition = ""; // cancel smooth return during drag
+  }, { passive: true });
 
-  handleTouchMove(evt); // handle left/right swipe
-});
+  // Touch move
+  box.addEventListener("touchmove", e => {
+    if (!isTouching) return;
 
-    
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+    const maxScroll = box.scrollHeight - box.clientHeight;
+
+    if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
+      const stretch = Math.max(-maxStretch, Math.min(deltaY / 2, maxStretch));
+      inner.style.transform = `translateY(${stretch}px)`;
+      pulling = true;
+      e.preventDefault(); // stop native glow overscroll
+    }
+  }, { passive: false });
+
+  // Touch end
+  box.addEventListener("touchend", () => {
+    if (pulling) {
+      inner.style.transition = "transform 0.3s ease";
+      inner.style.transform = "translateY(0)";
+    }
+    isTouching = false;
+    pulling = false;
+  });
+})();
+
+
+/* =========================================================
+   GLOBAL VERTICAL SWIPE: Bottom Drawer Handling
+   ========================================================= */
+    let startY = 0;
+    document.body.addEventListener("touchstart", evt => {
+      startY = evt.touches[0].clientY;
+      handleTouchStart(evt); // 🛑 your existing left/right swipe start
+    });
+
+    document.body.addEventListener("touchmove", evt => {
+      const deltaY = evt.touches[0].clientY - startY;
+
+      // 🚫 Ignore if inside .next-box (so bounce handles it instead)
+      if (evt.target.closest(".next-box")) {
+        return;
+      }
+
+      if (isLeftOverlayOpen) {
+        if (deltaY > 40) closeBottomDrawer(); // 🛑 swipe down closes bottom drawer
+        return; // prevent bottom drawer while left is open
+      }
+
+      if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+        toggleBottomDrawer(); // 🛑 swipe up to open bottom drawer
+      } else if (deltaY > 40) {
+        closeBottomDrawer(); // 🛑 swipe down always closes
+      }
+
+      handleTouchMove(evt); // 🛑 your existing left/right swipe move
+    });
+
+
+
 // =====================
 // Keyboard Shortcuts
 // =====================
@@ -1501,6 +1556,7 @@ document.getElementById("youtubeInputDrawer").addEventListener("keydown", functi
 // =====================
 document.body.addEventListener("click", handleTap);
 
+
 // =====================
 // YouTube Player Setup
 // =====================
@@ -1523,6 +1579,24 @@ function onYouTubeIframeAPIReady() {
     origin: window.location.origin
   });
 }
+
+// =====================
+// Touchpad Play/Pause
+// =====================
+document.addEventListener("DOMContentLoaded", () => {
+  const touchpad = document.querySelector('.touchpad');
+  if (!touchpad) return;
+
+  touchpad.addEventListener('click', () => {
+    if (!player) return;
+    const state = player.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) {
+      player.pauseVideo();
+    } else {
+      player.playVideo();
+    }
+  });
+});
 
 let pauseTimeout = null;
 
@@ -2212,101 +2286,6 @@ tooltipElements.forEach(el => {
 });
 
 
-
-
-/* ===============================
-   Bounce for Scrolling Nextbox
-   =============================== */
-(function unifiedScroll() {
-  const box = document.querySelector(".next-box");
-  if (!box) return;
-
-  let isTouching = false;
-  let startY = 0;
-  let velocity = 0;
-  let raf;
-  let lastScrollTop = 0;
-
-  const threshold = 2;
-  const bounceDistance = 15; // same for both
-  const maxStretch = 60;     // max stretch px
-
-  /* ---------- Bounce helper ---------- */
-  function triggerBounce(distance) {
-    box.style.setProperty("--bounce-distance", distance + "px");
-    box.classList.remove("bounce");
-    void box.offsetWidth; // reflow
-    box.classList.add("bounce");
-  }
-
-  /* ---------- Momentum / inertia ---------- */
-  function momentumScroll() {
-    if (isTouching) return;
-    if (Math.abs(velocity) < 0.5) return;
-    box.scrollTop += velocity;
-    velocity *= 0.95; // friction
-    raf = requestAnimationFrame(momentumScroll);
-  }
-
-  /* ---------- Touch Events ---------- */
-  box.addEventListener("touchstart", e => {
-    isTouching = true;
-    startY = e.touches[0].clientY;
-    cancelAnimationFrame(raf);
-  }, { passive: true });
-
-  box.addEventListener("touchmove", e => {
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - startY;
-    const maxScroll = box.scrollHeight - box.clientHeight;
-
-    // ---------- Stretch-on-hold ----------
-    if (box.scrollTop <= 0 && deltaY > 0) {
-      const stretch = Math.min(deltaY / 2, maxStretch);
-      box.style.transform = `translateY(${stretch}px)`;
-      // optional: triggerBounce(bounceDistance) only on release
-    } else if (box.scrollTop >= maxScroll && deltaY < 0) {
-      const stretch = Math.max(deltaY / 2, -maxStretch);
-      box.style.transform = `translateY(${stretch}px)`;
-      // optional: triggerBounce(-bounceDistance) only on release
-    } else {
-      box.style.transform = `translateY(0px)`;
-    }
-
-    velocity = deltaY;
-    startY = currentY;
-  }, { passive: true });
-
-  box.addEventListener("touchend", () => {
-    isTouching = false;
-    box.style.transition = "transform 0.4s ease";
-    box.style.transform = "translateY(0px)";
-    setTimeout(() => {
-      box.style.transition = "";
-    }, 400);
-    momentumScroll();
-  });
-
-  /* ---------- Mouse / Trackpad Wheel ---------- */
-  box.addEventListener("wheel", e => {
-    const maxScroll = box.scrollHeight - box.clientHeight;
-    velocity = e.deltaY;
-
-    // Trigger bounce
-    if (box.scrollTop <= threshold && velocity < 0) {
-      triggerBounce(bounceDistance);  // top
-    }
-    if (box.scrollTop >= maxScroll - threshold && velocity > 0) {
-      triggerBounce(-bounceDistance); // bottom (mirror)
-    }
-
-    momentumScroll();
-  }, { passive: true });
-
-})();
-
-
-
 // ======================================
 // Exit Modal
 // ======================================
@@ -2658,13 +2637,13 @@ function _colorToRGBA(colorStr, alpha) {
         titleColor: "magenta",
         messages: [
           {
-            text: "This action cannot be undone!",
-            color: "gray",
+            text: "Press back twice to leave the app.",
+            color: "white",
             style: "font-family: Arial, sans-serif;" },
           {
-            text: "Double-tap the back button to confirm exit",
-            color: "white",
-            style: "font-family: Arial, sans-serif;" }
+            text: "Note: This action is irreversible",
+            color: "gray",
+            style: "font-family: Arial, sans-serif;" },
         ],
         buttons: [
           { label: "Cancel" }
