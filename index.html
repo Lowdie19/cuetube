@@ -1615,7 +1615,7 @@ function onPlayerStateChange(event) {
       player.stopVideo();
       player.clearVideo();
       
-      showPopup("That's the last tune!", "magenta", true, true);
+      showPopup("That's the last tune !", "magenta", true, true);
     } else {
       currentIndex++;
       player.loadVideoById(queue[currentIndex].id);
@@ -1625,7 +1625,7 @@ function onPlayerStateChange(event) {
   } 
   else if (event.data === YT.PlayerState.PAUSED) {
     pauseTimeout = setTimeout(() => {
-      showPopup("Paused", "purple", true, "purple");
+      showPopup("Paused", "magenta", true, "magenta");
     }, 500); 
     stopProgressChecker();
   } 
@@ -1730,7 +1730,7 @@ async function reserveFromDrawer() {
   // ✅ Show success popup only if no persistent popup is active
   if (!persistentPopupActive) {
     setTimeout(() => {
-      showPopup("Reserved!", "lime", false, "lime");
+      showPopup("Reserved !", "cyan", false, "cyan");
       playSuccessSound();
     }, 600);
   }
@@ -1756,7 +1756,7 @@ function playNextFromQueue() {
   updateQueueDisplay();
   
   setTimeout(() => {
-    showPopup("Next song!", "magenta", false, "magenta");
+    showPopup("Next song", "cyan", false, "cyan");
     playSuccessSound();
   }, 600);
 }
