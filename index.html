@@ -1234,7 +1234,7 @@
   
   <!-- Popup -->
   <div id="popupOverlay"></div>
-  <div id="popupModal">Reserved!</div>
+  <div id="popupModal"></div>
   
   
   <!-- Generic Overlay -->
@@ -1317,19 +1317,19 @@ function openDrawer() {
   overlay.classList.add('visible');
   isLeftOverlayOpen = true;
   document.getElementById('drawerHandle').style.display = 'none';
-  document.getElementById("confirmDelete").style.display = "none";
 }
 
 // Close left drawer
 function closeDrawer() {
+  if (!drawer.classList.contains("open")) return; // prevent redundant runs
+
   drawer.classList.remove('open');
-  overlay.classList.remove('visible');
+  drawerOverlay.classList.remove('visible'); // use dedicated .drawer-overlay
   isLeftOverlayOpen = false;
   bottomDrawerOverlay.classList.remove("visible");
   document.getElementById('drawerHandle').style.display = 'flex';
-  document.getElementById("confirmDelete").style.display = "none";
 
-  // Restore focus to body so keyboard shortcuts (like SPACEBAR) still work
+  // Restore focus
   document.activeElement.blur();
   document.body.focus();
 }
@@ -1350,13 +1350,14 @@ function closeBottomDrawer() {
 // =====================
 // Swipe to Close Left Drawer
 // =====================
-overlay.addEventListener('touchstart', (e) => {
+drawerOverlay.addEventListener('touchstart', (e) => {
+  if (isModalOpen) return; // disable swipe if modal is up
   overlayTouchStartX = e.touches[0].clientX;
 });
 
-overlay.addEventListener('touchmove', (e) => {
-  const touchCurrentX = e.touches[0].clientX;
-  const deltaX = touchCurrentX - overlayTouchStartX;
+drawerOverlay.addEventListener('touchmove', (e) => {
+  if (isModalOpen) return;
+  const deltaX = e.touches[0].clientX - overlayTouchStartX;
   if (deltaX < -50) closeDrawer(); // swipe left to close
 });
 
@@ -1375,23 +1376,25 @@ function toggleBottomDrawer() {
       drawer.classList.remove("open");
       drawerOverlay.classList.remove("visible");
       document.getElementById('drawerHandle').style.display = 'flex';
-      document.getElementById("confirmDelete").style.display = "none";
     }
   } else {
     bottomDrawerOverlay.classList.remove("visible");
   }
 }
 
+// =====================
 // Click on bottom overlay closes drawers
+// =====================
 bottomDrawerOverlay.onclick = function() {
+  if (isModalOpen) return; // don’t close drawers if modal is open
   if (drawer.classList.contains("open")) closeDrawer();
   if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
 };
 
 
-/* ===============================
-   Smooth Stretch Overscroll
-   =============================== */
+// ===============================
+// Smooth Stretch Overscroll
+// ===============================
 (function smoothStretchScroll() {
   const box = document.querySelector(".next-box");
   const inner = box.querySelector(".next-box-inner");
@@ -1477,37 +1480,43 @@ bottomDrawerOverlay.onclick = function() {
 document.addEventListener('keydown', async (e) => {
   // Ignore shortcuts when typing in input or textarea
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-  
-  
+
+  // Always allow ESC to close modal
+  if (e.key === "Escape" && isModalOpen) {
+    hideModal();  // generic modal handles hiding
+    return;
+  }
+
+  // Block drawer shortcuts if modal is open
+  if (isModalOpen) return;
+
   // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
-    e.preventDefault(); // prevent default paste
+    e.preventDefault();
     await pasteFromClipboard();
+    return;
   }
-  
-  
+
   // Ctrl + Right Arrow → Next button
   if (e.ctrlKey && e.key === "ArrowRight") {
     e.preventDefault();
     const nextBtnDrawer = document.getElementById("nextBtnDrawer");
-    if (nextBtnDrawer) {
-      nextBtnDrawer.click();
-    }
-    return; // stop here so openDrawer() doesn’t also run
+    if (nextBtnDrawer) nextBtnDrawer.click();
+    return;
   }
-  
 
-  // Drawer arrow controls
-  if (e.key === "ArrowUp") toggleBottomDrawer();     // Open/close bottom drawer
-  if (e.key === "ArrowDown") closeBottomDrawer();    // Close bottom drawer
-  if (e.key === "ArrowRight") openDrawer();          // Open left drawer
-  if (e.key === "ArrowLeft") closeDrawer();          // Close left drawer
-  if (e.key === "Escape") {                          // Close all drawers
+  // Drawer controls
+  if (e.key === "ArrowUp") toggleBottomDrawer();
+  if (e.key === "ArrowDown") closeBottomDrawer();
+  if (e.key === "ArrowRight") openDrawer();
+  if (e.key === "ArrowLeft") closeDrawer();
+
+  // ESC closes everything if no modal
+  if (e.key === "Escape") {
     closeDrawer();
     closeBottomDrawer();
   }
 
-  
   // Spacebar: Play / Pause YouTube video
   if (e.code === "Space") {
     e.preventDefault(); // prevent page scroll
@@ -1520,27 +1529,15 @@ document.addEventListener('keydown', async (e) => {
     }
   }
 
-  
   // Enter: confirm active modal
-  if (e.key === "Enter") {
-    // 1️⃣ Delete confirm
-    const deleteBox = document.getElementById("confirmDelete");
-    const yesBtn = document.getElementById("yesBtn");
-    if (deleteBox && deleteBox.style.display === "block") {
-      yesBtn.click();
-      e.preventDefault();
-      return;
-    }
-    
-    // 2️⃣ Next song confirm
-    const nextModal = document.getElementById("nextConfirmModal");
-    if (nextModal && nextModal.style.display !== "none") {
-      confirmPlayNext();
-      e.preventDefault();
-      return;
-    }
+  if (e.key === "Enter" && isModalOpen) {
+    // Trigger the first button in the modal
+    const firstBtn = document.getElementById("genericContent")?.querySelector("button");
+    if (firstBtn) firstBtn.click();
+    e.preventDefault();
   }
 });
+
 
 
 // =====================
@@ -2461,8 +2458,10 @@ document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard
 let __modal_onClose = null;
 let __modal_keydownHandler = null;
 let __modal_prevActive = null;
+let isModalOpen = false;
 
 function showModal(settings) {
+  isModalOpen = true;
   const overlay = document.getElementById("genericOverlay");
   const modal   = document.getElementById("genericModal");
   const content = document.getElementById("genericContent");
@@ -2538,6 +2537,7 @@ function showModal(settings) {
 }
 
 function hideModal() {
+  isModalOpen = false;
   const overlay = document.getElementById("genericOverlay");
   const modal   = document.getElementById("genericModal");
 
