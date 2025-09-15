@@ -505,6 +505,15 @@
   user-select: none;
   cursor: pointer;
 }
+    
+/* ===============================
+  Song Deletion Animation
+  =============================== */
+.next-box .songtitle.removing {
+  opacity: 0;
+  transform: translateX(50px); /* slide out to the right */
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
 
 /* ===============================
    Ripple Overlay (Base)
@@ -2676,9 +2685,25 @@ function showDeleteConfirm(index, onCloseCallback) {
       {
         label: "Confirm",
         onClick: () => {
-          queue.splice(index, 1);
-          updateQueueDisplay();
-          playTrashSound();
+          const list = document.getElementById("nextList");
+          // Index shift: queue starts from currentIndex+1
+          const item = list.children[index - (currentIndex + 1)];
+
+          if (item) {
+            item.classList.add("removing");
+
+            // Wait for transition, then remove
+            item.addEventListener("transitionend", () => {
+              queue.splice(index, 1);
+              updateQueueDisplay();
+              playTrashSound();
+            }, { once: true });
+          } else {
+            // fallback if something goes wrong
+            queue.splice(index, 1);
+            updateQueueDisplay();
+            playTrashSound();
+          }
         }
       },
       { label: "Cancel" }
