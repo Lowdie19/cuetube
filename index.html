@@ -682,7 +682,7 @@
       padding: 10px;
       font-size: .9em;
       background-color: black; /*#121212;*/
-      color: black;
+      color: white;
       box-shadow: none;
       transition: box-shadow 0.3s ease;
     }
@@ -1615,7 +1615,7 @@ function onPlayerStateChange(event) {
       player.stopVideo();
       player.clearVideo();
       
-      showPopup("That's the last tune !", "magenta", true, true);
+      showPopup("That's the last tune!", "magenta", true, true);
     } else {
       currentIndex++;
       player.loadVideoById(queue[currentIndex].id);
@@ -1678,7 +1678,7 @@ async function fetchTitle(videoId) {
 
   } catch (err) {
     invalidSongCount++;
-    showPopup("⚠️ Oops! Try choosing another video.", "red", true, "red");
+    showPopup("⚠️ Oops! Try choosing another video", "red", true, "red");
     playErrorSound();
     return `Invalid Song ${invalidSongCount}`;
   }
@@ -1698,7 +1698,7 @@ async function reserveFromDrawer() {
     input.value = "";
     setTimeout(() => {
       // Make error popup persistent
-      showPopup("⚠️ Invalid YouTube URL!", "red", true, "red");
+      showPopup("⚠️ Invalid Youtube URL!", "red", true, "red");
       playErrorSound();
     }, 600);
     return; // stop further execution
@@ -1730,7 +1730,7 @@ async function reserveFromDrawer() {
   // ✅ Show success popup only if no persistent popup is active
   if (!persistentPopupActive) {
     setTimeout(() => {
-      showPopup("Reserved !", "cyan", false, "cyan");
+      showPopup("Reserved!", "cyan", false, "cyan");
       playSuccessSound();
     }, 600);
   }
@@ -1744,7 +1744,7 @@ async function reserveFromDrawer() {
 function playNextFromQueue() {
   if (queue.length === 0 || currentIndex + 1 >= queue.length) {
     setTimeout(() => {
-      showPopup("No next song.", "red", true, true);
+      showPopup("Queue is Empty!", "red", true, true);
       playErrorSound();
     }, 600);
     return;
@@ -1756,7 +1756,7 @@ function playNextFromQueue() {
   updateQueueDisplay();
   
   setTimeout(() => {
-    showPopup("Next song", "cyan", false, "cyan");
+    showPopup("Next", "cyan", false, "cyan");
     playSuccessSound();
   }, 600);
 }
@@ -2439,14 +2439,14 @@ window.addEventListener("load", () => {
 
     if (!videoId) {
       input.value = "";
-      showPopup("⚠️ Invalid\nYouTube URL!", "red", false, "red");
+      showPopup("⚠️ Invalid Youtube URL!", "red", false, "red");
       playErrorSound();
     } else {
       input.dispatchEvent(new Event("input")); // Trigger glow if needed
       await reserveFromDrawer(); // ✅ Auto-reserve if valid
     }
   } catch (err) {
-    showPopup("⚠️ Failed!\nPaste manually.", "red", true, "red");
+    showPopup("⚠️ Failed! Paste manually", "red", true, "red");
     playErrorSound();
     console.error("Clipboard error:", err);
   }
