@@ -1,893 +1,929 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="CueTube Icon.png">
-  <title>CueTube</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-  <style>
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2em;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
-    }
-    
-    button {
-      padding: 10px 20px;
-      margin-left: 10px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    #queue {
-      margin-top: 30px;
-      border-top: 1px solid #444;
-      padding-top: 10px;
-    }
-    .queue-item {
-      padding: 8px;
-      background: #222;
-      border: 1px solid #333;
-      margin-bottom: 5px;
-    }
-    
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Orbitron', sans-serif;
-      background-color: black;
-      color: white;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="CueTube Icon.png" />
+    <title>CueTube</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+    <style>
+      /*h1 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2em;
+        color: #0ff;
+        text-shadow:
+          0 0 5px #0ff,
+          0 0 10px #0ff;
+      }*/
+      
+      h1 {
+        font-family: "Arial", sans-serif;
+        font-size: 2em;
+        color: #0ff;
+        text-shadow:
+          0 0 5px #0ff,
+          0 0 10px #0ff;
+      }
 
+      button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      #queue {
+        margin-top: 30px;
+        border-top: 1px solid #444;
+        padding-top: 10px;
+      }
+      .queue-item {
+        padding: 8px;
+        background: #222;
+        border: 1px solid #333;
+        margin-bottom: 5px;
+      }
 
-/*  =====================
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Orbitron", sans-serif;
+        background-color: black;
+        color: white;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /*  =====================
     CUETUBE TITLE +++++++
     ===================== */
-    .title-bar {
-      text-align: center;
-      font-size: 1.2em;
-      padding: 20px 0 10px 0;
-      color: cyan;
-      background-color: black;
-      position: relative;
-      animation: neon-text 3.0s ease-in-out infinite alternate;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      user-select: none; /* prevent text selection */
-    }
-    
-    .title-icon {
-      height: 30px;
-      width: 30px;
-      cursor: pointer;   /* clickable */
-      user-select: none; /* prevent text selection */
-      animation: neon-glow 3.0s ease-in-out infinite alternate;
-    }
-    .title-icon:active {
-      transform: scale(0.9);  /* shrink slightly */
-      opacity: 0.7;           /* fade */
-    }
-    
-    /* Neon text animation */
-    @keyframes neon-text {
-      from { text-shadow: 0 0 2px cyan, 0 0 4px cyan; }
-      to { text-shadow: 0 0 8px cyan, 0 0 16px cyan; }
-    }
-    
-    /* Neon image glow using drop-shadow */
-    @keyframes neon-glow {
-      from { filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan); }
-      to { filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan); }
-    }
-
-    
-    /* Neon glow for popups */
-    @keyframes pulseGlow {
-      from {
-        filter: drop-shadow(0 0 1px var(--glow-color))
-                drop-shadow(0 0 2px var(--glow-color));
+      .title-bar {
+        text-align: center;
+        font-size: 1.2em;
+        padding: 20px 0 10px 0;
+        color: cyan;
+        background-color: black;
+        position: relative;
+        animation: neon-text 3s ease-in-out infinite alternate;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        user-select: none; /* prevent text selection */
       }
-      to {
-        filter: drop-shadow(0 0 4px var(--glow-color))
-                drop-shadow(0 0 8px var(--glow-color));
-      }
-    }
-    
-    .glow-text {
-      animation: pulseGlow 1.5s infinite alternate;
-    }
-    
-    .static-glow {
-      filter:
-        drop-shadow(0 0 4px var(--glow-color))
-        drop-shadow(0 0 8px var(--glow-color));
-    }
-    
 
-/*  =============================
+      .title-icon {
+        height: 30px;
+        width: 30px;
+        cursor: pointer; /* clickable */
+        user-select: none; /* prevent text selection */
+        animation: neon-glow 3s ease-in-out infinite alternate;
+      }
+      .title-icon:active {
+        transform: scale(0.9); /* shrink slightly */
+        opacity: 0.7; /* fade */
+      }
+
+      /* Neon text animation */
+      @keyframes neon-text {
+        from {
+          text-shadow:
+            0 0 2px cyan,
+            0 0 4px cyan;
+        }
+        to {
+          text-shadow:
+            0 0 8px cyan,
+            0 0 16px cyan;
+        }
+      }
+
+      /* Neon image glow using drop-shadow */
+      @keyframes neon-glow {
+        from {
+          filter: drop-shadow(0 0 1px cyan) drop-shadow(0 0 2px cyan);
+        }
+        to {
+          filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan);
+        }
+      }
+
+      /* Neon glow for popups */
+      @keyframes pulseGlow {
+        from {
+          filter: drop-shadow(0 0 1px var(--glow-color)) drop-shadow(0 0 2px var(--glow-color));
+        }
+        to {
+          filter: drop-shadow(0 0 4px var(--glow-color)) drop-shadow(0 0 8px var(--glow-color));
+        }
+      }
+
+      .glow-text {
+        animation: pulseGlow 1.5s infinite alternate;
+      }
+
+      .static-glow {
+        filter: drop-shadow(0 0 4px var(--glow-color)) drop-shadow(0 0 8px var(--glow-color));
+      }
+
+      /*  =============================
     YOUTUBE SCREEN ++++++++++++++
     =============================  */
-    .youtube-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 50vh; /* 50% of the screen height */
-      padding: 0;
-      margin: 0;
-    }
-    
-    .youtube-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      outline: none !important;
-      display: block;
-    }
-    
-    /* On wider screens (like PC), use 40% width */
-    @media (min-width: 768px) {
-      .drawer {
-        width: 40% !important;
-        left: -40% !important;
+      .youtube-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 50vh; /* 50% of the screen height */
+        padding: 0;
+        margin: 0;
       }
-    
-      .drawer.open {
-        left: 0 !important;
+
+      .youtube-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none !important;
+        display: block;
       }
-      .bottom-buttons {
-        width: 70vw !important;
+
+      /* On wider screens (like PC), use 40% width */
+      @media (min-width: 768px) {
+        .drawer {
+          width: 40% !important;
+          left: -40% !important;
+        }
+
+        .drawer.open {
+          left: 0 !important;
+        }
+        .bottom-buttons {
+          width: 70vw !important;
+        }
       }
-    }
-    
-    
-/*  ============================
+
+      /*  ============================
     NOTIFICATION +++++++++++++++
     ============================ */
-    .notify-box {
-      display: flex;
-      height: 60px;
-      width: 90%;              /* leaves 5% space on each side */
-      margin: 5px 5%;         /* top/bottom = 10px, left/right = 5% */
-      padding: 5px;
-      box-sizing: border-box;
-    }
-          
-    .Notify {
-      display: flex;
-      align-items: center;                /* vertical alignment (centered on y-axis) */
-      justify-content: center;            /* items aligned to the left (x-axis) */
-      font-family: 'Orbitron', sans-serif;
-      overflow: hidden;
-      position: relative;
-      border-radius: 1.5px;
-      width: 80%;
-      height: 100%;
-      background-color: none;
-    }
-    
-    /* Line */
-    .Notify .line {
-      width: 3px;
-      height: 100%;
-      background-color: #7f95e4;
+      .notify-box {
+        display: flex;
+        height: 60px;
+        width: 90%; /* leaves 5% space on each side */
+        margin: 5px 5%; /* top/bottom = 10px, left/right = 5% */
+        padding: 5px;
+        box-sizing: border-box;
+      }
+
+      .Notify {
+        display: flex;
+        align-items: center; /* vertical alignment (centered on y-axis) */
+        justify-content: center; /* items aligned to the left (x-axis) */
+        font-family: "Orbitron", sans-serif;
+        overflow: hidden;
+        position: relative;
+        border-radius: 1.5px;
+        width: 80%;
+        height: 100%;
+        background-color: none;
+      }
+
+      /* Line */
+      .Notify .line {
+        width: 3px;
+        height: 100%;
+        background-color: #7f95e4;
         /*rgba(91, 24, 194, 1);*/
-      opacity: 0;
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      animation: fadeIn 3s forwards;
-      box-shadow: 5px 0 15px #7f95e4;
-    }
-    
-    /* Text */
-    .Notify .text {
-      color: white;
-      text-shadow:
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        animation: fadeIn 3s forwards;
+        box-shadow: 5px 0 15px #7f95e4;
+      }
+
+      /* Text */
+      .Notify .text {
+        color: white;
+        text-shadow:
           0 0 8px black,
           0 0 8px black,
           0 0 12px #222,
           0 0 24px #222;
-      font-family: Arial, sans-serif;
-      font-weight: regular;
-      font-size: 1.0em;
-      letter-spacing: 0.1em;
-      word-wrap: break-word;
-      opacity: 0;
-      transform: translateX(-100%);
-      animation: slideOut 0.8s forwards;
-      animation-delay: 0.5s;
-      margin-left: 25px;
-      position: relative;
-      white-space: normal;   /* allow wrapping */
-      word-wrap: break-word; /* break long words if needed */
-      padding: 5px 0;     /* keep alignment with vertical line */
-      box-sizing: border-box;
-      width: 100vw;       /* 100% of viewport width */
-      left: 0;            /* stick to left edge */
-      position: relative;
-      background-color: none;
-    }
-    
-    /* Show animations */
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    /* Hide animations */
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
+        font-family: Arial, sans-serif;
+        font-weight: regular;
+        font-size: 1em;
+        letter-spacing: 0.1em;
+        word-wrap: break-word;
         opacity: 0;
         transform: translateX(-100%);
+        animation: slideOut 0.8s forwards;
+        animation-delay: 0.5s;
+        margin-left: 25px;
+        position: relative;
+        white-space: normal; /* allow wrapping */
+        word-wrap: break-word; /* break long words if needed */
+        padding: 5px 0; /* keep alignment with vertical line */
+        box-sizing: border-box;
+        width: 100vw; /* 100% of viewport width */
+        left: 0; /* stick to left edge */
+        position: relative;
+        background-color: none;
       }
-    }
-    
-    .Notify.hide .line {
-      animation: fadeOut 1.5s forwards;
-    }
-    
-    .Notify.hide .text {
-      animation: slideIn 1.2s forwards;
-    }
-    
-    
-/*  ==============================
+
+      /* Show animations */
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Hide animations */
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-100%);
+        }
+      }
+
+      .Notify.hide .line {
+        animation: fadeOut 1.5s forwards;
+      }
+
+      .Notify.hide .text {
+        animation: slideIn 1.2s forwards;
+      }
+
+      /*  ==============================
     LEFT DRAWER ++++++++++++++++++
     ============================== */
-   /* Left Drawer body */ 
-   .drawer {
-      position: fixed;
-      top: 0;
-      left: -80%; /* hidden off-screen */
-      width: 80%; /* always full width */
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.6) 0%,
-        #000000 100%
-      );
-      padding: 20px;
-      z-index: 99;
-      transition: left 0.3s cubic-bezier(0.25, 1.15, 0.5, 1);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 25px;
-    }
-    
+      /* Left Drawer body */
+      .drawer {
+        position: fixed;
+        top: 0;
+        left: -80%; /* hidden off-screen */
+        width: 80%; /* always full width */
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
+        padding: 20px;
+        z-index: 99;
+        transition: left 0.3s cubic-bezier(0.25, 1.15, 0.5, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 25px;
+      }
 
-    .drawer::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0) 0%,     
-        rgba(13, 14, 14, 0.6) 60%,  
-        #000000 100%
-      );
-      z-index: 10;
-      pointer-events: none;
-    }
-    
-    .drawer.open {
-      left: 0%; /* stop 20% before the right edge → looks like 80% */
-      animation: shadowFloat 5s infinite ease-in-out;
-    }
-    
-    @keyframes shadowFloat {
-      0%   { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
-      50%  { box-shadow: 0  10px 80px rgba(0, 255, 255, 0.1); }  
-      100% { box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01); }  
-    }
-    
-/* =============================
+      .drawer::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(13, 14, 14, 0) 0%, rgba(13, 14, 14, 0.6) 60%, #000000 100%);
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .drawer.open {
+        left: 0%; /* stop 20% before the right edge → looks like 80% */
+        animation: shadowFloat 5s infinite ease-in-out;
+      }
+
+      @keyframes shadowFloat {
+        0% {
+          box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01);
+        }
+        50% {
+          box-shadow: 0 10px 80px rgba(0, 255, 255, 0.1);
+        }
+        100% {
+          box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01);
+        }
+      }
+
+      /* =============================
     Left Drawer Handle
-    =============================  */ 
-    .drawer-handle {
-      position: absolute;
-      top: 7px;
-      right: -55px;
-      width: 50px;
-      height: 50px;
-      background: none;
-      color: #840072;
-      font-size: 1.8em; /* bigger text */
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 80;
-      user-select: none; /* prevent text selection */
-      text-shadow: none; /* no glow by default */
-      -webkit-tap-highlight-color: transparent; /* no blue/red flash */
-      -webkit-text-stroke: 0px transparent;
-      transition: opacity 1.0s ease-in-out,
-                  color 0.2s ease,
-                  -webkit-text-stroke 0.1s ease,
-                  transform 0.1s ease-in-out;
-    }
-    
-    .drawer-handle.idle {
-      opacity: 0.2; /* fade to 20% when idle */
-    }
+    =============================  */
+      .drawer-handle {
+        position: absolute;
+        top: 7px;
+        right: -55px;
+        width: 50px;
+        height: 50px;
+        background: none;
+        color: #840072;
+        font-size: 1.8em; /* bigger text */
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 80;
+        user-select: none; /* prevent text selection */
+        text-shadow: none; /* no glow by default */
+        -webkit-tap-highlight-color: transparent; /* no blue/red flash */
+        -webkit-text-stroke: 0px transparent;
+        transition:
+          opacity 1s ease-in-out,
+          color 0.2s ease,
+          -webkit-text-stroke 0.1s ease,
+          transform 0.1s ease-in-out;
+      }
 
-    /* Hover + Focus-visible share same effect */
-    .drawer-handle:hover,
-    .drawer-handle:focus-visible {
-      outline: none; /* remove dotted outline for keyboard */
-      opacity: 1 !important; /* ensure visible while interacting */
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 8px cyan,
-        0 0 8px cyan,
-        0 0 12px cyan,
-        0 0 24px cyan;
-      /*transform: scale(1.05);  enlarge a bit */
-    }
-    
-    
-    /* Overlay for Left and Bottom drawer ??? */
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
-      z-index: 90;
-      display: none;
-    }
-    .drawer-overlay.visible { display: block; }
+      .drawer-handle.idle {
+        opacity: 0.2; /* fade to 20% when idle */
+      }
 
-    .drawer > div {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .drawer.open {
-      display: flex;
-    }
-    
+      /* Hover + Focus-visible share same effect */
+      .drawer-handle:hover,
+      .drawer-handle:focus-visible {
+        outline: none; /* remove dotted outline for keyboard */
+        opacity: 1 !important; /* ensure visible while interacting */
+        color: cyan;
+        -webkit-text-stroke: 0px cyan;
+        text-shadow:
+          0 0 8px cyan,
+          0 0 8px cyan,
+          0 0 12px cyan,
+          0 0 24px cyan;
+        /*transform: scale(1.05);  enlarge a bit */
+      }
+
+      /* Overlay for Left and Bottom drawer ??? */
+      .drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 90;
+        display: none;
+      }
+      .drawer-overlay.visible {
+        display: block;
+      }
+
+      .drawer > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .drawer.open {
+        display: flex;
+      }
 
 /*  =================
     Nowplaying-box
     ================= */
     /* Box */
     .nowplaying-box {
-      border-radius: 10px;
+      border-radius: 20px;
       padding: 18px;
       background: black;
-      margin: 50px 10px 15px 15px;                    /* top | right | bottom | left */
+      margin: 50px 10px 15px 15px;
+      border: 1px solid var(--btn-glow, #000000);
+      transition: box-shadow 0.5s;
+    }
+
+    /* Hover or Active (when a song is playing) */
+    .nowplaying-box:hover,
+    .nowplaying-box.active {
+      z-index: 99;
       border: 1px solid var(--btn-glow, cyan);
       box-shadow:
-        0 0 10px 0.5px var(--btn-glow, cyan),     /* outer glow */
-        inset 0 0 10px 0.5px var(--btn-glow, cyan);/* inner glow */
+        0 0 10px 0.5px var(--btn-glow, cyan),
+        inset 0 0 10px 0.5px var(--btn-glow, cyan);
     }
-    
-    /* Label text inside Nowplaying-box (Now playing) */
+
+    /* Label default */
     .nowplaying-box .label {
       font-size: 0.7em;
-      color: cyan;
+      color: #222;
       margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    /* Song titles inside Nowplaying-box */
-    .nowplaying-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 1.1em;
-      margin: 5px 0;
-      word-wrap: break-word;
-      font-weight: regular;  
-    }
-    
-   /* Glowing effect for Now Playing title */
-    .now-playing-glow {
-      color: white;
-      text-shadow: 0 0 5px magenta, 0 0 10px magenta, 0 0 20px magenta, 0 0 30px magenta;
-      animation: glowPulse 2s infinite alternate;
-    }
-    
-    @keyframes glowPulse {
-       from { text-shadow: 0 0 2px magenta, 0 0 2px magenta, 0 0 2px magenta; }
-      to { text-shadow: 0 0 12px magenta, 0 0 20px magenta, 0 0 20px magenta; }
+    /* Label highlights when the BOX is hovered OR active */
+    .nowplaying-box:hover .label,
+    .nowplaying-box.active .label {
+      color: cyan;
     }
 
 
+      /* Song titles inside Nowplaying-box */
+      .nowplaying-box .title {
+        font-family: Arial, sans-serif;
+        font-size: 1.1em;
+        margin: 5px 0;
+        word-wrap: break-word;
+        font-weight: regular;
+      }
+
+      /* Glowing effect for Now Playing title */
+      .now-playing-glow {
+        color: white;
+        text-shadow:
+          0 0 5px magenta,
+          0 0 10px magenta,
+          0 0 20px magenta,
+          0 0 30px magenta;
+        animation: glowPulse 2s infinite alternate;
+      }
+
+      @keyframes glowPulse {
+        from {
+          text-shadow:
+            0 0 2px magenta,
+            0 0 2px magenta,
+            0 0 2px magenta;
+        }
+        to {
+          text-shadow:
+            0 0 12px magenta,
+            0 0 20px magenta,
+            0 0 20px magenta;
+        }
+      }
+
 /* ===============================
-   Next-box Base Styles
+   Next-box
    =============================== */
-.next-box {
-  position: relative;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  margin-left: 15px;
-  flex: 1;
-  min-height: 0;
+      .next-box {
+        position: relative;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        margin-left: 15px;
+        flex: 1;
+        min-height: 0;
 
-  overscroll-behavior: contain;      
-  -webkit-overflow-scrolling: touch; 
-  touch-action: pan-y;
-  scrollbar-width: none;
-}
-/* Inner wrapper for stretch */
-.next-box-inner {
-  will-change: transform;
-  transition: transform 0.3s ease;
-}
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        scrollbar-width: none;
+      }
+      /* Inner wrapper for stretch */
+      .next-box-inner {
+        will-change: transform;
+        transition: transform 0.3s ease;
+      }
 
-/* ===============================
-   Hide Scrollbar for WebKit Browsers
-   =============================== */
-.next-box::-webkit-scrollbar {
-  display: none;
-}
-.next-box::-webkit-scrollbar-track {
-  background: transparent;
-}
+      /* Hide Scrollbar for WebKit Browsers */
+      .next-box::-webkit-scrollbar {
+        display: none;
+      }
+      .next-box::-webkit-scrollbar-track {
+        background: transparent;
+      }
 
-/* ===============================
-   Hidden Next-box
-   =============================== */
-.next-box.hidden {
-  display: none !important;
-}
+      .next-box.hidden {
+        display: none !important;
+      }
 
-/* ===============================
-   Overflow Counter
-   =============================== */
-#overflowCounter {
-  text-align: center;
-  font-size: 0.7em;
-  color: #888;
-  margin-top: 5px;
-  display: none;
-}
+      #overflowCounter {
+        text-align: center;
+        font-size: 0.7em;
+        color: #888;
+        margin-top: 5px;
+        display: none;
+      }
 
-/* ===============================
-   Label Text inside Next-box
-   =============================== */
-.next-box .label {
-  font-size: 0.7em;
-  color: grey;
-}
+      /* Label (NEXT) */
+      .next-box .label {
+        font-size: 0.7em;
+        color: grey;
+      }
 
-/* ===============================
-   Song Titles inside Next-box
-   =============================== */
-.next-box .songtitle {
-  font-family: Arial, sans-serif;
-  font-size: 0.9em;
-  margin: 10px 0;
-  text-align: left;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  font-weight: normal;
-  padding: 5px;
+      /* Song Titles inside Next-box */
+      .next-box .songtitle {
+        font-family: Arial, sans-serif;
+        font-size: 0.9em;
+        margin: 10px 0;
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        font-weight: normal;
+        padding: 5px;
 
-  position: relative;
-  overflow: hidden;
-  user-select: none;
-  cursor: pointer;
-}
-    
-/* ===============================
+        position: relative;
+        overflow: hidden;
+        user-select: none;
+        cursor: pointer;
+      }
+
+ /* ===============================
   Song Deletion Animation
   =============================== */
-.next-box .songtitle.removing {
-  opacity: 0;
-  transform: translateX(50px); /* slide out to the right */
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
+      .next-box .songtitle.removing {
+        opacity: 0;
+        transform: translateX(50px); /* slide out to the right */
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
 
 /* ===============================
    Ripple Overlay (Base)
    =============================== */
-.next-box .songtitle::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(128, 128, 128, 0.4);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
+      .next-box .songtitle::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(128, 128, 128, 0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
 
-/* Click Ripple */
-.next-box .songtitle.ripple::after {
-  opacity: 1;
-  transition: opacity 0s;
-}
+      /* Click Ripple */
+      .next-box .songtitle.ripple::after {
+        opacity: 1;
+        transition: opacity 0s;
+      }
 
-/* Hover Flash */
-.next-box .songtitle.hover-flash::after {
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
+      /* Hover Flash */
+      .next-box .songtitle.hover-flash::after {
+        opacity: 1;
+        transition: opacity 0.5s ease;
+      }
 
-/* Long Press / Right-click Red Highlight */
-.next-box .songtitle.long-pressing {
-  background-color: rgba(255, 0, 0, 0.25) !important;
-  color: #ff4c4c !important;
-  transition: background-color 0.3s ease !important;
-}
-    
-    
- /* =============================
-    BOTTOM DRAWER +++++++++++++++
-    =============================  */
-    /* Bottom Drawer body */
-   .bottom-drawer {
-      position: fixed;
-      bottom: -160px;
-      left: 0;
-      width: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.6) 0%,
-        #000000 100%
-      );
-      padding: 20px 15px 15px 25px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-      transition: bottom 0.3s cubic-bezier(0.25, 1.25, 0.5, 1);
-      z-index: 98;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 15px 25px; /* bottom is 25px default */
-    }
-    
-    /* bottom-drawer When open --start */
-    .bottom-drawer.open {
-      bottom: 0;
-      animation: shadowFloat 5s infinite ease-in-out;
-    }
-    
-    /* Shadow moves up and down */
-    @keyframes shadowFloat {
-      0%   { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
-      50%  { box-shadow: 10px 0 80px rgba(0, 255, 255, 0.1); }  
-      100% { box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01); }  
-    }
-  
-      
- /* =============================
-    Bottom drawer Handle
-    =============================  */  
-    .bottom-drawer-handle {
-      position: absolute;
-      top: -80px;
-      left: 49%;
-      transform: translateX(-50%);
-      background: none;
-      border: none;
-      color: #840072; /* default color */
-      font-size: 2.0em;
-      cursor: pointer;
-      text-shadow: none; /* 🚫 no glow */
-      -webkit-text-stroke: 0px transparent;
-      z-index: 99;
-      user-select: none;
-      transition: opacity 1.0s ease-in-out,
-                  color 0.2s ease,
-                  -webkit-text-stroke 0.1s ease,
-                  transform 0.1s ease-in-out;
-      opacity: 1; /* start fully visible */
-      padding: 10px;       /* bigger tap zone */
-      -webkit-tap-highlight-color: transparent; /* no blue/red flash */
-    }
-
-    .bottom-drawer-handle.idle {
-      opacity: 0.2; /* fade to 20% when idle */
-    }
-
-    /* Hover/focus overrides idle */
-    .bottom-drawer-handle:hover,
-    .bottom-drawer-handle:focus-visible {
-      outline: none;
-      opacity: 1 !important;
-      color: cyan;
-      -webkit-text-stroke: 0px cyan;
-      text-shadow:
-        0 0 8px cyan,
-        0 0 8px cyan,
-        0 0 12px cyan,
-        0 0 24px cyan;
-    }
-    
- /* =============================
-    Url box + Paste button Group
-    =============================  */
-    .url-group {
-      width: 60vw;
-      display: flex;
-      justify-content: center; /* space between grandchildren */
-      align-items: center;
-      position: relative;
-      min-width: 300px;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    
-  /* =============================
-    Url box
-    =============================  */   
-    .url-input {
-      flex: 1;
-      width: 100%;
-      min-width: 210px;
-      max-width: 50vw;
-      height: 40px;
-      border-radius: 10px;
-      border: none;
-      background-color: #1a1a1a;
-      text-align: center;
-      
-      cursor: pointer;
-      transition: transform 1s, box-shadow 0.3s;
-    }
-
-    /* Hover effect */
-    .url-input:hover {
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, #222);     /* outer glow */
-    }
-    
-    
-    .url-input.glow {
-      border: 1px solid var(--btn-glow, white);
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
-        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
-    }
-    
-    input[type="text"]::placeholder {
-      color: white;
-      opacity: .3;
-    }
-    
-    input[type="text"] {
-      width: 60%;
-      border: 2px magenta;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: .9em;
-      background-color: black; /*#121212;*/
-      color: white;
-      box-shadow:
-        0 0 15px 1px var(--btn-glow, rgba(33, 32, 32, 0.32));
-      transition: box-shadow 0.3s ease;
-    }
-    
-    input[type="text"]:focus {
-      outline: 1px;
-      border-color: solid white;
-      border: 1px solid var(--btn-glow, white);
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
-        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
-      background-color: black !important; /* stay black when focused */
-      color: white !important;
-    }
-
-    /* for Suggested URL - Normal focus */
-    input[type="text"]:focus {
-      outline: none;
-      border: 1px solid var(--btn-glow, white);
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),     /* outer glow */
-        inset 0 0 10px 0.5px var(--btn-glow, magenta);/* inner glow */
-    }
-    
-    /* Autofill fix */
-    input[type="text"]:-webkit-autofill {
-      border: 1px solid white;
-      -webkit-box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),
-        inset 0 0 10px 0.5px var(--btn-glow, magenta),
-        0 0 0px 1000px black inset !important;
-      -webkit-text-fill-color: white !important;
-      caret-color: white;
-    }
-    
-    
- /* =============================
-    Paste button
-    =============================  */
-   .paste-btn-icon {
-     background: none;
-     border: none;
-     cursor: pointer;
-     padding: 11px;
-     margin-left: 15px;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     user-select: none;
-     filter: 
-       drop-shadow(0 0 2px black)
-       drop-shadow(0 0 6.5px black);
-     cursor: pointer;
-     transition: transform 1s, filter 0.3s;
-   }
-
-   .paste-btn-icon:active {
-     transform: scale(0.95);
-     transform: translateY(2px);
-   }
-
-   .paste-icon-image {
-     width: 22px;
-     height: 22px;
-     content: url("Paste Icon.png"); /* default icon */
-   }
-
-
-   /* Optional glow & Change imagewhen pressed */
-   .paste-btn-icon:active img {
-     content: url("Paste Icon 2.png"); /* works here */
-     filter: 
-       drop-shadow(0 0 2px magenta)
-       drop-shadow(0 0 6.5px magenta)
-       drop-shadow(0 0 15px magenta);
-   }
-    
-   .paste-btn-icon:hover {
-     filter: 
-       drop-shadow(0 0 3px black)
-       drop-shadow(0 0 5px black)
-       drop-shadow(0 0 1.5px #222)
-       drop-shadow(0 0 8px #222);
-   }
+      /* Long Press / Right-click Red Highlight */
+      .next-box .songtitle.long-pressing {
+        background-color: rgba(255, 0, 0, 0.25) !important;
+        color: #ff4c4c !important;
+        transition: background-color 0.3s ease !important;
+      }
 
 /* =============================
+    BOTTOM DRAWER +++++++++++++++
+    =============================  */
+      /* Bottom Drawer body */
+      .bottom-drawer {
+        position: fixed;
+        bottom: -160px;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
+        padding: 20px 15px 15px 25px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+        transition: bottom 0.3s cubic-bezier(0.25, 1.25, 0.5, 1);
+        z-index: 98;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 15px 25px; /* bottom is 25px default */
+      }
+
+      /* bottom-drawer When open --start */
+      .bottom-drawer.open {
+        bottom: 0;
+        animation: shadowFloat 5s infinite ease-in-out;
+      }
+
+      /* Shadow moves up and down */
+      @keyframes shadowFloat {
+        0% {
+          box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01);
+        }
+        50% {
+          box-shadow: 10px 0 80px rgba(0, 255, 255, 0.1);
+        }
+        100% {
+          box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01);
+        }
+      }
+
+      /* =============================
+    Bottom drawer Handle
+    =============================  */
+      .bottom-drawer-handle {
+        position: absolute;
+        top: -80px;
+        left: 49%;
+        transform: translateX(-50%);
+        background: none;
+        border: none;
+        color: #840072; /* default color */
+        font-size: 2em;
+        cursor: pointer;
+        text-shadow: none; /* 🚫 no glow */
+        -webkit-text-stroke: 0px transparent;
+        z-index: 99;
+        user-select: none;
+        transition:
+          opacity 1s ease-in-out,
+          color 0.2s ease,
+          -webkit-text-stroke 0.1s ease,
+          transform 0.1s ease-in-out;
+        opacity: 1; /* start fully visible */
+        padding: 10px; /* bigger tap zone */
+        -webkit-tap-highlight-color: transparent; /* no blue/red flash */
+      }
+
+      .bottom-drawer-handle.idle {
+        opacity: 0.2; /* fade to 20% when idle */
+      }
+
+      /* Hover/focus overrides idle */
+      .bottom-drawer-handle:hover,
+      .bottom-drawer-handle:focus-visible {
+        outline: none;
+        opacity: 1 !important;
+        color: cyan;
+        -webkit-text-stroke: 0px cyan;
+        text-shadow:
+          0 0 8px cyan,
+          0 0 8px cyan,
+          0 0 12px cyan,
+          0 0 24px cyan;
+      }
+
+      /* =============================
+    Url box + Paste button Group
+    =============================  */
+      .url-group {
+        width: 60vw;
+        display: flex;
+        justify-content: center; /* space between grandchildren */
+        align-items: center;
+        position: relative;
+        min-width: 300px;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      /* =============================
+    Url box
+    =============================  */
+      .url-input {
+        flex: 1;
+        width: 100%;
+        min-width: 210px;
+        max-width: 50vw;
+        height: 40px;
+        border-radius: 10px;
+        border: none;
+        background-color: #1a1a1a;
+        text-align: center;
+
+        cursor: pointer;
+        transition:
+          transform 1s,
+          box-shadow 0.3s;
+      }
+
+      /* Hover effect */
+      .url-input:hover {
+        box-shadow: 0 0 10px 0.5px var(--btn-glow, #222); /* outer glow */
+      }
+
+      .url-input.glow {
+        border: 1px solid var(--btn-glow, white);
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, magenta),
+          /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
+      }
+
+      input[type="text"]::placeholder {
+        color: white;
+        opacity: 0.3;
+      }
+
+      input[type="text"] {
+        width: 60%;
+        border: 2px magenta;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 0.9em;
+        background-color: black; /*#121212;*/
+        color: white;
+        box-shadow: 0 0 15px 1px var(--btn-glow, rgba(33, 32, 32, 0.32));
+        transition: box-shadow 0.3s ease;
+      }
+
+      input[type="text"]:focus {
+        outline: 1px;
+        border-color: solid white;
+        border: 1px solid var(--btn-glow, white);
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, magenta),
+          /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
+        background-color: black !important; /* stay black when focused */
+        color: white !important;
+      }
+
+      /* for Suggested URL - Normal focus */
+      input[type="text"]:focus {
+        outline: none;
+        border: 1px solid var(--btn-glow, white);
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, magenta),
+          /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
+      }
+
+      /* Autofill fix */
+      input[type="text"]:-webkit-autofill {
+        border: 1px solid white;
+        -webkit-box-shadow:
+          0 0 10px 0.5px var(--btn-glow, magenta),
+          inset 0 0 10px 0.5px var(--btn-glow, magenta),
+          0 0 0px 1000px black inset !important;
+        -webkit-text-fill-color: white !important;
+        caret-color: white;
+      }
+
+      /* =============================
+    Paste button
+    =============================  */
+      .paste-btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 11px;
+        margin-left: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        filter: drop-shadow(0 0 2px black) drop-shadow(0 0 6.5px black);
+        cursor: pointer;
+        transition:
+          transform 1s,
+          filter 0.3s;
+      }
+
+      .paste-btn-icon:active {
+        transform: scale(0.95);
+        transform: translateY(2px);
+      }
+
+      .paste-icon-image {
+        width: 22px;
+        height: 22px;
+        content: url("Paste Icon.png"); /* default icon */
+      }
+
+      /* Optional glow & Change imagewhen pressed */
+      .paste-btn-icon:active img {
+        content: url("Paste Icon 2.png"); /* works here */
+        filter: drop-shadow(0 0 2px magenta) drop-shadow(0 0 6.5px magenta) drop-shadow(0 0 15px magenta);
+      }
+
+      .paste-btn-icon:hover {
+        filter: drop-shadow(0 0 3px black) drop-shadow(0 0 5px black) drop-shadow(0 0 1.5px #222)
+          drop-shadow(0 0 8px #222);
+      }
+
+      /* =============================
     Bottom buttons
     =============================  */
-    .bottom-buttons {
-      justify-content: center;  /* center buttons */
-      gap: 15px;                /* spacing between buttons */
-      width: 100%;
-      display: flex;
-      justify-content: space-between; /* default: spread buttons apart */
-      align-items: center;
-      z-index: 5;
-    }
-    
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0) 0%,     
-        rgba(13, 14, 14, 0.5) 60%,  
-        #000000 100%                
-      );
-      z-index: 999;
-    }
-    
-  /* Invisible overlay for Tap/close */
-    .bot-drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: invisible;
-      z-index: 90;
-      display: none;
-    }
-    .bot-drawer-overlay.visible { display: block; }
+      .bottom-buttons {
+        justify-content: center; /* center buttons */
+        gap: 15px; /* spacing between buttons */
+        width: 100%;
+        display: flex;
+        justify-content: space-between; /* default: spread buttons apart */
+        align-items: center;
+        z-index: 5;
+      }
 
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom, rgba(13, 14, 14, 0) 0%, rgba(13, 14, 14, 0.5) 60%, #000000 100%);
+        z-index: 999;
+      }
 
-/*  ===============================================
+      /* Invisible overlay for Tap/close */
+      .bot-drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: invisible;
+        z-index: 90;
+        display: none;
+      }
+      .bot-drawer-overlay.visible {
+        display: block;
+      }
+
+      /*  ===============================================
     Typical Buttons (Bottom buttons and Confirm's)
     ===============================================  */
-    /* Note: Button Style (color is dynamic via CSS vars) */
-    .cyan-btn {
-      margin: 0;
-      flex: 1;
-      padding: 14px;
-      background: black;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, transform 0.15s, box-shadow 0.3s;
-      border: 1px solid var(--btn-glow, cyan);
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, cyan),     /* outer glow */
-        inset 0 0 10px 0.5px var(--btn-glow, cyan);/* inner glow */
-    }
+      /* Note: Button Style (color is dynamic via CSS vars) */
+      .cyan-btn {
+        margin: 0;
+        flex: 1;
+        padding: 14px;
+        background: black;
+        border-radius: 10px;
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+        transition:
+          background 0.3s,
+          color 0.3s,
+          transform 0.15s,
+          box-shadow 0.3s;
+        border: 1px solid var(--btn-glow, cyan);
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, cyan),
+          /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, cyan); /* inner glow */
+      }
 
-    /* Hover effect */
-    .cyan-btn:hover {
-      background: var(--btn-hover-bg, rgba(0, 255, 255, 0.2)); /* set by JS */
-      color: white;
-      text-shadow: 0 0 16px var(--btn-glow, cyan);
-    }
+      /* Hover effect */
+      .cyan-btn:hover {
+        background: var(--btn-hover-bg, rgba(0, 255, 255, 0.2)); /* set by JS */
+        color: white;
+        text-shadow: 0 0 16px var(--btn-glow, cyan);
+      }
 
-    /* Press / click effect */
-    .cyan-btn:active {
-      transform: scale(0.9); /* shrink when pressed */
-      box-shadow: 0 0 5px var(--btn-glow, cyan), 0 0 20px var(--btn-glow, cyan) inset; /* temporary glow */
-      background: var(--btn-glow, cyan);
-      color: black;
-      transition: transform 0.15s, box-shadow 0.15s; /* faster transition */
-    }
+      /* Press / click effect */
+      .cyan-btn:active {
+        transform: scale(0.9); /* shrink when pressed */
+        box-shadow:
+          0 0 5px var(--btn-glow, cyan),
+          0 0 20px var(--btn-glow, cyan) inset; /* temporary glow */
+        background: var(--btn-glow, cyan);
+        color: black;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s; /* faster transition */
+      }
 
-    /* Reset hover/glow after click (if you toggle this class in your code) */
-    .cyan-btn.clicked {
-      transform: scale(1);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+      /* Reset hover/glow after click (if you toggle this class in your code) */
+      .cyan-btn.clicked {
+        transform: scale(1);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
 
-    
- /* =========================
+      /* =========================
     Exit Modal
     =========================  */
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      border: 2px solid red;
-      border-radius: 10px;
-      padding: 20px;
-      z-index: 1000;
-      text-align: center;
-      width: 90%;
-      max-width: 320px;
-      box-shadow: 0 0 20px red;
-    }
-    
-    .single-btn {
-      width: 45%;
-      max-width: 200px;
-    }
-    
-/*  =============================
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #222;
+        border: 2px solid red;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 1000;
+        text-align: center;
+        width: 90%;
+        max-width: 320px;
+        box-shadow: 0 0 20px red;
+      }
+
+      .single-btn {
+        width: 45%;
+        max-width: 200px;
+      }
+
+      /*  =============================
     Touchpad +++++++++++++++++++
     ============================  */
       .touchpad {
@@ -898,1143 +934,1267 @@
         width: 40vw;
         height: 62vh;
         background: invisible;
-        outline: none; 
+        outline: none;
         z-index: 999;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent; /* no blue/red flash */
       }
-    
-/*  ============================
+
+      /*  ============================
      Landscape Mode
     ============================ */
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 65vh;
-      }
-      .drawer {
-        width: 65% !important;
-        left: -65% !important;
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      .drawer.open {
-        left: 0 !important;
-      }
-      .url-input, .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-    }
-    
-    @media screen and (orientation: landscape) and (max-width: 915px) {
-      .title-bar {
-        display: none !important;
+      @media (orientation: landscape) {
+        .youtube-wrapper {
+          height: 65vh;
+        }
+        .drawer {
+          width: 65% !important;
+          left: -65% !important;
+          height: 100vh; /* Full screen height in landscape */
+          justify-content: space-between; /* Keep space for top + bottom parts */
+          padding-bottom: 20px; /* Add some space at the bottom */
+        }
+        .drawer.open {
+          left: 0 !important;
+        }
+        .url-input,
+        .search-bar {
+          display: block; /* Make sure it's visible */
+        }
       }
 
-      .nowplaying-box {
-        margin-top: 15px !important;
-      }
+      @media screen and (orientation: landscape) and (max-width: 915px) {
+        .title-bar {
+          display: none !important;
+        }
 
-      .notify-box {
-        position: fixed;
-        top: 13vh;
-        left: 45vw;
-        width: 50vw;
-        transform: translateX(-50%);
-        z-index: 1;
-      }
-          
-      .Notify {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        width: 50vw;
-        height: 100%;
-        /*background: linear-gradient(
+        .nowplaying-box {
+          margin-top: 15px !important;
+        }
+
+        .notify-box {
+          position: fixed;
+          top: 13vh;
+          left: 45vw;
+          width: 50vw;
+          transform: translateX(-50%);
+          z-index: 1;
+        }
+
+        .Notify {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          width: 50vw;
+          height: 100%;
+          /*background: linear-gradient(
           to left,
           rgba(0, 0, 0, 0) 0,
           rgba(0, 0, 0, 0.050) 0 0%
         );*/
-        backdrop-filter: blur(5px);
-      }
-          
-      .youtube-wrapper {
-        position: fixed !important;
-        left: 50vw !important;
-        transform: translateX(-50%)!important;
-        width: 100vw !important;
-        height: 100vh !important;
-        padding: 5px !important;
-      }
-      
-      #popupModal {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-      }
-      
-      .url-group {
-        width: auto !important;
-        margin: auto!important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        z-index: 10;
-      }
-      
-      .paste-btn-icon {
-          margin-left: 5px !important;
-      }
-
-      .bottom-buttons {
-        width: 90vw !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        gap: 55vw !important;
-      }
-      
-      .bottom-drawer {
-        bottom: -100px;
-        width: 100vw !important;
-        height: 100px !important;
-      }
-      
-      .bottom-drawer-handle,
-      .drawer-handle {
-        z-index: 9999 !important;
-        color: white !important;
-        -webkit-text-stroke: 0px magenta;
-        text-shadow:
-          0 0 8px magenta,
-          0 0 8px magenta,
-          0 0 12px magenta,
-          0 0 24px magenta;
+          backdrop-filter: blur(5px);
         }
-      
-      .bottom-drawer-handle.idle,
-      .drawer-handle.idle {
-        opacity: .01 !important;
+
+        .youtube-wrapper {
+          position: fixed !important;
+          left: 50vw !important;
+          transform: translateX(-50%) !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          padding: 5px !important;
+        }
+
+        #popupModal {
+          position: fixed !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+        }
+
+        .url-group {
+          width: 40vw !important;
+          position: absolute !important;
+          top: 50% !important;
+          right: 3% !important;
+          transform: translate(0, -50%) !important;
+          gap: 10px !important;
+        }
+
+        .paste-btn-icon {
+          margin-left: 5px !important;
+        }
+
+        .bottom-buttons {
+          width: 50vw !important;
+          position: absolute !important;
+          top: 50% !important;
+          left: 4% !important;
+          transform: translate(0, -50%) !important;
+          gap: 2% !important;
+        }
+
+        .bottom-drawer {
+          bottom: -100px;
+          width: 100vw !important;
+          height: 100px !important;
+        }
+
+        .bottom-drawer-handle,
+        .drawer-handle {
+          z-index: 9999 !important;
+          color: white !important;
+          -webkit-text-stroke: 0px magenta;
+          text-shadow:
+            0 0 8px magenta,
+            0 0 8px magenta,
+            0 0 12px magenta,
+            0 0 24px magenta;
+        }
+
+        .bottom-drawer-handle.idle,
+        .drawer-handle.idle {
+          opacity: 0.01 !important;
+        }
+
+        .touchpad {
+          display: block !important;
+        }
       }
-      
-      .touchpad {
-        display: block !important;
-      }
-    }   
-    
 
-
-
- /* ======================================
+      /* ======================================
     Popups Text with glow (Reserve, etc.)
     ======================================  */
-    #popupOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(
-        to bottom,
-        rgba(13, 14, 14, 0.4) 0%,
-        #000000 80%
-      );  /* Dimming effect */
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-      z-index: 9998;
-    }
-    
-    #popupOverlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    #popupModal {
-      position: fixed;
-      top: 75%; left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      background: none !important; /* #222; */
-      border: none !important; /* 2px solid cyan; */
-      border-radius: 10px;
-      padding: 0 !important; /* 15px 25px; */
-      color: inherit; /* white; */
-      font-weight: bold;
-      text-align: center !important;
-      text-shadow: inherit;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-      max-width: 90vw;
-      box-shadow: none !important; /* 0 0 20px cyan; */
-      user-select: none;
-      font-size: 1.8em !important;
-    }
-    
-    #popupModal.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    #confirmDelete {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-    }
-    
-    #confirmDelete.show {
-      opacity: 1;
-    }
-    
-   /* .long-pressing { pansamantala
+      #popupOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom, rgba(13, 14, 14, 0.4) 0%, #000000 80%); /* Dimming effect */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+        z-index: 9998;
+      }
+
+      #popupOverlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #popupModal {
+        position: fixed;
+        top: 75%;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        background: none !important; /* #222; */
+        border: none !important; /* 2px solid cyan; */
+        border-radius: 10px;
+        padding: 0 !important; /* 15px 25px; */
+        color: inherit; /* white; */
+        font-weight: bold;
+        text-align: center !important;
+        text-shadow: inherit;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+        max-width: 90vw;
+        box-shadow: none !important; /* 0 0 20px cyan; */
+        user-select: none;
+        font-size: 1.8em !important;
+      }
+
+      #popupModal.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #confirmDelete {
+        transition: opacity 0.3s ease;
+        opacity: 1;
+      }
+
+      #confirmDelete.show {
+        opacity: 1;
+      }
+
+      /* .long-pressing { pansamantala
       background: red;
       box-shadow: 0 0 10px red;
     }*/
 
-
-/* ===========================================
+      /* ===========================================
    Typical Tooltip Style
    =========================================== */
-    [data-tooltip] {
-      position: relative;
-    }
+      [data-tooltip] {
+        position: relative;
+      }
 
-    /* Tooltip base style */
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 120%;       /* above button */
-      left: 50%;
-      transform: translateX(-50%);
-      background: #111;
-      color: cyan;
-      padding: 6px 10px;
-      border-radius: 8px;
-      white-space: nowrap;
-      font-size: 13px;
-      pointer-events: none;
-      opacity: 0;         /* hidden by default */
-      box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
-      transition: opacity 0.3s ease-in-out;       /* smooth fade */
-    }
+      /* Tooltip base style */
+      [data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 120%; /* above button */
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111;
+        color: cyan;
+        padding: 6px 10px;
+        border-radius: 8px;
+        white-space: nowrap;
+        font-size: 13px;
+        pointer-events: none;
+        opacity: 0; /* hidden by default */
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
+        transition: opacity 0.3s ease-in-out; /* smooth fade */
+      }
 
-    /* Show tooltip when class is added */
-    [data-tooltip].show-tooltip::after {
-      opacity: 1;
-    }
+      /* Show tooltip when class is added */
+      [data-tooltip].show-tooltip::after {
+        opacity: 1;
+      }
 
-/*  Typical Tooltip Style +++++ end +++++ */ 
+      /*  Typical Tooltip Style +++++ end +++++ */
 
-/* =============================
+      /* =============================
    Generic Modal Base
    ============================= */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-    }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
 
-    .modal {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      border-radius: 10px;
-      padding: 20px 30px;
-      z-index: 1000;
-      text-align: center;
-      min-width: 260px;
-      border: 1px solid cyan;                 /* will be overridden by JS */
-      box-shadow: 0 0 10px 0.5px cyan;        /* will be overridden by JS */
-    }
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #222;
+        border-radius: 10px;
+        padding: 20px 30px;
+        z-index: 1000;
+        text-align: center;
+        min-width: 260px;
+        border: 1px solid cyan; /* will be overridden by JS */
+        box-shadow: 0 0 10px 0.5px cyan; /* will be overridden by JS */
+      }
 
-    .modal-content p {
-      margin: 8px 0;
-      font-size: 1em;
-      color: white;
-    }
-    
-  </style>
-</head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
-    
-  <!-- Invisible touchpad --> 
-  <div class="touchpad"></div>
-  
-  <!-- Title -->
-<div class="title-bar">
-  <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
-  <span class="title-text">CueTube :)</span>
-</div>
-  
+      .modal-content p {
+        margin: 8px 0;
+        font-size: 1em;
+        color: white;
+      }
+
+/*  ===============================
+   SongBook Queue
+    =============================== */
+      .songbook {
+        position: relative;
+        bottom: 0;
+        border: 1px solid var(--btn-glow, white);
+        border-radius: 20px;
+        padding: 10px; /* top/right/bott/left */
+        background: black;
+        margin: 0px 10px 15px 15px; /* top/right/bott/left */
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, magenta),
+          inset 0 0 10px 0.5px var(--btn-glow, magenta);
+        overflow: hidden;
+        transition:
+          transform 0.5s ease,
+          max-height 0.5s ease;
+        z-index: 999;
+      }
+
+      /* Handle bar (Songbook Button) */
+      .songbook-handle {
+        text-align: center;
+        padding: 10px;
+        font-size: 0.8em;
+        color: #9377ea;
+        background: none;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.15s;
+      }
+      /* Hover effect */
+      .songbook-handle:hover {
+        transform: scale(0.9); /* shrink when pressed */
+      }
+      
+      
+      /* Songbook list container */
+      .songbook-list {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        padding: 0 10px;
+      }
+
+      /* Expanded state */
+      .songbook.open .songbook-list {
+        max-height: 70vh; /* adjust as needed */
+      }
+      
+      /* Inner scrollable box (like NextBox) */
+      .songbook-box-inner {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding: 5px 0;
+      }
+
+      /* Hide scrollbar */
+      .songbook-box-inner::-webkit-scrollbar {
+        display: none;
+      }
+      .songbook-box-inner {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Song Titles */
+      .songbook .songtitle {
+        font-family: Arial, sans-serif;
+        font-size: 0.9em;
+        margin: 10px;
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        font-weight: normal;
+        padding: 5px;
+        color: white;
+        user-select: none;
+        cursor: pointer;
+      }
+
+      /* SongBook search bar */
+      .songbook-search {
+        padding: 10px 5px;
+      }
+
+      /* Search bar */
+      .songbook-search {
+        padding: 10px 5px;
+      }
+      .songbook-search input {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        border-radius: 20px;
+        background: black;
+        color: white;
+        outline: none;
+        box-shadow: 0 0 5px #222;
+        cursor: pointer;
+      }
+      .songbook-search input::placeholder {
+        color: grey;
+        text-align-last: center;
+      }
+
+      /* Hide Scrollbar for WebKit Browsers */
+      .next-box::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Hover effect */
+      .songbook-search input:hover {
+        box-shadow:
+          0 0 10px 0.5px var(--btn-glow, #222);     /* outer glow */
+      }
+      
+      .songbook-search input::placeholder {
+        color: grey;
+        text-align-last: center;
+      }
+    </style>
+  </head>
+  <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+    <!-- Invisible touchpad -->
+    <div class="touchpad"></div>
+
+    <!-- Title -->
+    <div class="title-bar">
+      <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
+      <span class="title-text">CueTube :)</span>
+    </div>
+
   <!-- Drawer -->
-<div class="drawer" id="drawer">
-  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-  <div>
-    <!-- Now Playing stays fixed -->
-    <div class="nowplaying-box">
-      <div class="label">NOW PLAYING</div>
-      <div class="title" id="nowTitle"></div>
-    </div>  
+  <div class="drawer" id="drawer">
+    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+    <div>
+      <!-- Now Playing stays fixed -->
+      <div class="nowplaying-box">
+        <div class="label">NOW PLAYING</div>
+        <div class="title" id="nowTitle"></div>
+      </div>
 
-    <!-- Next list with smooth stretch -->
-    <div class="next-box hidden">
-      <div class="next-box-inner">
-        <div class="label">NEXT</div>
-        <div id="nextList"></div>
-        <div id="overflowCounter"></div>
+      <!-- Next list with smooth stretch -->
+      <div class="next-box hidden">
+        <div class="next-box-inner">
+          <div class="label">NEXT</div>
+          <div id="nextList"></div>
+          <div id="overflowCounter"></div>
+        </div>
+      </div>
+
+      <!-- SongBook -->
+      <div class="songbook" id="songbook">
+        <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
+        <div class="songbook-list">
+          <div class="songbook-search">
+            <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+          </div>
+
+          <!-- Scrollable inner like NextBox -->
+          <div class="songbook-box-inner" id="songbookList"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-  
-  <!-- Overlays -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <div class="bot-drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
-  
-   <!-- Notify --> 
-  <div class="notify-box">
-    <div id="nowPlayingCopy"></div>
-  </div>
-  <!-- YouTube Player -->
-  <div class="youtube-wrapper">
-  <iframe
-    id="player"
-    src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
-    allowfullscreen
-  ></iframe>
-</div>
 
-  <!-- Bottom Drawer -->
-<div class="bottom-drawer" id="bottomDrawer">
-  <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
-  
-<div class="url-group">
-  <input 
-    type="text" 
-    class="url-input" 
-    placeholder="Paste the YouTube URL here" 
-    id="youtubeInputDrawer" 
-  />
-  
-  <button 
-    id="pasteBtn" 
-    class="paste-btn-icon" 
-    data-tooltip="Paste (Ctrl + V)"
-  >
-    <img 
-      src="Paste Icon.png" 
-      alt="Paste" 
-      class="paste-icon-image" 
-    />
-  </button>
-</div>
-  
-  <div class="bottom-buttons">
-    <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-    <button id="nextBtnDrawer" class="cyan-btn" data-tooltip="Next Song (Ctrl + →)" onclick="showNextConfirm()">Next</button>
+    <!-- Overlays -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="bot-drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
+
+    <!-- Notify -->
+    <div class="notify-box">
+      <div id="nowPlayingCopy"></div>
     </div>
-  </div>
-  
-  
-  <!-- Popup -->
-  <div id="popupOverlay"></div>
-  <div id="popupModal"></div>
-  
-  
-  <!-- Generic Overlay -->
-  <!-- Overlay -->
-  <div id="genericOverlay" class="overlay" style="display:none;"></div>
-
-  <!-- Modal -->
-  <div id="genericModal" class="modal" style="display:none;">
-    <div class="modal-content" id="genericContent">
-      <!-- Dynamic content is injected by showModal(...) -->
+    <!-- YouTube Player -->
+    <div class="youtube-wrapper">
+      <iframe
+        id="player"
+        src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
+        allowfullscreen></iframe>
     </div>
-  </div>
 
-  
-  <audio id="clickSound" src="click.wav" preload="auto"></audio>
-  <audio id="successSound" src="success.wav" preload="auto"></audio>
-  <audio id="errorSound" src="error.wav" preload="auto"></audio>
-  <audio id="trashSound" src="trash.wav" preload="auto"></audio>
-  <audio id="slideSound" src="slide.wav" preload="auto"></audio>
-  <audio id="notifSound" src="notif.wav" preload="auto"></audio>
-  
-  <!-- JS -->
-  <script>
-// =====================
-// Drawer & Overlay Setup
-// =====================
-let overlayTouchStartX = 0;
-let isLeftOverlayOpen = false;
-let touchStartX = 0;
+    <!-- Bottom Drawer -->
+    <div class="bottom-drawer" id="bottomDrawer">
+      <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
 
-// Drawer elements
-const drawer = document.getElementById('drawer');
-  addRubberBandEffect(drawer, "left", 70, 0.25); // Left drawer rubber-band
-const bottomDrawer = document.getElementById("bottomDrawer");
-  addRubberBandEffect(bottomDrawer, "bottom", 15, 0.0);
-const overlay = document.getElementById('drawerOverlay'); // Bottom drawer rubber-band
-const popupOverlay = document.getElementById("popupOverlay");
+      <div class="url-group">
+        <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
 
+        <button id="pasteBtn" class="paste-btn-icon" data-tooltip="Paste (Ctrl + V)">
+          <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
+        </button>
+      </div>
 
-// =====================
-// Touch Handlers
-// =====================
+      <div class="bottom-buttons">
+        <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
+        <button class="cyan-btn" onclick="saveToSongbook()">Save</button>
+        <button id="nextBtnDrawer" class="cyan-btn" data-tooltip="Next Song (Ctrl + →)" onclick="showNextConfirm()">
+          Next
+        </button>
+      </div>
+    </div>
 
-// Track initial X position when touch starts
-function handleTouchStart(evt) {
-  touchStartX = evt.touches[0].clientX;
-}
+    <!-- Popup -->
+    <div id="popupOverlay"></div>
+    <div id="popupModal"></div>
 
-// Track movement to swipe left/right for drawer
-function handleTouchMove(evt) {
-  const deltaX = evt.touches[0].clientX - touchStartX;
-  if (deltaX > 50) openDrawer();
-  else if (deltaX < -50) closeDrawer();
-}
+    <!-- Generic Overlay -->
+    <!-- Overlay -->
+    <div id="genericOverlay" class="overlay" style="display: none"></div>
 
-// Tap outside left drawer closes it
-function handleTap(evt) {
-  if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
-    closeDrawer();
-  }
-}
+    <!-- Modal -->
+    <div id="genericModal" class="modal" style="display: none">
+      <div class="modal-content" id="genericContent">
+        <!-- Dynamic content is injected by showModal(...) -->
+      </div>
+    </div>
 
-// =====================
-// Drawer Toggle Functions
-// =====================
-function toggleDrawer() {
-  if (drawer.classList.contains("open")) closeDrawer();
-  else openDrawer();
-}
+    <audio id="clickSound" src="click.wav" preload="auto"></audio>
+    <audio id="successSound" src="success.wav" preload="auto"></audio>
+    <audio id="errorSound" src="error.wav" preload="auto"></audio>
+    <audio id="trashSound" src="trash.wav" preload="auto"></audio>
+    <audio id="slideSound" src="slide.wav" preload="auto"></audio>
+    <audio id="notifSound" src="notif.wav" preload="auto"></audio>
 
-// Open left drawer
-function openDrawer() {
-  // Close bottom drawer if open
-  if (bottomDrawer.classList.contains("open")) {
-    bottomDrawer.classList.remove("open");
-    document.querySelector(".bottom-drawer-handle").style.display = "flex";
-  }
+    <!-- JS -->
+    <script>
+      // =====================
+      // Drawer & Overlay Setup
+      // =====================
+      let overlayTouchStartX = 0;
+      let isLeftOverlayOpen = false;
+      let touchStartX = 0;
 
-  drawer.classList.add('open');
-  overlay.classList.add('visible');
-  isLeftOverlayOpen = true;
-  document.getElementById('drawerHandle').style.display = 'none';
-}
+      // Drawer elements
+      const drawer = document.getElementById("drawer");
+      addRubberBandEffect(drawer, "left", 70, 0.25); // Left drawer rubber-band
+      const bottomDrawer = document.getElementById("bottomDrawer");
+      addRubberBandEffect(bottomDrawer, "bottom", 15, 0.0);
+      const overlay = document.getElementById("drawerOverlay"); // Bottom drawer rubber-band
+      const popupOverlay = document.getElementById("popupOverlay");
 
-// Close left drawer
-function closeDrawer() {
-  if (!drawer.classList.contains("open") || isModalOpen) return;
+      // =====================
+      // Touch Handlers
+      // =====================
 
-  drawer.classList.remove('open');
-  drawerOverlay.classList.remove('visible');
-  isLeftOverlayOpen = false;
-  document.getElementById('drawerHandle').style.display = 'flex';
+      // Track initial X position when touch starts
+      function handleTouchStart(evt) {
+        touchStartX = evt.touches[0].clientX;
+      }
 
-  document.activeElement.blur();
-  document.body.focus();
-}
+      // Track movement to swipe left/right for drawer
+      function handleTouchMove(evt) {
+        const deltaX = evt.touches[0].clientX - touchStartX;
+        if (deltaX > 50) openDrawer();
+        else if (deltaX < -50) closeDrawer();
+      }
 
-function closeBottomDrawer() {
-  if (!bottomDrawer.classList.contains("open") || isModalOpen) return;
+      // Tap outside left drawer closes it
+      function handleTap(evt) {
+        if (!drawer.contains(evt.target) && drawer.classList.contains("open")) {
+          closeDrawer();
+        }
+      }
 
-  bottomDrawer.classList.remove("open");
-  document.querySelector(".bottom-drawer-handle").style.display = "flex";
-  bottomDrawerOverlay.classList.remove("visible");
+      // =====================
+      // Drawer Toggle Functions
+      // =====================
+      function toggleDrawer() {
+        if (drawer.classList.contains("open")) closeDrawer();
+        else openDrawer();
+      }
 
-  document.activeElement.blur();
-  document.body.focus();
-}
+      // Open left drawer
+      function openDrawer() {
+        // Close bottom drawer if open
+        if (bottomDrawer.classList.contains("open")) {
+          bottomDrawer.classList.remove("open");
+          document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        }
 
-// =====================
-// Swipe to Close Left Drawer
-// =====================
-drawerOverlay.addEventListener('touchstart', (e) => {
-  if (isModalOpen) return; // disable swipe if modal is up
-  overlayTouchStartX = e.touches[0].clientX;
-});
+        drawer.classList.add("open");
+        overlay.classList.add("visible");
+        isLeftOverlayOpen = true;
+        document.getElementById("drawerHandle").style.display = "none";
+      }
 
-drawerOverlay.addEventListener('touchmove', (e) => {
-  if (isModalOpen) return;
-  const deltaX = e.touches[0].clientX - overlayTouchStartX;
-  if (deltaX < -50) closeDrawer(); // swipe left to close
-});
+      // Close left drawer
+      function closeDrawer() {
+        if (!drawer.classList.contains("open") || isModalOpen) return;
 
-    
-// =====================
-// Bottom Drawer Toggle
-// =====================
-function toggleBottomDrawer() {
-  const isOpen = bottomDrawer.classList.toggle("open");
-  document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
-  bottomDrawerOverlay.classList.toggle("visible", isOpen);
+        drawer.classList.remove("open");
+        drawerOverlay.classList.remove("visible");
+        isLeftOverlayOpen = false;
+        document.getElementById("drawerHandle").style.display = "flex";
 
-  if (isOpen) {
-    // Close left drawer if open
-    if (drawer.classList.contains("open")) {
-      drawer.classList.remove("open");
-      drawerOverlay.classList.remove("visible");
-      document.getElementById('drawerHandle').style.display = 'flex';
-    }
-  } else {
-    bottomDrawerOverlay.classList.remove("visible");
-  }
-}
+        document.activeElement.blur();
+        document.body.focus();
+      }
 
-// =====================
-// Click on bottom overlay closes drawers
-// =====================
-bottomDrawerOverlay.onclick = function() {
-  if (isModalOpen) return; // don’t close drawers if modal is open
-  if (drawer.classList.contains("open")) closeDrawer();
-  if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
-};
+      function closeBottomDrawer() {
+        if (!bottomDrawer.classList.contains("open") || isModalOpen) return;
 
+        bottomDrawer.classList.remove("open");
+        document.querySelector(".bottom-drawer-handle").style.display = "flex";
+        bottomDrawerOverlay.classList.remove("visible");
 
-// ===============================
-// Smooth Stretch Overscroll
-// ===============================
-(function smoothStretchScroll() {
-  const box = document.querySelector(".next-box");
-  const inner = box.querySelector(".next-box-inner");
-  if (!box || !inner) return;
+        document.activeElement.blur();
+        document.body.focus();
+      }
 
-  let startY = 0;
-  let isTouching = false;
-  let pulling = false;
-  const maxStretch = 60; // px
+      // =====================
+      // Swipe to Close Left Drawer
+      // =====================
+      drawerOverlay.addEventListener("touchstart", (e) => {
+        if (isModalOpen) return; // disable swipe if modal is up
+        overlayTouchStartX = e.touches[0].clientX;
+      });
 
-  // Touch start
-  box.addEventListener("touchstart", e => {
-    startY = e.touches[0].clientY;
-    isTouching = true;
-    pulling = false;
-    inner.style.transition = ""; // cancel smooth return during drag
-  }, { passive: true });
+      drawerOverlay.addEventListener("touchmove", (e) => {
+        if (isModalOpen) return;
+        const deltaX = e.touches[0].clientX - overlayTouchStartX;
+        if (deltaX < -50) closeDrawer(); // swipe left to close
+      });
 
-  // Touch move
-  box.addEventListener("touchmove", e => {
-    if (!isTouching) return;
+      // =====================
+      // Bottom Drawer Toggle
+      // =====================
+      function toggleBottomDrawer() {
+        const isOpen = bottomDrawer.classList.toggle("open");
+        document.querySelector(".bottom-drawer-handle").style.display = isOpen ? "none" : "flex";
+        bottomDrawerOverlay.classList.toggle("visible", isOpen);
 
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - startY;
-    const maxScroll = box.scrollHeight - box.clientHeight;
+        if (isOpen) {
+          // Close left drawer if open
+          if (drawer.classList.contains("open")) {
+            drawer.classList.remove("open");
+            drawerOverlay.classList.remove("visible");
+            document.getElementById("drawerHandle").style.display = "flex";
+          }
+        } else {
+          bottomDrawerOverlay.classList.remove("visible");
+        }
+      }
 
-    if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
-      const stretch = Math.max(-maxStretch, Math.min(deltaY / 2, maxStretch));
-      inner.style.transform = `translateY(${stretch}px)`;
-      pulling = true;
-      e.preventDefault(); // stop native glow overscroll
-    }
-  }, { passive: false });
+      // =====================
+      // Click on bottom overlay closes drawers
+      // =====================
+      bottomDrawerOverlay.onclick = function () {
+        if (isModalOpen) return; // don’t close drawers if modal is open
+        if (drawer.classList.contains("open")) closeDrawer();
+        if (bottomDrawer.classList.contains("open")) closeBottomDrawer();
+      };
 
-  // Touch end
-  box.addEventListener("touchend", () => {
-    if (pulling) {
-      inner.style.transition = "transform 0.3s ease";
-      inner.style.transform = "translateY(0)";
-    }
-    isTouching = false;
-    pulling = false;
-  });
-})();
+      // ===============================
+      // Smooth Stretch Overscroll
+      // ===============================
+      (function smoothStretchScroll() {
+        const box = document.querySelector(".next-box");
+        const inner = box.querySelector(".next-box-inner");
+        if (!box || !inner) return;
 
+        let startY = 0;
+        let isTouching = false;
+        let pulling = false;
+        const maxStretch = 60; // px
+
+        // Touch start
+        box.addEventListener(
+          "touchstart",
+          (e) => {
+            startY = e.touches[0].clientY;
+            isTouching = true;
+            pulling = false;
+            inner.style.transition = ""; // cancel smooth return during drag
+          },
+          { passive: true }
+        );
+
+        // Touch move
+        box.addEventListener(
+          "touchmove",
+          (e) => {
+            if (!isTouching) return;
+
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            const maxScroll = box.scrollHeight - box.clientHeight;
+
+            if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
+              const stretch = Math.max(-maxStretch, Math.min(deltaY / 2, maxStretch));
+              inner.style.transform = `translateY(${stretch}px)`;
+              pulling = true;
+              e.preventDefault(); // stop native glow overscroll
+            }
+          },
+          { passive: false }
+        );
+
+        // Touch end
+        box.addEventListener("touchend", () => {
+          if (pulling) {
+            inner.style.transition = "transform 0.3s ease";
+            inner.style.transform = "translateY(0)";
+          }
+          isTouching = false;
+          pulling = false;
+        });
+      })();
 
 /* =========================================================
-   GLOBAL VERTICAL SWIPE: Bottom Drawer Handling
-   ========================================================= */
-    let startY = 0;
-    document.body.addEventListener("touchstart", evt => {
-      startY = evt.touches[0].clientY;
-      handleTouchStart(evt); // 🛑 your existing left/right swipe start
-    });
+  GLOBAL VERTICAL SWIPE: Bottom Drawer Handling
+  ======================================================== */
+      let startY = 0;
+      document.body.addEventListener("touchstart", (evt) => {
+        startY = evt.touches[0].clientY;
+        handleTouchStart(evt); // 🛑 your existing left/right swipe start
+      });
 
-    document.body.addEventListener("touchmove", evt => {
-      const deltaY = evt.touches[0].clientY - startY;
+      document.body.addEventListener("touchmove", (evt) => {
+        const deltaY = evt.touches[0].clientY - startY;
 
-      // 🚫 Ignore if inside .next-box (so bounce handles it instead)
-      if (evt.target.closest(".next-box")) {
+        // 🚫 Ignore if inside .next-box (so bounce handles it instead)
+        if (evt.target.closest(".next-box")) {
+          return;
+        }
+
+        if (isLeftOverlayOpen) {
+          if (deltaY > 40) closeBottomDrawer(); // 🛑 swipe down closes bottom drawer
+          return; // prevent bottom drawer while left is open
+        }
+
+        if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
+          toggleBottomDrawer(); // 🛑 swipe up to open bottom drawer
+        } else if (deltaY > 40) {
+          closeBottomDrawer(); // 🛑 swipe down always closes
+        }
+
+        handleTouchMove(evt); // 🛑 your existing left/right swipe move
+      });
+
+      // =====================
+      // Keyboard Shortcuts
+      // =====================
+      document.addEventListener("keydown", async (e) => {
+        // Ignore shortcuts when typing in input or textarea
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+        // Always allow ESC to close modal
+        if (e.key === "Escape" && isModalOpen) {
+          hideModal(); // generic modal handles hiding
+          return;
+        }
+
+        // Block drawer shortcuts if modal is open
+        if (isModalOpen) return;
+
+        // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
+          e.preventDefault();
+          await pasteFromClipboard();
+          return;
+        }
+
+        // Ctrl + Right Arrow → Next button
+        if (e.ctrlKey && e.key === "ArrowRight") {
+          e.preventDefault();
+          const nextBtnDrawer = document.getElementById("nextBtnDrawer");
+          if (nextBtnDrawer) nextBtnDrawer.click();
+          return;
+        }
+
+        // Drawer controls
+        if (e.key === "ArrowUp") toggleBottomDrawer();
+        if (e.key === "ArrowDown") closeBottomDrawer();
+        if (e.key === "ArrowRight") openDrawer();
+        if (e.key === "ArrowLeft") closeDrawer();
+
+        // ESC closes everything if no modal
+        if (e.key === "Escape") {
+          closeDrawer();
+          closeBottomDrawer();
+        }
+
+        // Spacebar: Play / Pause YouTube video
+        if (e.code === "Space") {
+          e.preventDefault(); // prevent page scroll
+          if (player && player.getPlayerState) {
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+              player.pauseVideo();
+            } else {
+              player.playVideo();
+            }
+          }
+        }
+
+        // Enter: confirm active modal
+        if (e.key === "Enter" && isModalOpen) {
+          // Trigger the first button in the modal
+          const firstBtn = document.getElementById("genericContent")?.querySelector("button");
+          if (firstBtn) firstBtn.click();
+          e.preventDefault();
+        }
+      });
+
+      // =====================
+      // URL Input Enter Key
+      // =====================
+      document.getElementById("youtubeInputDrawer").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault(); // prevent form submission / page refresh
+          reserveFromDrawer(); // trigger reserve function
+        }
+      });
+
+      // =====================
+      // Body click handler
+      // =====================
+      document.body.addEventListener("click", handleTap);
+
+      // =====================
+      // YouTube Player Setup
+      // =====================
+      let player;
+      let queue = [];
+      let currentIndex = -1;
+
+      if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
+
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player("player", {
+          events: {
+            onReady: () => console.log("Player Ready"),
+            onStateChange: onPlayerStateChange
+          },
+          origin: window.location.origin
+        });
+      }
+
+      // =====================
+      // Touchpad Play/Pause
+      // =====================
+      document.addEventListener("DOMContentLoaded", () => {
+        const touchpad = document.querySelector(".touchpad");
+        if (!touchpad) return;
+
+        touchpad.addEventListener("click", () => {
+          if (!player) return;
+          const state = player.getPlayerState();
+          if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+          } else {
+            player.playVideo();
+          }
+        });
+      });
+
+      let pauseTimeout = null;
+
+      function onPlayerStateChange(event) {
+        if (event.data === YT.PlayerState.ENDED) {
+          const isLastVideo = currentIndex === queue.length - 1;
+          if (queue.length === 0 || isLastVideo) {
+            hideNotify();
+            queue = [];
+            currentIndex = -1;
+
+            updateNowPlaying();
+            updateQueueDisplay();
+
+            player.stopVideo();
+            player.clearVideo();
+
+            showPopup("That's the last tune!", "magenta", true, true);
+          } else {
+            currentIndex++;
+            player.loadVideoById(queue[currentIndex].id);
+            updateNowPlaying();
+            updateQueueDisplay();
+          }
+        } else if (event.data === YT.PlayerState.PAUSED) {
+          pauseTimeout = setTimeout(() => {
+            showPopup("Paused", "magenta", true, true);
+          }, 500);
+          stopProgressChecker();
+        } else if (event.data === YT.PlayerState.PLAYING) {
+          clearTimeout(pauseTimeout);
+          clearPersistentPopup();
+          startProgressChecker();
+        } else {
+          stopProgressChecker();
+        }
+      }
+
+      // =====================
+      // Extract Video ID (supports standard, shortened, embed URLs)
+      // =====================
+      function extractVideoId(url) {
+        if (!url) return null;
+
+        // Remove extra parameters
+        const cleanUrl = url.split("&")[0];
+
+        // Match standard, shortened, or embed URLs
+        const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([0-9A-Za-z_-]{11})/;
+        const match = cleanUrl.match(regex);
+        return match ? match[1] : null;
+      }
+
+      // =====================
+      // Song Fetch: Title
+      // =====================
+      let invalidSongCount = 0; // counter for invalid/untitled songs
+
+      function resetInvalidSongCounter() {
+        invalidSongCount = 0;
+      }
+
+      async function fetchTitle(videoId) {
+        try {
+          const res = await fetch(
+            `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
+          );
+
+          if (!res.ok) throw new Error("Failed to fetch video info");
+
+          const data = await res.json();
+
+          // Return title only, or Invalid Song with numbering
+          return data.title || `Invalid Song ${++invalidSongCount}`;
+        } catch (err) {
+          invalidSongCount++;
+          showPopup("⚠️ Oops! Try choosing another video", "red", true, true);
+          playErrorSound();
+          return `Invalid Song ${invalidSongCount}`;
+        }
+      }
+
+      // =====================
+      // Reserve Video from Drawer
+      // =====================
+      async function reserveFromDrawer() {
+        clearPersistentPopup();
+
+        const input = document.getElementById("youtubeInputDrawer");
+        const url = input.value.trim();
+        const videoId = extractVideoId(url);
+
+        if (!videoId) {
+          input.value = "";
+          setTimeout(() => {
+            // Make error popup persistent
+            showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
+            playErrorSound();
+          }, 600);
+          return; // stop further execution
+        }
+
+        const title = await fetchTitle(videoId); // title only
+
+        // If fetchTitle returned an invalid/untitled video, don't show "Reserved!" popup
+        if (title.startsWith("Invalid Song")) {
+          input.value = "";
+          return;
+        }
+
+        // AUTO PLAY FIRST VIDEO
+        if (queue.length === 0 && currentIndex === -1) {
+          queue.push({ id: videoId, title });
+          currentIndex = 0;
+
+          player.loadVideoById(videoId);
+          player.playVideo();
+          updateNowPlaying();
+        } else {
+          queue.push({ id: videoId, title });
+        }
+
+        updateQueueDisplay();
+        input.value = "";
+
+        // ✅ Show success popup only if no persistent popup is active
+        if (!persistentPopupActive) {
+          setTimeout(() => {
+            showPopup("Reserved!", "cyan", false, "cyan");
+            playSuccessSound();
+          }, 600);
+        }
+
+        closeBottomDrawer();
+      }
+
+      // =====================
+      // Play Next from Queue
+      // =====================
+      function playNextFromQueue() {
+        if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+          setTimeout(() => {
+            showPopup("Queue is Empty!", "red", true, true);
+            playErrorSound();
+          }, 600);
+          return;
+        }
+
+        currentIndex++;
+        player.loadVideoById(queue[currentIndex].id);
+        updateNowPlaying();
+        updateQueueDisplay();
+
+        setTimeout(() => {
+          showPopup("Next", "cyan", false, "cyan");
+          playSuccessSound();
+        }, 600);
+      }
+
+      // =====================
+      // Queue Display
+      // =====================
+      function updateQueueDisplay() {
+        const list = document.getElementById("nextList");
+        const overflow = document.getElementById("overflowCounter");
+        list.innerHTML = "";
+
+        for (let i = currentIndex + 1; i < queue.length; i++) {
+          const div = document.createElement("div");
+          div.className = "songtitle";
+          div.textContent = queue[i].title; // Title - Artist
+          div.style.cursor = "pointer";
+
+          let longPressTimer;
+          let longPressTriggered = false;
+
+          const startHandler = (e) => {
+            longPressTriggered = false;
+            if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
+              longPressTimer = setTimeout(() => {
+                longPressTriggered = true;
+                div.classList.add("long-pressing");
+                navigator.vibrate?.(50);
+
+                showDeleteConfirm(i, () => {
+                  div.classList.remove("long-pressing");
+                });
+              }, 2000);
+            }
+          };
+
+          const endHandler = () => {
+            clearTimeout(longPressTimer);
+            if (!longPressTriggered) div.classList.remove("long-pressing");
+          };
+
+          const cancelHandler = () => {
+            clearTimeout(longPressTimer);
+            div.classList.remove("long-pressing");
+          };
+
+          // ==============================
+          // Ripple Effect (tap/click)
+          // ==============================
+          div.addEventListener("click", () => {
+            div.classList.add("ripple");
+            setTimeout(() => div.classList.remove("ripple"), 500);
+          });
+
+          // ==============================
+          // Hover Ripple Effect (desktop pointer)
+          // ==============================
+          div.addEventListener("mouseenter", () => {
+            div.classList.add("hover-flash");
+            setTimeout(() => {
+              div.classList.remove("hover-flash");
+            }, 500); // stay for 0.5s
+          });
+
+          // ==============================
+          // Right-click support (desktop)
+          // ==============================
+          div.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            div.classList.add("long-pressing"); // highlight red
+            showDeleteConfirm(i, () => {
+              div.classList.remove("long-pressing"); // remove highlight when modal closes
+            });
+          });
+
+          // ==============================
+          // Event Handlers
+          // ==============================
+          div.addEventListener("mousedown", startHandler);
+          div.addEventListener("touchstart", startHandler, { passive: true });
+
+          div.addEventListener("mouseup", endHandler);
+          div.addEventListener("mouseleave", cancelHandler);
+          div.addEventListener("touchend", endHandler);
+          div.addEventListener("touchcancel", cancelHandler);
+
+          // Add item to the list
+          list.appendChild(div);
+        }
+
+        updateOverflowCounter();
+
+        const nextBtn = document.getElementById("nextBtnDrawer");
+        const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+        nextBtn.disabled = !hasNext;
+        nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+        nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+
+        const nextBox = document.querySelector(".next-box");
+        const upcomingCount = queue.length - (currentIndex + 1);
+
+        // Hide or show next-box based on upcoming songs
+        if (upcomingCount >= 1) {
+          nextBox.classList.remove("hidden");
+        } else {
+          nextBox.classList.add("hidden");
+        }
+      }
+
+      // =====================
+      // Overflow Counter
+      // =====================
+      function updateOverflowCounter() {
+        const list = document.getElementById("nextList");
+        const overflow = document.getElementById("overflowCounter");
+        if (!list || !overflow) return;
+
+        const totalHeight = list.scrollHeight;
+        const visibleHeight = list.clientHeight;
+        const scrollable = totalHeight > visibleHeight;
+
+        if (scrollable) {
+          const items = list.children;
+          let shown = 0;
+          let accHeight = 0;
+          for (let i = 0; i < items.length; i++) {
+            accHeight += items[i].offsetHeight;
+            if (accHeight < visibleHeight) shown++;
+          }
+          const remainingCount = items.length - shown;
+          overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? "s" : ""}`;
+          overflow.style.display = "block";
+        } else {
+          overflow.style.display = "none";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        updateQueueDisplay();
+      });
+
+      // =====================
+      // Notify Animation & Now Playing
+      // =====================
+      let progressChecker = null;
+      let nextSongNotifyShown = false;
+
+      // Track notify timers
+      let notifyShowTimeout = null;
+      let notifyHideTimeout = null;
+
+    // =====================
+    // Update Now Playing Box
+    // =====================
+    function updateNowPlaying() {
+      const nowTitleEl = document.getElementById("nowTitle");
+      const nowBoxEl = document.querySelector(".nowplaying-box");
+      const labelEl = nowBoxEl.querySelector(".label");
+      const current = queue[currentIndex];
+
+      // Cancel any pending notify timers
+      if (notifyShowTimeout) {
+        clearTimeout(notifyShowTimeout);
+        notifyShowTimeout = null;
+      }
+      if (notifyHideTimeout) {
+        clearTimeout(notifyHideTimeout);
+        notifyHideTimeout = null;
+      }
+
+      if (!current) {
+        nowTitleEl.innerHTML = "";
+        labelEl.textContent = "Now Playing";
+        nowBoxEl.classList.remove("active"); // 🔹 remove glow + label highlight
+        stopProgressChecker();
         return;
       }
 
-      if (isLeftOverlayOpen) {
-        if (deltaY > 40) closeBottomDrawer(); // 🛑 swipe down closes bottom drawer
-        return; // prevent bottom drawer while left is open
-      }
+      let title = current.title || `Video ID: ${current.id}`;
+      let remaining = queue.length - (currentIndex + 1);
 
-      if (deltaY < -40 && !bottomDrawer.classList.contains("open")) {
-        toggleBottomDrawer(); // 🛑 swipe up to open bottom drawer
-      } else if (deltaY > 40) {
-        closeBottomDrawer(); // 🛑 swipe down always closes
-      }
+      // 🔹 add active state so box + label glow
+      nowBoxEl.classList.add("active");
 
-      handleTouchMove(evt); // 🛑 your existing left/right swipe move
-    });
+      if (remaining === 0) {
+        // No upcoming song
+        nowTitleEl.innerHTML = `
+          <span class="now-playing-glow">${title}</span>
+          <div id="noUpcoming"
+            style="color: #7f95e4;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            margin-top: 10px;
+            font-size: 0.8em;">
+            No upcoming song . . .
+          </div>`;
 
+        labelEl.textContent = "Now Playing"; // keep label updated
 
+        notifyShowTimeout = setTimeout(() => {
+          showNotify("No upcoming song");
 
-// =====================
-// Keyboard Shortcuts
-// =====================
-document.addEventListener('keydown', async (e) => {
-  // Ignore shortcuts when typing in input or textarea
-  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+          notifyHideTimeout = setTimeout(() => {
+            hideNotify();
+          }, 10000);
+        }, 10000);
 
-  // Always allow ESC to close modal
-  if (e.key === "Escape" && isModalOpen) {
-    hideModal();  // generic modal handles hiding
-    return;
-  }
-
-  // Block drawer shortcuts if modal is open
-  if (isModalOpen) return;
-
-  // Ctrl+V / Cmd+V: Paste from clipboard → auto-reserve
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
-    e.preventDefault();
-    await pasteFromClipboard();
-    return;
-  }
-
-  // Ctrl + Right Arrow → Next button
-  if (e.ctrlKey && e.key === "ArrowRight") {
-    e.preventDefault();
-    const nextBtnDrawer = document.getElementById("nextBtnDrawer");
-    if (nextBtnDrawer) nextBtnDrawer.click();
-    return;
-  }
-
-  // Drawer controls
-  if (e.key === "ArrowUp") toggleBottomDrawer();
-  if (e.key === "ArrowDown") closeBottomDrawer();
-  if (e.key === "ArrowRight") openDrawer();
-  if (e.key === "ArrowLeft") closeDrawer();
-
-  // ESC closes everything if no modal
-  if (e.key === "Escape") {
-    closeDrawer();
-    closeBottomDrawer();
-  }
-
-  // Spacebar: Play / Pause YouTube video
-  if (e.code === "Space") {
-    e.preventDefault(); // prevent page scroll
-    if (player && player.getPlayerState) {
-      if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-        player.pauseVideo();
+        stopProgressChecker();
       } else {
-        player.playVideo();
-      }
-    }
-  }
-
-  // Enter: confirm active modal
-  if (e.key === "Enter" && isModalOpen) {
-    // Trigger the first button in the modal
-    const firstBtn = document.getElementById("genericContent")?.querySelector("button");
-    if (firstBtn) firstBtn.click();
-    e.preventDefault();
-  }
-});
-
-
-
-// =====================
-// URL Input Enter Key
-// =====================
-document.getElementById("youtubeInputDrawer").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault(); // prevent form submission / page refresh
-    reserveFromDrawer(); // trigger reserve function
-  }
-});
-
-// =====================
-// Body click handler
-// =====================
-document.body.addEventListener("click", handleTap);
-
-
-// =====================
-// YouTube Player Setup
-// =====================
-let player;
-let queue = [];
-let currentIndex = -1;
-
-if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-  const tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
-}
-
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    events: {
-      onReady: () => console.log("Player Ready"),
-      onStateChange: onPlayerStateChange
-    },
-    origin: window.location.origin
-  });
-}
-
-// =====================
-// Touchpad Play/Pause
-// =====================
-document.addEventListener("DOMContentLoaded", () => {
-  const touchpad = document.querySelector('.touchpad');
-  if (!touchpad) return;
-
-  touchpad.addEventListener('click', () => {
-    if (!player) return;
-    const state = player.getPlayerState();
-    if (state === YT.PlayerState.PLAYING) {
-      player.pauseVideo();
-    } else {
-      player.playVideo();
-    }
-  });
-});
-
-let pauseTimeout = null;
-
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.ENDED) {
-    const isLastVideo = currentIndex === queue.length - 1;
-    if (queue.length === 0 || isLastVideo) {
-      hideNotify();
-      queue = [];
-      currentIndex = -1;
-      
-      updateNowPlaying();
-      updateQueueDisplay();
-      
-      player.stopVideo();
-      player.clearVideo();
-      
-      showPopup("That's the last tune!", "magenta", true, true);
-    } else {
-      currentIndex++;
-      player.loadVideoById(queue[currentIndex].id);
-      updateNowPlaying();
-      updateQueueDisplay();
-    }
-  } 
-  else if (event.data === YT.PlayerState.PAUSED) {
-    pauseTimeout = setTimeout(() => {
-      showPopup("Paused", "magenta", true, "magenta");
-    }, 500); 
-    stopProgressChecker();
-  } 
-  else if (event.data === YT.PlayerState.PLAYING) {
-    clearTimeout(pauseTimeout);
-    clearPersistentPopup();
-    startProgressChecker();
-  } 
-  else {
-    stopProgressChecker();
-  }
-}
-
-// =====================
-// Extract Video ID (supports standard, shortened, embed URLs)
-// =====================
-function extractVideoId(url) {
-  if (!url) return null;
-  
-  // Remove extra parameters
-  const cleanUrl = url.split('&')[0];
-  
-  // Match standard, shortened, or embed URLs
-  const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([0-9A-Za-z_-]{11})/;
-  const match = cleanUrl.match(regex);
-  return match ? match[1] : null;
-}
-
-// =====================
-// Song Fetch: Title
-// =====================
-let invalidSongCount = 0; // counter for invalid/untitled songs
-
-function resetInvalidSongCounter() {
-  invalidSongCount = 0;
-}
-
-async function fetchTitle(videoId) {
-  try {
-    const res = await fetch(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
-    );
-
-    if (!res.ok) throw new Error("Failed to fetch video info");
-
-    const data = await res.json();
-
-    // Return title only, or Invalid Song with numbering
-    return data.title || `Invalid Song ${++invalidSongCount}`;
-
-  } catch (err) {
-    invalidSongCount++;
-    showPopup("⚠️ Oops! Try choosing another video", "red", true, "red");
-    playErrorSound();
-    return `Invalid Song ${invalidSongCount}`;
-  }
-}
-
-// =====================
-// Reserve Video from Drawer
-// =====================
-async function reserveFromDrawer() {
-  clearPersistentPopup();
-
-  const input = document.getElementById("youtubeInputDrawer");
-  const url = input.value.trim();
-  const videoId = extractVideoId(url);
-
-  if (!videoId) {
-    input.value = "";
-    setTimeout(() => {
-      // Make error popup persistent
-      showPopup("⚠️ Invalid Youtube URL!", "red", true, "red");
-      playErrorSound();
-    }, 600);
-    return; // stop further execution
-  }
-
-  const title = await fetchTitle(videoId); // title only
-
-  // If fetchTitle returned an invalid/untitled video, don't show "Reserved!" popup
-  if (title.startsWith("Invalid Song")) {
-    input.value = "";
-    return;
-  }
-
-  // AUTO PLAY FIRST VIDEO
-  if (queue.length === 0 && currentIndex === -1) {
-    queue.push({ id: videoId, title });
-    currentIndex = 0;
-
-    player.loadVideoById(videoId);
-    player.playVideo();
-    updateNowPlaying();
-  } else {
-    queue.push({ id: videoId, title });
-  }
-
-  updateQueueDisplay();
-  input.value = "";
-
-  // ✅ Show success popup only if no persistent popup is active
-  if (!persistentPopupActive) {
-    setTimeout(() => {
-      showPopup("Reserved!", "cyan", false, "cyan");
-      playSuccessSound();
-    }, 600);
-  }
-
-  closeBottomDrawer();
-}
-
-// =====================
-// Play Next from Queue
-// =====================
-function playNextFromQueue() {
-  if (queue.length === 0 || currentIndex + 1 >= queue.length) {
-    setTimeout(() => {
-      showPopup("Queue is Empty!", "red", true, true);
-      playErrorSound();
-    }, 600);
-    return;
-  }
-  
-  currentIndex++;
-  player.loadVideoById(queue[currentIndex].id);
-  updateNowPlaying();
-  updateQueueDisplay();
-  
-  setTimeout(() => {
-    showPopup("Next", "cyan", false, "cyan");
-    playSuccessSound();
-  }, 600);
-}
-
-// =====================
-// Queue Display
-// =====================
-function updateQueueDisplay() {
-  const list = document.getElementById("nextList");
-  const overflow = document.getElementById("overflowCounter");
-  list.innerHTML = "";
-
-  for (let i = currentIndex + 1; i < queue.length; i++) {
-    const div = document.createElement("div");
-    div.className = "songtitle"; 
-    div.textContent = queue[i].title; // Title - Artist
-    div.style.cursor = "pointer";
-
-    let longPressTimer;
-    let longPressTriggered = false;
-
-    const startHandler = (e) => {
-      longPressTriggered = false;
-      if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
-        longPressTimer = setTimeout(() => {
-          longPressTriggered = true;
-          div.classList.add("long-pressing");
-          navigator.vibrate?.(50);
-
-          showDeleteConfirm(i, () => {
-            div.classList.remove("long-pressing");
-          });
-        }, 2000);
-      }
-    };
-
-    const endHandler = () => {
-      clearTimeout(longPressTimer);
-      if (!longPressTriggered) div.classList.remove("long-pressing");
-    };
-
-    const cancelHandler = () => {
-      clearTimeout(longPressTimer);
-      div.classList.remove("long-pressing");
-    };
-
-    // ==============================
-    // Ripple Effect (tap/click)
-    // ==============================
-    div.addEventListener("click", () => {
-      div.classList.add("ripple");
-      setTimeout(() => div.classList.remove("ripple"), 500);
-    });
-
-    // ==============================
-    // Hover Ripple Effect (desktop pointer)
-    // ==============================
-    div.addEventListener("mouseenter", () => {
-      div.classList.add("hover-flash");
-      setTimeout(() => {
-        div.classList.remove("hover-flash");
-      }, 500); // stay for 0.5s
-    });
-
-    // ==============================
-    // Right-click support (desktop)
-    // ==============================
-    div.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      div.classList.add("long-pressing"); // highlight red
-      showDeleteConfirm(i, () => {
-        div.classList.remove("long-pressing"); // remove highlight when modal closes
-      });
-    });
-
-    // ==============================
-    // Event Handlers
-    // ==============================
-    div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: true });
-
-    div.addEventListener("mouseup", endHandler);
-    div.addEventListener("mouseleave", cancelHandler);
-    div.addEventListener("touchend", endHandler);
-    div.addEventListener("touchcancel", cancelHandler);
-
-    // Add item to the list
-    list.appendChild(div);
-  }
-
-  updateOverflowCounter();
-  
-  
-  
-
-  const nextBtn = document.getElementById("nextBtnDrawer");
-  const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-  nextBtn.disabled = !hasNext;
-  nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-  nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
-
-  const nextBox = document.querySelector('.next-box');
-  const upcomingCount = queue.length - (currentIndex + 1);
-  
-  // Hide or show next-box based on upcoming songs
-  if (upcomingCount >= 1) {
-    nextBox.classList.remove('hidden');
-  } else {
-    nextBox.classList.add('hidden');
-  }
-  }
-    
-// =====================
-// Overflow Counter
-// =====================
-function updateOverflowCounter() {
-  const list = document.getElementById("nextList");
-  const overflow = document.getElementById("overflowCounter");
-  if (!list || !overflow) return;
-
-  const totalHeight = list.scrollHeight;
-  const visibleHeight = list.clientHeight;
-  const scrollable = totalHeight > visibleHeight;
-
-  if (scrollable) {
-    const items = list.children;
-    let shown = 0;
-    let accHeight = 0;
-    for (let i = 0; i < items.length; i++) {
-      accHeight += items[i].offsetHeight;
-      if (accHeight < visibleHeight) shown++;
-    }
-    const remainingCount = items.length - shown;
-    overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? 's' : ''}`;
-    overflow.style.display = "block";
-  } else {
-    overflow.style.display = "none";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  updateQueueDisplay();
-});
-
-    
-// ===================== 
-// Notify Animation & Now Playing
-// =====================    
-let progressChecker = null;
-let nextSongNotifyShown = false;
-
-// Track notify timers
-let notifyShowTimeout = null;
-let notifyHideTimeout = null;
-
-// =====================
-// Update Now Playing Box
-// =====================
-function updateNowPlaying() {
-  const nowTitleEl = document.getElementById("nowTitle");
-  const current = queue[currentIndex];
-
-  // Cancel any pending notify timers
-  if (notifyShowTimeout) { clearTimeout(notifyShowTimeout); notifyShowTimeout = null; }
-  if (notifyHideTimeout) { clearTimeout(notifyHideTimeout); notifyHideTimeout = null; }
-
-  if (!current) {
-    nowTitleEl.innerHTML = '';
-    stopProgressChecker();
-    return;
-  }
-
-  let title = current.title || `Video ID: ${current.id}`;
-  let remaining = queue.length - (currentIndex + 1);
-
-  if (remaining === 0) {
-    // No upcoming song
-    nowTitleEl.innerHTML = `
-      <span class="now-playing-glow">${title}</span>
-      <div id="noUpcoming"
-        style="color: #7f95e4;
-        font-family: Arial, sans-serif;
-        font-weight: normal;
-        margin-top: 10px;
-        font-size: 0.8em;
-        ">
-        No upcoming song . . .
-      </div>`;
-
-    notifyShowTimeout = setTimeout(() => {
-      showNotify("No upcoming song");
-
-      notifyHideTimeout = setTimeout(() => {
+        // Update the title with glow
+        nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
+        labelEl.textContent = "Now Playing"; // keep label updated
         hideNotify();
-      }, 10000);
-    }, 10000);
+        removeNoUpcoming(); // Remove "No upcoming song" immediately
+        startProgressChecker();
+      }
+    }
 
-    stopProgressChecker();
-  } else {
-    // Update the title with glow
-    nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
-    hideNotify();
-    removeNoUpcoming(); // Remove "No upcoming song" immediately
-    startProgressChecker();
-  }
-}
 
-// =====================
-// Remove "No upcoming song" text
-// =====================
-function removeNoUpcoming() {
-  const noUpcomingEl = document.getElementById("noUpcoming");
-  if (noUpcomingEl) {
-    noUpcomingEl.remove();
-  }
-}
+      // =====================
+      // Remove "No upcoming song" text
+      // =====================
+      function removeNoUpcoming() {
+        const noUpcomingEl = document.getElementById("noUpcoming");
+        if (noUpcomingEl) {
+          noUpcomingEl.remove();
+        }
+      }
 
-// =====================
-// Notify helper functions
-// =====================
-function showNotify(message) {
-  hideNotify(); // remove any existing notify first
-  document.getElementById("nowPlayingCopy").innerHTML = `
+      // =====================
+      // Notify helper functions
+      // =====================
+      function showNotify(message) {
+        hideNotify(); // remove any existing notify first
+        document.getElementById("nowPlayingCopy").innerHTML = `
     <div class="Notify">
       <div class="line"></div>
       <div class="text">${message}</div>
     </div>
   `;
-  playNotifSound(); // 🔊 play sound exactly when shown
-}
+        playNotifSound(); // 🔊 play sound exactly when shown
+      }
 
-function showTempNotify(message) {
-  showNotify(message); // sound plays here
-  setTimeout(() => hideNotify(), 10000); // auto-hide after 10s
-}
+      function showTempNotify(message) {
+        showNotify(message); // sound plays here
+        setTimeout(() => hideNotify(), 10000); // auto-hide after 10s
+      }
 
-function hideNotify() {
-  const notifyEl = document.querySelector('.Notify');
-  if (notifyEl) {
-    playSlideSound(); // 🔊 play sound right when hide starts
-    notifyEl.classList.add('hide');
-    setTimeout(() => notifyEl.remove(), 1500); // remove after animation
-  }
-}
+      function hideNotify() {
+        const notifyEl = document.querySelector(".Notify");
+        if (notifyEl) {
+          playSlideSound(); // 🔊 play sound right when hide starts
+          notifyEl.classList.add("hide");
+          setTimeout(() => notifyEl.remove(), 1500); // remove after animation
+        }
+      }
 
-// =====================
-// Progress checking for "Up next"
-// =====================
-function startProgressChecker() {
-  if (progressChecker) return; // already running
-  nextSongNotifyShown = false;
-  progressChecker = setInterval(() => {
-    const currentTime = player.getCurrentTime();
-    const duration = player.getDuration();
+      // =====================
+      // Progress checking for "Up next"
+      // =====================
+      function startProgressChecker() {
+        if (progressChecker) return; // already running
+        nextSongNotifyShown = false;
+        progressChecker = setInterval(() => {
+          const currentTime = player.getCurrentTime();
+          const duration = player.getDuration();
 
-    if (!nextSongNotifyShown) {
-      const shown = scheduleNextSongNotify(duration, currentTime);
-      if (shown) nextSongNotifyShown = true;
-    }
-  }, 1000);
-}
+          if (!nextSongNotifyShown) {
+            const shown = scheduleNextSongNotify(duration, currentTime);
+            if (shown) nextSongNotifyShown = true;
+          }
+        }, 1000);
+      }
 
-function stopProgressChecker() {
-  clearInterval(progressChecker);
-  progressChecker = null;
-}
+      function stopProgressChecker() {
+        clearInterval(progressChecker);
+        progressChecker = null;
+      }
 
-function scheduleNextSongNotify(duration, currentTime) {
-  const secondsBeforeEnd = 20; // how early to show upnext
-  const timeRemaining = duration - currentTime;
+      function scheduleNextSongNotify(duration, currentTime) {
+        const secondsBeforeEnd = 20; // how early to show upnext
+        const timeRemaining = duration - currentTime;
 
-  if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
-    const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
+        if (timeRemaining <= secondsBeforeEnd && queue[currentIndex + 1]) {
+          const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
 
-    const messageHTML = `
+          const messageHTML = `
       <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
         <span style="
           font-family: Arial, sans-serif;
@@ -2063,688 +2223,859 @@ function scheduleNextSongNotify(duration, currentTime) {
       </div>
     `;
 
-    showTempNotify(messageHTML); // plays notif sound on show, slide sound on hide
-    return true;
-  }
-  return false;
-}
-
-// =====================
-// Reactive Queue Proxy
-// Automatically update Now Playing whenever a song is added
-// Also removes "No upcoming song" immediately
-// =====================
-queue = new Proxy(queue, {
-  get(target, prop) {
-    if (prop === 'push') {
-      return function(...songs) {
-        const result = Array.prototype.push.apply(target, songs);
-        removeNoUpcoming();   // hide "No upcoming song" immediately
-        updateNowPlaying();   // update glow/title/notify
-        return result;
-      }
-    }
-    return target[prop];
-  },
-  set(target, prop, value) {
-    target[prop] = value;
-    if (prop !== 'length') {
-      removeNoUpcoming();   // hide "No upcoming song" immediately
-      updateNowPlaying();
-    }
-    return true;
-  }
-});
-
-
-    
-// =====================
-// PopUps 
-// =====================    
-let persistentPopupActive = false;
-
-function showPopup(message, color = 'magenta', persistent = false, glow = false, delay = 0) {
-  setTimeout(() => {
-    const popup = document.getElementById('popupModal');
-    const overlay = document.getElementById('popupOverlay');
-
-    popup.textContent = message;
-    popup.style.color = 'white';
-    popup.classList.remove('glow-text', 'static-glow');
-
-    if (typeof glow === 'string') {
-      popup.style.setProperty('--glow-color', glow);
-      popup.classList.add('static-glow');
-    } else if (glow === true) {
-      popup.style.setProperty('--glow-color', color);
-      popup.classList.add('glow-text');
-    }
-
-    overlay.classList.add('visible');
-    popup.classList.add('show');
-
-    if (persistent) {
-      persistentPopupActive = true;
-    } else {
-      persistentPopupActive = false;
-      setTimeout(() => {
-        popup.classList.remove('show');
-        overlay.classList.remove('visible');
-      }, 800);
-    }
-
-    // 🎯 Anywhere click/tap when paused will unpause
-    if (message === "Paused") {
-      overlay.style.cursor = "pointer";
-      overlay.onclick = () => {
-        if (player && player.playVideo) {
-          player.playVideo(); // resume video
+          showTempNotify(messageHTML); // plays notif sound on show, slide sound on hide
+          return true;
         }
-        clearPersistentPopup(); // hide popup
-        overlay.onclick = null; // remove listener
-        overlay.style.cursor = "default";
-      };
-    } else {
-      overlay.onclick = null;
-      overlay.style.cursor = "default";
-    }
-
-  }, delay);
-}
-
-function clearPersistentPopup() {
-  if (persistentPopupActive) {
-    const popup = document.getElementById('popupModal');
-    const overlay = document.getElementById('popupOverlay');
-    popup.classList.remove('show');
-    overlay.classList.remove('visible');
-    popup.classList.remove('glow-text'); // remove glow when clearing
-    persistentPopupActive = false;
-  }
-}
-    
-// Tap anywhere to clear persistent popup and resume video if paused
-document.body.addEventListener("click", () => {
-  if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
-    player.playVideo();
-  }
-  clearPersistentPopup();
-});
-    
-
-
-// Popup Overlay Close
-document.getElementById("popupOverlay").onclick = () => {
-  const popup = document.getElementById("popupModal");
-  popup.classList.remove("show");
-  document.getElementById("popupOverlay").classList.remove("visible");
-  persistentPopupActive = false;
-};
-
-
-// ===============================
-// On page load
-// ===============================
-window.onload = () => {
-  hideNextConfirm();
-};
-
-
-// =====================
-// Flexible Rubber Band Stretch Effect
-// for Left or Bottom Drawer
-// =====================
-function addRubberBandEffect(drawerEl, direction = "left", maxStretch = 50, thresholdPercent = 0.3) {
-  let startPos = 0;
-  let isDragging = false;
-  let thresholdReached = false;
-  let axis = direction === "left" ? "X" : "Y";
-
-  // Set transform origin based on drawer direction
-  if (direction === "left") drawerEl.style.transformOrigin = "left center";
-  else if (direction === "bottom") drawerEl.style.transformOrigin = "center bottom";
-
-  drawerEl.addEventListener("touchstart", (e) => {
-    if (!drawerEl.classList.contains("open")) return;
-    isDragging = true;
-    thresholdReached = false;
-
-    startPos = axis === "X" ? e.touches[0].clientX : e.touches[0].clientY;
-  });
-
-  drawerEl.addEventListener("touchmove", (e) => {
-    if (!isDragging || !drawerEl.classList.contains("open")) return;
-
-    let delta = axis === "X"
-      ? e.touches[0].clientX - startPos
-      : startPos - e.touches[0].clientY; // swipe up for bottom drawer
-
-    let screenSize = axis === "X" ? window.innerWidth : window.innerHeight;
-    let threshold = screenSize * thresholdPercent;
-
-    if (delta > threshold) {
-      thresholdReached = true;
-
-      const stretch = Math.min(delta - threshold, maxStretch);
-      const scale = axis === "X"
-        ? 1 + stretch / drawerEl.offsetWidth
-        : 1 + stretch / drawerEl.offsetHeight;
-
-      drawerEl.style.transform = axis === "X"
-        ? `scaleX(${scale})`
-        : `scaleY(${scale})`;
-    }
-  });
-
-  drawerEl.addEventListener("touchend", () => {
-    if (!isDragging) return;
-    isDragging = false;
-
-    if (thresholdReached) {
-      drawerEl.style.transition = "transform 0.15s ease-out";
-      drawerEl.style.transform = axis === "X" ? "scaleX(1)" : "scaleY(1)";
-      setTimeout(() => {
-        drawerEl.style.transition = "";
-      }, 150);
-    }
-  });
-}
-
-    
-// =====================
-// Universal Tooltip
-// =====================
-// note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button> 
-// Select all elements with data-tooltip
-const tooltipElements = document.querySelectorAll("[data-tooltip]");
-
-tooltipElements.forEach(el => {
-  let tooltipTimeout;
-
-  // Desktop hover
-  el.addEventListener("mouseenter", () => {
-    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000);
-  });
-  el.addEventListener("mouseleave", () => {
-    clearTimeout(tooltipTimeout);
-    el.classList.remove("show-tooltip");
-  });
-
-  // Mobile/Android long-press
-  el.addEventListener("touchstart", (e) => {
-    // Only trigger on first finger
-    if (e.touches.length > 1) return;
-
-    tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000); // 3-sec press
-  });
-
-  el.addEventListener("touchend", () => {
-    clearTimeout(tooltipTimeout);
-    el.classList.remove("show-tooltip");
-  });
-
-  el.addEventListener("touchcancel", () => {
-    clearTimeout(tooltipTimeout);
-    el.classList.remove("show-tooltip");
-  });
-});
-
-
-// ======================================
-// Exit Modal
-// ======================================
-  // Android/WebView Back Button Handler
-  window.addEventListener("load", () => {
-    history.pushState(null, document.title, location.href);
-  });
-
-  window.addEventListener("popstate", function (e) {
-    showExitConfirm();
-    history.pushState(null, document.title, location.href);
-  });
-
-  // PC/Browser close confirmation
-  window.addEventListener("beforeunload", function (e) {
-    e.preventDefault();
-    e.returnValue = "";
-  });
-
-
-// ======================================
-// Desktop: popup window tab
-// Mobile: YouTube app or browser fallback
-// 3s cooldown, no click animation
-// ======================================
-const titleIcon = document.querySelector(".title-icon");
-let canClick = true;
-
-titleIcon.addEventListener("click", () => {
-  if (!canClick) return;
-  canClick = false;
-  titleIcon.style.pointerEvents = "none";
-
-  const searchQuery = "karaoke";
-  const youtubeSearchURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  if (isAndroid) {
-    // Android → open YouTube app via intent with search
-    window.location.href = 
-      `intent://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}#Intent;scheme=https;package=com.google.android.youtube;end`;
-  } else if (isIOS) {
-    // iOS → open YouTube app via URL scheme, fallback to browser
-    window.location.href = `youtube://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-    setTimeout(() => {
-      window.location.href = youtubeSearchURL; // fallback to browser
-    }, 500);
-  } else {
-    // Desktop → custom popup window
-    const w = window.screen.width / 2;   // half screen width
-    const h = window.screen.height;      // full height
-    const left = window.screen.width - w; // right side
-    const top = 0;
-
-    window.open(
-      youtubeSearchURL,
-      "_blank",
-      `width=${w},height=${h},top=${top},left=${left}`
-    );
-  }
-
-  // Re-enable after 3 seconds
-  setTimeout(() => {
-    canClick = true;
-    titleIcon.style.pointerEvents = "auto";
-  }, 3000);
-});
-// Desktop: popup window tab ----end //
-
-
-
-    
-  // Play click sound
-function playClickSound() {
-  const click = document.getElementById("clickSound");
-  if (click) {
-    click.currentTime = 0;
-    click.play().catch((e) => console.log("Click sound blocked", e));
-  }
-}
-
-// Play success sound
-function playSuccessSound() {
-  const success = document.getElementById("successSound");
-  if (success) {
-    success.currentTime = 0;
-    success.play().catch((e) => console.log("Success sound blocked", e));
-  }
-}
-
-// Play error sound
-function playErrorSound() {
-  const error = document.getElementById("errorSound");
-  if (error) {
-    error.currentTime = 0;
-    error.play().catch((e) => console.log("Error sound blocked", e));
-  }
-}
-    
-// Play trash sound
-function playTrashSound() {
-  const trash = document.getElementById("trashSound");
-  if (trash) {
-    trash.currentTime = 0;
-    trash.play().catch((e) => console.log("trash sound blocked", e));
-  }
-}
-  
-// Play slide sound
-function playSlideSound() {
-  const slide = document.getElementById("slideSound");
-  if (slide) {
-    slide.currentTime = 0;
-    slide.play().catch((e) => console.log("slide sound blocked", e));
-  }
-}
-
-// Play notif sound
-function playNotifSound() {
-  const notif = document.getElementById("notifSound");
-  if (notif) {
-    notif.currentTime = 0;
-    notif.play().catch((e) => console.log("notif sound blocked", e));
-  }
-}
-
-  document.querySelectorAll('.cyan-btn').forEach(btn => {
-    btn.addEventListener('click', playClickSound);
-  });
-    
-  // Intercept Android back button using history
-window.addEventListener("load", () => {
-// Push dummy history state to trap the back button
-  history.pushState(null, document.title, location.href);
-});
-    
-
-  async function pasteFromClipboard() {
-  playClickSound(); // Play click sound immediately
-
-  try {
-    const text = await navigator.clipboard.readText();
-    const input = document.getElementById("youtubeInputDrawer");
-    input.focus();  // optional
-    input.value = text;
-
-    const videoId = extractVideoId(text);
-
-    if (!videoId) {
-      input.value = "";
-      showPopup("⚠️ Invalid Youtube URL!", "red", false, "red");
-      playErrorSound();
-    } else {
-      input.dispatchEvent(new Event("input")); // Trigger glow if needed
-      await reserveFromDrawer(); // ✅ Auto-reserve if valid
-    }
-  } catch (err) {
-    showPopup("⚠️ Failed! Paste manually", "red", true, "red");
-    playErrorSound();
-    console.error("Clipboard error:", err);
-  }
-}
-document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
-
-
-/* =========================================================
-   GENERIC MODAL SYSTEM
-   ========================================================= */
-let __modal_onClose = null;
-let __modal_keydownHandler = null;
-let __modal_prevActive = null;
-let isModalOpen = false;
-
-function showModal(settings) {
-  isModalOpen = true;
-  const overlay = document.getElementById("genericOverlay");
-  const modal   = document.getElementById("genericModal");
-  const content = document.getElementById("genericContent");
-
-  if (!overlay || !modal || !content) {
-    console.error("[Modal] Missing genericOverlay/genericModal/genericContent in HTML.");
-    return;
-  }
-
-  const {
-    glowColor      = "cyan",
-    title          = "",
-    titleColor     = "white", // NEW
-    messages       = [],      // [{ text, color?, style? }]
-    buttons        = [],      // [{ label, onClick?, className? }]
-    closeOnOverlay = true,
-    onClose        = null
-  } = settings || {};
-
-  __modal_onClose = (typeof onClose === "function") ? onClose : null;
-  __modal_prevActive = document.activeElement;
-
-  let html = "";
-  if (title) {
-    html += `<p class="gm-title" style="font-weight:bold; font-size:1.1em; margin-bottom:10px; color:${titleColor};">${_escapeHtml(title)}</p>`;
-  }
-  for (const msg of messages) {
-    const color = msg?.color || "white";
-    const text  = msg?.text  || "";
-    const extraStyle = msg?.style || "";
-    html += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
-  }
-    html += `<div style="height:0.5px;"></div>`;
-  
-  if (buttons.length > 0) {
-    html += `<div class="modal-buttons" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">`;
-    buttons.forEach((btn, i) => {
-      const extra = btn?.className ? " " + btn.className : "";
-      const label = btn?.label || "OK";
-      html += `<button id="modalBtn${i}" class="cyan-btn${extra}">${_escapeHtml(label)}</button>`;
-    });
-    html += `</div>`;
-  }
-  content.innerHTML = html;
-
-  _applyModalGlow(modal, glowColor);
-
-  overlay.style.display = "block";
-  modal.style.display   = "inline-block";
-
-  buttons.forEach((btn, i) => {
-    const el = document.getElementById(`modalBtn${i}`);
-    if (!el) return;
-    el.addEventListener("click", () => {
-      try { if (typeof btn.onClick === "function") btn.onClick(); }
-      finally { 
-        setTimeout(() => hideModal(), 200); // <-- delay 0.2s
+        return false;
       }
-    }, { once: true });
-  });
 
-  overlay.onclick = closeOnOverlay
-  ? () => setTimeout(() => hideModal(), 200)  // 0.2s delay for overlay clicks
-  : null;
+      // =====================
+      // Reactive Queue Proxy
+      // Automatically update Now Playing whenever a song is added
+      // Also removes "No upcoming song" immediately
+      // =====================
+      queue = new Proxy(queue, {
+        get(target, prop) {
+          if (prop === "push") {
+            return function (...songs) {
+              const result = Array.prototype.push.apply(target, songs);
+              removeNoUpcoming(); // hide "No upcoming song" immediately
+              updateNowPlaying(); // update glow/title/notify
+              return result;
+            };
+          }
+          return target[prop];
+        },
+        set(target, prop, value) {
+          target[prop] = value;
+          if (prop !== "length") {
+            removeNoUpcoming(); // hide "No upcoming song" immediately
+            updateNowPlaying();
+          }
+          return true;
+        }
+      });
 
-  __modal_keydownHandler = (ev) => {
-    if (ev.key === "Escape") hideModal();
-  };
-  document.addEventListener("keydown", __modal_keydownHandler);
+      // =====================
+      // PopUps
+      // =====================
+      let persistentPopupActive = false;
 
-  const firstBtn = content.querySelector("button");
-  if (firstBtn) firstBtn.focus();
-}
+      function showPopup(message, color = "magenta", persistent = false, glow = false, delay = 0) {
+        setTimeout(() => {
+          const popup = document.getElementById("popupModal");
+          const overlay = document.getElementById("popupOverlay");
 
-function hideModal() {
-  isModalOpen = false;
-  const overlay = document.getElementById("genericOverlay");
-  const modal   = document.getElementById("genericModal");
+          popup.textContent = message;
+          popup.style.color = "white";
+          popup.classList.remove("glow-text", "static-glow");
 
-  if (overlay) overlay.style.display = "none";
-  if (modal)   modal.style.display   = "none";
+          if (typeof glow === "string") {
+            popup.style.setProperty("--glow-color", glow);
+            popup.classList.add("static-glow");
+          } else if (glow === true) {
+            popup.style.setProperty("--glow-color", color);
+            popup.classList.add("glow-text");
+          }
 
-  if (__modal_keydownHandler) {
-    document.removeEventListener("keydown", __modal_keydownHandler);
-    __modal_keydownHandler = null;
-  }
+          overlay.classList.add("visible");
+          popup.classList.add("show");
 
-  if (__modal_prevActive?.focus) {
-    try { __modal_prevActive.focus(); } catch (_) {}
-  }
-  __modal_prevActive = null;
+          if (persistent) {
+            persistentPopupActive = true;
+          } else {
+            persistentPopupActive = false;
+            setTimeout(() => {
+              popup.classList.remove("show");
+              overlay.classList.remove("visible");
+            }, 800);
+          }
 
-  if (__modal_onClose) {
-    const cb = __modal_onClose;
-    __modal_onClose = null;
-    try { cb(); } catch (err) { console.error(err); }
-  }
-}
+          // 🎯 Anywhere click/tap when paused will unpause
+          if (message === "Paused") {
+            overlay.style.cursor = "pointer";
+            overlay.onclick = () => {
+              if (player && player.playVideo) {
+                player.playVideo(); // resume video
+              }
+              clearPersistentPopup(); // hide popup
+              overlay.onclick = null; // remove listener
+              overlay.style.cursor = "default";
+            };
+          } else {
+            overlay.onclick = null;
+            overlay.style.cursor = "default";
+          }
+        }, delay);
+      }
 
-/* ---------- Helpers ---------- */
-function _escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+      function clearPersistentPopup() {
+        if (persistentPopupActive) {
+          const popup = document.getElementById("popupModal");
+          const overlay = document.getElementById("popupOverlay");
+          popup.classList.remove("show");
+          overlay.classList.remove("visible");
+          popup.classList.remove("glow-text"); // remove glow when clearing
+          persistentPopupActive = false;
+        }
+      }
 
-function _applyModalGlow(modalEl, glowColor) {
-  modalEl.style.border    = `1px solid ${glowColor}`;
-  modalEl.style.boxShadow = `0 0 10px 0.5px ${glowColor}`;
-  modalEl.style.setProperty("--btn-glow", glowColor);
+      // Tap anywhere to clear persistent popup and resume video if paused
+      document.body.addEventListener("click", () => {
+        if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
+          player.playVideo();
+        }
+        clearPersistentPopup();
+      });
 
-  const rgba020 = _colorToRGBA(glowColor, 0.2);
-  modalEl.style.setProperty("--btn-hover-bg", rgba020);
-}
+      // Popup Overlay Close
+      document.getElementById("popupOverlay").onclick = () => {
+        const popup = document.getElementById("popupModal");
+        popup.classList.remove("show");
+        document.getElementById("popupOverlay").classList.remove("visible");
+        persistentPopupActive = false;
+      };
 
-function _colorToRGBA(colorStr, alpha) {
-  const tmp = document.createElement("span");
-  tmp.style.color = colorStr;
-  tmp.style.display = "none";
-  document.body.appendChild(tmp);
+      // ===============================
+      // On page load
+      // ===============================
+      window.onload = () => {
+        hideNextConfirm();
+      };
 
-  const rgb = getComputedStyle(tmp).color;
-  document.body.removeChild(tmp);
+      // =====================
+      // Flexible Rubber Band Stretch Effect
+      // for Left or Bottom Drawer
+      // =====================
+      function addRubberBandEffect(drawerEl, direction = "left", maxStretch = 50, thresholdPercent = 0.3) {
+        let startPos = 0;
+        let isDragging = false;
+        let thresholdReached = false;
+        let axis = direction === "left" ? "X" : "Y";
 
-  const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-  if (!m) return `rgba(0, 255, 255, ${alpha || 1})`;
-  const r = Number(m[1]), g = Number(m[2]), b = Number(m[3]);
-  const a = (typeof alpha === "number") ? alpha : 1;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
+        // Set transform origin based on drawer direction
+        if (direction === "left") drawerEl.style.transformOrigin = "left center";
+        else if (direction === "bottom") drawerEl.style.transformOrigin = "center bottom";
 
-/* =========================================================
-   NEXT MODAL
-   ========================================================= */
-    function showNextConfirm() {
-      const nextSong = queue[currentIndex + 1];
+        drawerEl.addEventListener("touchstart", (e) => {
+          if (!drawerEl.classList.contains("open")) return;
+          isDragging = true;
+          thresholdReached = false;
+
+          startPos = axis === "X" ? e.touches[0].clientX : e.touches[0].clientY;
+        });
+
+        drawerEl.addEventListener("touchmove", (e) => {
+          if (!isDragging || !drawerEl.classList.contains("open")) return;
+
+          let delta = axis === "X" ? e.touches[0].clientX - startPos : startPos - e.touches[0].clientY; // swipe up for bottom drawer
+
+          let screenSize = axis === "X" ? window.innerWidth : window.innerHeight;
+          let threshold = screenSize * thresholdPercent;
+
+          if (delta > threshold) {
+            thresholdReached = true;
+
+            const stretch = Math.min(delta - threshold, maxStretch);
+            const scale = axis === "X" ? 1 + stretch / drawerEl.offsetWidth : 1 + stretch / drawerEl.offsetHeight;
+
+            drawerEl.style.transform = axis === "X" ? `scaleX(${scale})` : `scaleY(${scale})`;
+          }
+        });
+
+        drawerEl.addEventListener("touchend", () => {
+          if (!isDragging) return;
+          isDragging = false;
+
+          if (thresholdReached) {
+            drawerEl.style.transition = "transform 0.15s ease-out";
+            drawerEl.style.transform = axis === "X" ? "scaleX(1)" : "scaleY(1)";
+            setTimeout(() => {
+              drawerEl.style.transition = "";
+            }, 150);
+          }
+        });
+      }
+
+      // =====================
+      // Universal Tooltip
+      // =====================
+      // note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button>
+      // Select all elements with data-tooltip
+      const tooltipElements = document.querySelectorAll("[data-tooltip]");
+
+      tooltipElements.forEach((el) => {
+        let tooltipTimeout;
+
+        // Desktop hover
+        el.addEventListener("mouseenter", () => {
+          tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000);
+        });
+        el.addEventListener("mouseleave", () => {
+          clearTimeout(tooltipTimeout);
+          el.classList.remove("show-tooltip");
+        });
+
+        // Mobile/Android long-press
+        el.addEventListener("touchstart", (e) => {
+          // Only trigger on first finger
+          if (e.touches.length > 1) return;
+
+          tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000); // 3-sec press
+        });
+
+        el.addEventListener("touchend", () => {
+          clearTimeout(tooltipTimeout);
+          el.classList.remove("show-tooltip");
+        });
+
+        el.addEventListener("touchcancel", () => {
+          clearTimeout(tooltipTimeout);
+          el.classList.remove("show-tooltip");
+        });
+      });
+
+      // ======================================
+      // Exit Modal
+      // ======================================
+      // Android/WebView Back Button Handler
+      window.addEventListener("load", () => {
+        history.pushState(null, document.title, location.href);
+      });
+
+      window.addEventListener("popstate", function (e) {
+        showExitConfirm();
+        history.pushState(null, document.title, location.href);
+      });
+
+      // PC/Browser close confirmation
+      window.addEventListener("beforeunload", function (e) {
+        e.preventDefault();
+        e.returnValue = "";
+      });
+
+      // ======================================
+      // Desktop: popup window tab
+      // Mobile: YouTube app or browser fallback
+      // 3s cooldown, no click animation
+      // ======================================
+      const titleIcon = document.querySelector(".title-icon");
+      let canClick = true;
+
+      titleIcon.addEventListener("click", () => {
+        if (!canClick) return;
+        canClick = false;
+        titleIcon.style.pointerEvents = "none";
+
+        const searchQuery = "karaoke";
+        const youtubeSearchURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if (isAndroid) {
+          // Android → open YouTube app via intent with search
+          window.location.href = `intent://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}#Intent;scheme=https;package=com.google.android.youtube;end`;
+        } else if (isIOS) {
+          // iOS → open YouTube app via URL scheme, fallback to browser
+          window.location.href = `youtube://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+          setTimeout(() => {
+            window.location.href = youtubeSearchURL; // fallback to browser
+          }, 500);
+        } else {
+          // Desktop → custom popup window
+          const w = window.screen.width / 2; // half screen width
+          const h = window.screen.height; // full height
+          const left = window.screen.width - w; // right side
+          const top = 0;
+
+          window.open(youtubeSearchURL, "_blank", `width=${w},height=${h},top=${top},left=${left}`);
+        }
+
+        // Re-enable after 3 seconds
+        setTimeout(() => {
+          canClick = true;
+          titleIcon.style.pointerEvents = "auto";
+        }, 3000);
+      });
+      // Desktop: popup window tab ----end //
+
+      // Play click sound
+      function playClickSound() {
+        const click = document.getElementById("clickSound");
+        if (click) {
+          click.currentTime = 0;
+          click.play().catch((e) => console.log("Click sound blocked", e));
+        }
+      }
+
+      // Play success sound
+      function playSuccessSound() {
+        const success = document.getElementById("successSound");
+        if (success) {
+          success.currentTime = 0;
+          success.play().catch((e) => console.log("Success sound blocked", e));
+        }
+      }
+
+      // Play error sound
+      function playErrorSound() {
+        const error = document.getElementById("errorSound");
+        if (error) {
+          error.currentTime = 0;
+          error.play().catch((e) => console.log("Error sound blocked", e));
+        }
+      }
+
+      // Play trash sound
+      function playTrashSound() {
+        const trash = document.getElementById("trashSound");
+        if (trash) {
+          trash.currentTime = 0;
+          trash.play().catch((e) => console.log("trash sound blocked", e));
+        }
+      }
+
+      // Play slide sound
+      function playSlideSound() {
+        const slide = document.getElementById("slideSound");
+        if (slide) {
+          slide.currentTime = 0;
+          slide.play().catch((e) => console.log("slide sound blocked", e));
+        }
+      }
+
+      // Play notif sound
+      function playNotifSound() {
+        const notif = document.getElementById("notifSound");
+        if (notif) {
+          notif.currentTime = 0;
+          notif.play().catch((e) => console.log("notif sound blocked", e));
+        }
+      }
+
+      document.querySelectorAll(".cyan-btn").forEach((btn) => {
+        btn.addEventListener("click", playClickSound);
+      });
+
+      // Intercept Android back button using history
+      window.addEventListener("load", () => {
+        // Push dummy history state to trap the back button
+        history.pushState(null, document.title, location.href);
+      });
+
+      async function pasteFromClipboard() {
+        playClickSound(); // Play click sound immediately
+
+        try {
+          const text = await navigator.clipboard.readText();
+          const input = document.getElementById("youtubeInputDrawer");
+          input.focus(); // optional
+          input.value = text;
+
+          const videoId = extractVideoId(text);
+
+          if (!videoId) {
+            input.value = "";
+            showPopup("⚠️ Invalid Youtube URL!", "red", false, "red");
+            playErrorSound();
+          } else {
+            input.dispatchEvent(new Event("input")); // Trigger glow if needed
+            await reserveFromDrawer(); // ✅ Auto-reserve if valid
+          }
+        } catch (err) {
+          showPopup("⚠️ Failed! Paste manually", "red", true, true);
+          playErrorSound();
+          console.error("Clipboard error:", err);
+        }
+      }
+      document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
+
+      //   ==========================================
+      //   GENERIC MODAL SYSTEM
+      //   ==========================================
+      let __modal_onClose = null;
+      let __modal_keydownHandler = null;
+      let __modal_prevActive = null;
+      let isModalOpen = false;
+
+      function showModal(settings) {
+        isModalOpen = true;
+        const overlay = document.getElementById("genericOverlay");
+        const modal = document.getElementById("genericModal");
+        const content = document.getElementById("genericContent");
+
+        if (!overlay || !modal || !content) {
+          console.error("[Modal] Missing genericOverlay/genericModal/genericContent in HTML.");
+          return;
+        }
+
+        const {
+          glowColor = "cyan",
+          title = "",
+          titleColor = "white", // NEW
+          messages = [], // [{ text, color?, style? }]
+          buttons = [], // [{ label, onClick?, className? }]
+          closeOnOverlay = true,
+          onClose = null
+        } = settings || {};
+
+        __modal_onClose = typeof onClose === "function" ? onClose : null;
+        __modal_prevActive = document.activeElement;
+
+        let html = "";
+        if (title) {
+          html += `<p class="gm-title" style="font-weight:bold; font-size:1.1em; margin-bottom:10px; color:${titleColor};">${_escapeHtml(title)}</p>`;
+        }
+        for (const msg of messages) {
+          const color = msg?.color || "white";
+          const text = msg?.text || "";
+          const extraStyle = msg?.style || "";
+          html += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
+        }
+        html += `<div style="height:0.5px;"></div>`;
+
+        if (buttons.length > 0) {
+          html += `<div class="modal-buttons" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">`;
+          buttons.forEach((btn, i) => {
+            const extra = btn?.className ? " " + btn.className : "";
+            const label = btn?.label || "OK";
+            html += `<button id="modalBtn${i}" class="cyan-btn${extra}">${_escapeHtml(label)}</button>`;
+          });
+          html += `</div>`;
+        }
+        content.innerHTML = html;
+
+        _applyModalGlow(modal, glowColor);
+
+        overlay.style.display = "block";
+        modal.style.display = "inline-block";
+
+        buttons.forEach((btn, i) => {
+          const el = document.getElementById(`modalBtn${i}`);
+          if (!el) return;
+          el.addEventListener(
+            "click",
+            () => {
+              try {
+                if (typeof btn.onClick === "function") btn.onClick();
+              } finally {
+                setTimeout(() => hideModal(), 200); // <-- delay 0.2s
+              }
+            },
+            { once: true }
+          );
+        });
+
+        overlay.onclick = closeOnOverlay
+          ? () => setTimeout(() => hideModal(), 200) // 0.2s delay for overlay clicks
+          : null;
+
+        __modal_keydownHandler = (ev) => {
+          if (ev.key === "Escape") hideModal();
+        };
+        document.addEventListener("keydown", __modal_keydownHandler);
+
+        const firstBtn = content.querySelector("button");
+        if (firstBtn) firstBtn.focus();
+      }
+
+      function hideModal() {
+        isModalOpen = false;
+        const overlay = document.getElementById("genericOverlay");
+        const modal = document.getElementById("genericModal");
+
+        if (overlay) overlay.style.display = "none";
+        if (modal) modal.style.display = "none";
+
+        if (__modal_keydownHandler) {
+          document.removeEventListener("keydown", __modal_keydownHandler);
+          __modal_keydownHandler = null;
+        }
+
+        if (__modal_prevActive?.focus) {
+          try {
+            __modal_prevActive.focus();
+          } catch (_) {}
+        }
+        __modal_prevActive = null;
+
+        if (__modal_onClose) {
+          const cb = __modal_onClose;
+          __modal_onClose = null;
+          try {
+            cb();
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }
+
+      //  Helpers =========================
+      function _escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function _applyModalGlow(modalEl, glowColor) {
+        modalEl.style.border = `1px solid ${glowColor}`;
+        modalEl.style.boxShadow = `0 0 10px 0.5px ${glowColor}`;
+        modalEl.style.setProperty("--btn-glow", glowColor);
+
+        const rgba020 = _colorToRGBA(glowColor, 0.2);
+        modalEl.style.setProperty("--btn-hover-bg", rgba020);
+      }
+
+      function _colorToRGBA(colorStr, alpha) {
+        const tmp = document.createElement("span");
+        tmp.style.color = colorStr;
+        tmp.style.display = "none";
+        document.body.appendChild(tmp);
+
+        const rgb = getComputedStyle(tmp).color;
+        document.body.removeChild(tmp);
+
+        const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (!m) return `rgba(0, 255, 255, ${alpha || 1})`;
+        const r = Number(m[1]),
+          g = Number(m[2]),
+          b = Number(m[3]);
+        const a = typeof alpha === "number" ? alpha : 1;
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+      }
+
+      //   ==========================================
+      //   NEXT MODAL
+      //   ==========================================
+      function showNextConfirm() {
+        const nextSong = queue[currentIndex + 1];
+        showModal({
+          glowColor: "cyan",
+          title: "Up Next",
+          titleColor: "cyan",
+          messages: [
+            {
+              text: nextSong ? `"${nextSong.title}"` : "No song available.",
+              color: "white",
+              style: "font-family: Arial, sans-serif; font-weight: normal;"
+            },
+            {
+              text: "Proceed to the next song?",
+              color: "gray",
+              style: "font-family: Arial, sans-serif;"
+            }
+          ],
+          buttons: [{ label: "Confirm", onClick: confirmPlayNext }, { label: "Cancel" }]
+        });
+      }
+
+      function confirmPlayNext() {
+        playNextFromQueue(); // just run the action
+        closeBottomDrawer();
+      }
+
+      //   ==========================================
+      //  EXIT MODAL
+      //  ===========================================
+      function showExitConfirm() {
+        showModal({
+          glowColor: "magenta",
+          title: "Exit CueTube ?",
+          titleColor: "magenta",
+          messages: [
+            {
+              text: "Press back twice to leave the app.",
+              color: "white",
+              style: "font-family: Arial, sans-serif;"
+            },
+            {
+              text: "Note: This action is irreversible",
+              color: "gray",
+              style: "font-family: Arial, sans-serif;"
+            }
+          ],
+          buttons: [{ label: "Cancel" }]
+        });
+        playErrorSound();
+      }
+
+      //  =========================================================
+      //  DELETE MODAL
+      //  ========================================================= */
+      function showDeleteConfirm(index, onCloseCallback) {
+        const songTitle = queue[index]?.title || "Unknown Song";
+
+        showModal({
+          glowColor: "red",
+          title: "Delete ?",
+          titleColor: "red",
+          messages: [
+            {
+              text: `"${songTitle}"`,
+              color: "white",
+              style: "font-family: Arial, sans-serif; font-weight: normal;"
+            },
+            {
+              text: " ",
+              color: "#ff4c4c",
+              style: "font-family: Arial, sans-serif;"
+            }
+          ],
+          buttons: [
+            {
+              label: "Confirm",
+              onClick: () => {
+                const list = document.getElementById("nextList");
+                // Index shift: queue starts from currentIndex+1
+                const item = list.children[index - (currentIndex + 1)];
+
+                if (item) {
+                  item.classList.add("removing");
+
+                  // Wait for transition, then remove
+                  item.addEventListener(
+                    "transitionend",
+                    () => {
+                      queue.splice(index, 1);
+                      updateQueueDisplay();
+                      playTrashSound();
+                    },
+                    { once: true }
+                  );
+                } else {
+                  // fallback if something goes wrong
+                  queue.splice(index, 1);
+                  updateQueueDisplay();
+                  playTrashSound();
+                }
+              }
+            },
+            { label: "Cancel" }
+          ],
+          onClose: () => {
+            if (typeof onCloseCallback === "function") onCloseCallback();
+          }
+        });
+      }
+
+      //  =========================================================
+      //  Idle Fucntion for Left and Bottom drawer handles
+      //  =========================================================
+      let idleTimer;
+      const idleDelay = 3000; // 3 seconds
+      const idleTargets = document.querySelectorAll(".drawer-handle, .bottom-drawer-handle");
+
+      function setIdle() {
+        idleTargets.forEach((el) => el.classList.add("idle"));
+      }
+
+      function resetIdle() {
+        idleTargets.forEach((el) => el.classList.remove("idle"));
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(setIdle, idleDelay);
+      }
+
+      // Events that reset idle
+      ["mousemove", "keydown", "click", "scroll", "touchstart", "touchmove"].forEach((event) => {
+        window.addEventListener(event, resetIdle, { passive: true });
+      });
+
+      // Start on load
+      resetIdle();
+
+//  ==============================
+//  Songbook
+//  ==============================
+      function toggleSongbook() {
+        const sb = document.getElementById("songbook");
+        sb.classList.toggle("open");
+      }
+
+      // Songbook Search-Bar
+      function filterSongbook() {
+        const input = document.getElementById("songbookSearch").value.toLowerCase();
+        const songs = document.querySelectorAll("#songbookList .songtitle");
+        const noResults = document.getElementById("noResults");
+
+        let hasMatch = false;
+
+        songs.forEach(song => {
+          const text = song.textContent.toLowerCase();
+          if (text.includes(input)) {
+            song.style.display = "";
+            hasMatch = true;
+          } else {
+            song.style.display = "none";
+          }
+        });
+
+        // Toggle "No results found" message
+        noResults.style.display = hasMatch ? "none" : "block";
+      }
+      
+      
+//  ==============================
+//  Save to Songbook
+//  ==============================      
+    async function saveToSongbook() {
+      const input = document.getElementById("youtubeInputDrawer");
+      const url = input.value.trim();
+
+      if (!url) {
+        showPopup("⚠️ Please paste a URL first", "red", true, true);
+        return;
+      }
+
+      try {
+        // Fetch video title via YouTube oEmbed
+        const oEmbedURL = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+        const response = await fetch(oEmbedURL);
+        if (!response.ok) throw new Error("Invalid URL");
+
+        const data = await response.json();
+        const title = data.title;
+
+        // Create new song element
+        const songList = document.getElementById("songbookList");
+        const songDiv = document.createElement("div");
+        songDiv.className = "songtitle";
+        songDiv.textContent = title;
+
+        // Append to songbook
+        songList.appendChild(songDiv);
+
+        // Clear input
+        input.value = "";
+
+        // ✅ Success popup (green glow)
+        showPopup("Saved", "cyan", false, "cyan");
+
+      } catch (err) {
+        console.error(err);
+        // ❌ Error popup (red glow)
+        showPopup("⚠️ Failed to fetch song title. Check the URL.", "red", true, true);
+      }
+    }
+
+    
+//  ==============================
+//  Smooth overscroll effect for SongBook
+//  ==============================   
+    (function smoothStretchScrollSongbook() {
+      const box = document.querySelector(".songbook-box-inner");
+      if (!box) return;
+
+      let startY = 0;
+      let isTouching = false;
+      let pulling = false;
+      const maxStretch = 60;
+
+      box.addEventListener("touchstart", (e) => {
+        startY = e.touches[0].clientY;
+        isTouching = true;
+        pulling = false;
+        box.style.transition = "";
+      }, { passive: true });
+
+      box.addEventListener("touchmove", (e) => {
+        if (!isTouching) return;
+        const currentY = e.touches[0].clientY;
+        const deltaY = currentY - startY;
+        const maxScroll = box.scrollHeight - box.clientHeight;
+
+        if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
+          const stretch = Math.max(-maxStretch, Math.min(deltaY / 2, maxStretch));
+          box.style.transform = `translateY(${stretch}px)`;
+          pulling = true;
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      box.addEventListener("touchend", () => {
+        if (pulling) {
+          box.style.transition = "transform 0.3s ease";
+          box.style.transform = "translateY(0)";
+        }
+        isTouching = false;
+        pulling = false;
+      });
+    })();
+
+
+
+// ==============================
+// SongBook Right-Click Actions with Modal (No Label)
+// ==============================
+
+    const songbookList = document.getElementById("songbookList");
+
+    // Right-click event
+    songbookList.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+
+      const target = e.target;
+      if (!target.classList.contains("songtitle")) return;
+
+      const songTitle = target.textContent;
+      const songUrl = target.dataset.url;
+
+      // Show modal for options
       showModal({
         glowColor: "cyan",
-        title: "Up Next",
+        title: "Song Options",
         titleColor: "cyan",
         messages: [
-          { 
-            text: nextSong
-              ? `"${nextSong.title}"`
-              : "No song available.",
-            color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;"},
-          {
-            text: "Proceed to the next song?",
-            color: "gray",
-            style: "font-family: Arial, sans-serif;" }
+          { text: `"${songTitle}"`, color: "white", style: "font-family: Arial, sans-serif;" }
         ],
         buttons: [
-          { label: "Confirm", onClick: confirmPlayNext },
-          { label: "Cancel"}
-        ]
-      });
-    }
+          {
+            label: "Delete",
+            onClick: () => {
+              // Close first modal and then open Delete Confirm
+              __modal_onClose = () => {
+                showModal({
+                  glowColor: "red",
+                  title: "Delete Song?",
+                  titleColor: "red",
+                  messages: [
+                    { text: `"${songTitle}"`, color: "white", style: "font-family: Arial, sans-serif;" }
+                  ],
+                  buttons: [
+                    {
+                      label: "Confirm",
+                      onClick: () => {
+                        target.remove();
+                        showPopup("Deleted!", "red", false, true);
+                      }
+                    },
+                    { label: "Cancel" }
+                  ]
+                });
+              };
 
-    function confirmPlayNext() {
-      playNextFromQueue(); // just run the action
-      closeBottomDrawer()
-    }
-    
-    
-/* =========================================================
-   EXIT MODAL
-   ========================================================= */
-    function showExitConfirm() {
-      showModal({
-        glowColor: "magenta",
-        title: "Exit CueTube ?",
-        titleColor: "magenta",
-        messages: [
+              hideModal(); // close first modal
+            }
+          },
           {
-            text: "Press back twice to leave the app.",
-            color: "white",
-            style: "font-family: Arial, sans-serif;" },
-          {
-            text: "Note: This action is irreversible",
-            color: "gray",
-            style: "font-family: Arial, sans-serif;" },
-        ],
-        buttons: [
+            label: "Reserved",
+            onClick: () => {
+              // Add song to NextBox queue
+              queue.push({ title: songTitle, url: songUrl });
+              updateQueueDisplay();
+              showPopup("Reserved!", "cyan", false, true);
+            }
+          },
           { label: "Cancel" }
         ]
       });
-      playErrorSound();
-    }
-
-
-/* =========================================================
-   DELETE MODAL
-   ========================================================= */
-function showDeleteConfirm(index, onCloseCallback) {
-  const songTitle = queue[index]?.title || "Unknown Song";
-
-  showModal({
-    glowColor: "red",
-    title: "Delete ?",
-    titleColor: "red",
-    messages: [
-      {
-        text: `"${songTitle}"`,
-        color: "white",
-        style: "font-family: Arial, sans-serif; font-weight: normal;" },
-      {
-        text: " ",
-        color: "#ff4c4c",
-        style: "font-family: Arial, sans-serif;" }
-    ],
-    buttons: [
-      {
-        label: "Confirm",
-        onClick: () => {
-          const list = document.getElementById("nextList");
-          // Index shift: queue starts from currentIndex+1
-          const item = list.children[index - (currentIndex + 1)];
-
-          if (item) {
-            item.classList.add("removing");
-
-            // Wait for transition, then remove
-            item.addEventListener("transitionend", () => {
-              queue.splice(index, 1);
-              updateQueueDisplay();
-              playTrashSound();
-            }, { once: true });
-          } else {
-            // fallback if something goes wrong
-            queue.splice(index, 1);
-            updateQueueDisplay();
-            playTrashSound();
-          }
-        }
-      },
-      { label: "Cancel" }
-    ],
-    onClose: () => {
-      if (typeof onCloseCallback === "function") onCloseCallback();
-    }
-  });
-}
-    
-    
-/* =========================================================
-   Idle Fucntion for Left and Bottom drawer handles
-   ========================================================= */
-    let idleTimer;
-    const idleDelay = 3000; // 3 seconds
-    const idleTargets = document.querySelectorAll('.drawer-handle, .bottom-drawer-handle');
-
-    function setIdle() {
-      idleTargets.forEach(el => el.classList.add('idle'));
-    }
-
-    function resetIdle() {
-      idleTargets.forEach(el => el.classList.remove('idle'));
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(setIdle, idleDelay);
-    }
-
-    // Events that reset idle
-    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart', 'touchmove'].forEach(event => {
-      window.addEventListener(event, resetIdle, { passive: true });
     });
 
-    // Start on load
-    resetIdle();
-
-    
-    
-  </script>
-  <script src="https://www.youtube.com/iframe_api">
-
-</script>
-</body>
+      
+    </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+  </body>
 </html>
