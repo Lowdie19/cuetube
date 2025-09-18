@@ -1836,7 +1836,8 @@
         } else if (event.data === YT.PlayerState.PAUSED) {
           pauseTimeout = setTimeout(() => {
             showPopup("Paused", "magenta", true, true);
-          }, 500);
+          }, 300);
+          playClickSound()
           stopProgressChecker();
         } else if (event.data === YT.PlayerState.PLAYING) {
           clearTimeout(pauseTimeout);
@@ -2994,6 +2995,7 @@
 
       if (!url) {
         showPopup("⚠️ Please paste a URL first", "red", true, true);
+        playErrorSound();
         return;
       }
 
@@ -3023,11 +3025,13 @@
 
         // ✅ Success popup (cyan glow)
         showPopup("Saved!", "cyan", false, "cyan");
+        playSuccessSound();
 
       } catch (err) {
         console.error(err);
         // ❌ Error popup (red glow)
         showPopup("⚠️ Failed to fetch song title. Check the URL.", "red", true, true);
+        playErrorSound();
       }
     }
 
@@ -3199,14 +3203,13 @@
               // Add to queue
               queue.push({ title: songTitle, url: songUrl });
               updateQueueDisplay();
-              
-              playSuccessSound();
 
               // Animate green success glow
               target.classList.add("reserved-success");
               setTimeout(() => target.classList.remove("reserved-success"), 800);
 
               showPopup("Reserved!", "cyan", false, true);
+              playSuccessSound();
               onClose?.();
             }
           },
