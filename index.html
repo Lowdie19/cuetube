@@ -2910,7 +2910,12 @@
                 }
               }
             },
-            { label: "Cancel" }
+           { 
+            label: "Cancel", 
+            onClick: () => {
+              playClickSound();
+            } 
+          }
           ],
           onClose: () => {
             if (typeof onCloseCallback === "function") onCloseCallback();
@@ -3132,7 +3137,7 @@
     }
 
     //  ==============================
-    //  Open Song Options Modal
+    //  Song Options Modal
     //  ==============================
     function openSongOptions(target, onClose) {
       const songTitle = target.textContent;
@@ -3149,6 +3154,7 @@
           {
             label: "Delete",
             onClick: () => {
+              playClickSound();
               __modal_onClose = () => {
                 showModal({
                   glowColor: "red",
@@ -3164,13 +3170,19 @@
                         // Animate removal first
                         target.classList.add("removing");
                         setTimeout(() => {
+                          playTrashSound()
                           target.remove();
                           showPopup("Deleted!", "red", false, true);
                           onClose?.();
                         }, 600); // match CSS transition time
                       }
                     },
-                    { label: "Cancel" }
+                    { 
+                      label: "Cancel",
+                      onClick: () => {
+                        playClickSound();
+                      }
+                    }
                   ]
                 });
               };
@@ -3182,6 +3194,8 @@
               // Add to queue
               queue.push({ title: songTitle, url: songUrl });
               updateQueueDisplay();
+              
+              playSuccessSound();
 
               // Animate green success glow
               target.classList.add("reserved-success");
@@ -3191,7 +3205,12 @@
               onClose?.();
             }
           },
-          { label: "Cancel" }
+          { 
+            label: "Cancel",
+            onClick: () => {
+              playClickSound();
+            }
+          }
         ]
       });
     }
