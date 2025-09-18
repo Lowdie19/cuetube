@@ -1886,8 +1886,10 @@
           return data.title || `Invalid Song ${++invalidSongCount}`;
         } catch (err) {
           invalidSongCount++;
-          showPopup("⚠️ Oops! Try choosing another video", "red", true, true);
-          playErrorSound();
+            setTimeout(() => {
+            showPopup("⚠️ Oops! Try choosing another video", "red", true, true);
+            playErrorSound();
+          }, 500);
           return `Invalid Song ${invalidSongCount}`;
         }
       }
@@ -1905,10 +1907,9 @@
         if (!videoId) {
           input.value = "";
           setTimeout(() => {
-            // Make error popup persistent
             showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
             playErrorSound();
-          }, 600);
+          }, 500);
           return; // stop further execution
         }
 
@@ -1940,7 +1941,7 @@
           setTimeout(() => {
             showPopup("Reserved!", "cyan", false, "cyan");
             playSuccessSound();
-          }, 600);
+          }, 500);
         }
 
         closeBottomDrawer();
@@ -1954,7 +1955,7 @@
           setTimeout(() => {
             showPopup("Queue is Empty!", "red", true, true);
             playErrorSound();
-          }, 600);
+          }, 500);
           return;
         }
 
@@ -1966,7 +1967,7 @@
         setTimeout(() => {
           showPopup("Next", "cyan", false, "cyan");
           playSuccessSound();
-        }, 600);
+        }, 500);
       }
 
       // =====================
@@ -2634,19 +2635,24 @@
 
           if (!videoId) {
             input.value = "";
+          setTimeout(() => {
             showPopup("⚠️ Invalid Youtube URL!", "red", false, "red");
             playErrorSound();
+          }, 500);
           } else {
             input.dispatchEvent(new Event("input")); // Trigger glow if needed
             await reserveFromDrawer(); // ✅ Auto-reserve if valid
           }
         } catch (err) {
-          showPopup("⚠️ Failed! Paste manually", "red", true, true);
-          playErrorSound();
+          setTimeout(() => {
+            showPopup("⚠️ Failed! Paste manually", "red", true, true);
+            playErrorSound();
+          }, 500);
           console.error("Clipboard error:", err);
         }
       }
       document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
+
 
       //   ==========================================
       //   GENERIC MODAL SYSTEM
@@ -2994,8 +3000,10 @@
       const url = input.value.trim();
 
       if (!url) {
-        showPopup("⚠️ Please paste a URL first", "red", true, true);
-        playErrorSound();
+          setTimeout(() => {
+            showPopup("⚠️ Please paste a URL first", "red", true, true);
+            playErrorSound();
+          }, 500);
         return;
       }
 
@@ -3023,17 +3031,20 @@
         // Clear input
         input.value = "";
 
-        // ✅ Success popup (cyan glow)
-        showPopup("Saved!", "cyan", false, "cyan");
-        playSuccessSound();
+          setTimeout(() => {
+            showPopup("Saved!", "cyan", false, "cyan");
+            playSuccessSound();
+          }, 500);  
 
       } catch (err) {
         console.error(err);
-        // ❌ Error popup (red glow)
-        showPopup("⚠️ Failed to fetch song title. Check the URL.", "red", true, true);
-        playErrorSound();
+          setTimeout(() => {
+            showPopup("⚠️ Failed to fetch song title. Check the URL.", "red", true, true);
+            playErrorSound();
+          }, 500);
       }
     }
+  
 
     //  ==============================
     //  Smooth overscroll effect for SongBook
@@ -3183,7 +3194,7 @@
                           target.remove();
                           showPopup("Deleted!", "red", false, true);
                           onClose?.();
-                        }, 600); // match CSS transition time
+                        }, 500); // match CSS transition time
                       }
                     },
                     { 
@@ -3197,22 +3208,21 @@
               };
             }
           },
-          {
-            label: "Reserve",
-            onClick: () => {
-              // Add to queue
-              queue.push({ title: songTitle, url: songUrl });
-              updateQueueDisplay();
-
-              // Animate green success glow
-              target.classList.add("reserved-success");
-              setTimeout(() => target.classList.remove("reserved-success"), 800);
-
-              showPopup("Reserved!", "cyan", false, true);
+        {
+          label: "Reserve",
+          onClick: () => {
+            // Add to queue
+            queue.push({ title: songTitle, url: songUrl });
+            updateQueueDisplay();
+            
+            setTimeout(() => {
+            showPopup("Reserved!", "cyan", false, true);
               playSuccessSound();
-              onClose?.();
-            }
-          },
+            }, 500);
+            
+            onClose?.();
+          }
+        },
           { 
             label: "Cancel",
             onClick: () => {
@@ -3222,7 +3232,7 @@
         ]
       });
     }
-
+      
       
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>
