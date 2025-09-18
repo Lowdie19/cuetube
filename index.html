@@ -2952,13 +2952,14 @@
     //  Songbook Toggle
     //  ==============================
     function toggleSongbook() {
+      playClickSound();
       const sb = document.getElementById("songbook");
       sb.classList.toggle("open");
     }
 
-    //  ==============================
-    //  Songbook Search-Bar
-    //  ==============================
+    // ==============================
+    // Songbook Search-Bar
+    // ==============================
     function filterSongbook() {
       const input = document.getElementById("songbookSearch").value.toLowerCase();
       const songs = document.querySelectorAll("#songbookList .songtitle");
@@ -2976,8 +2977,12 @@
         }
       });
 
-      // Toggle "No results found" message
-      noResults.style.display = hasMatch ? "none" : "block";
+      // Hide "No results found" if search is empty
+      if (input === "") {
+        noResults.style.display = "none";
+      } else {
+        noResults.style.display = hasMatch ? "none" : "block";
+      }
     }
 
     //  ==============================
