@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -1900,32 +1901,21 @@
       async function reserveFromDrawer() {
         clearPersistentPopup();
 
-        const input = document.getElementById("youtubeInputDrawer");
-        const url = input.value.trim();
-        const videoId = extractVideoId(url);
+        const result = validateYouTubeInput("youtubeInputDrawer");
+        if (!result) return; // stop if invalid
 
-        if (!videoId) {
-          input.value = "";
-          setTimeout(() => {
-            showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
-            playErrorSound();
-          }, 500);
-          return; // stop further execution
-        }
+        const { input, videoId } = result;
+        const title = await fetchTitle(videoId);
 
-        const title = await fetchTitle(videoId); // title only
-
-        // If fetchTitle returned an invalid/untitled video, don't show "Reserved!" popup
         if (title.startsWith("Invalid Song")) {
           input.value = "";
           return;
         }
 
-        // AUTO PLAY FIRST VIDEO
+        // Auto-play if queue empty
         if (queue.length === 0 && currentIndex === -1) {
           queue.push({ id: videoId, title });
           currentIndex = 0;
-
           player.loadVideoById(videoId);
           player.playVideo();
           updateNowPlaying();
@@ -1936,7 +1926,6 @@
         updateQueueDisplay();
         input.value = "";
 
-        // ✅ Show success popup only if no persistent popup is active
         if (!persistentPopupActive) {
           setTimeout(() => {
             showPopup("Reserved!", "cyan", false, "cyan");
@@ -1945,6 +1934,36 @@
         }
 
         closeBottomDrawer();
+      }
+
+      // =====================
+      // Common: Validate URL
+      // =====================
+      function validateYouTubeInput(inputId) {
+        const input = document.getElementById(inputId);
+        const url = input.value.trim();
+
+        // Empty input
+        if (!url) {
+          setTimeout(() => {
+            showPopup("⚠️ Please paste a URL first", "red", true, true);
+            playErrorSound();
+          }, 500);
+          return null;
+        }
+
+        // Extract Video ID
+        const videoId = extractVideoId(url);
+        if (!videoId) {
+          input.value = "";
+          setTimeout(() => {
+            showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
+            playErrorSound();
+          }, 500);
+          return null;
+        }
+
+        return { input, url, videoId };
       }
 
       // =====================
@@ -2992,57 +3011,56 @@
       }
     }
 
-    //  ==============================
-    //  Save to Songbook
-    //  ==============================
+    // ==============================
+    // Save to Songbook (Unified validation + fetchTitle)
+    // ==============================
     async function saveToSongbook() {
       const input = document.getElementById("youtubeInputDrawer");
       const url = input.value.trim();
 
       if (!url) {
-          setTimeout(() => {
-            showPopup("⚠️ Please paste a URL first", "red", true, true);
-            playErrorSound();
-          }, 500);
+        setTimeout(() => {
+          showPopup("⚠️ Please paste a URL first", "red", true, true);
+          playErrorSound();
+        }, 500);
         return;
       }
 
-      try {
-        // Fetch video title via YouTube oEmbed
-        const oEmbedURL = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-        const response = await fetch(oEmbedURL);
-        if (!response.ok) throw new Error("Invalid URL");
-
-        const data = await response.json();
-        const title = data.title;
-
-        // Create new song element
-        const songList = document.getElementById("songbookList");
-        const songDiv = document.createElement("div");
-        songDiv.className = "songtitle";
-        songDiv.textContent = title;
-
-        // Attach ripple + long-press effects (reusable for all new songs)
-        attachSongbookInteractions(songDiv);
-
-        // Append to songbook
-        songList.appendChild(songDiv);
-
-        // Clear input
+      const videoId = extractVideoId(url);
+      if (!videoId) {
         input.value = "";
-
-          setTimeout(() => {
-            showPopup("Saved!", "cyan", false, "cyan");
-            playSuccessSound();
-          }, 500);  
-
-      } catch (err) {
-        console.error(err);
-          setTimeout(() => {
-            showPopup("⚠️ Failed to fetch song title. Check the URL.", "red", true, true);
-            playErrorSound();
-          }, 500);
+        setTimeout(() => {
+          showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
+          playErrorSound();
+        }, 500);
+        return;
       }
+
+      const title = await fetchTitle(videoId);
+      if (title.startsWith("Invalid Song")) {
+        input.value = "";
+        return;
+      }
+
+      // Create new song element
+      const songList = document.getElementById("songbookList");
+      const songDiv = document.createElement("div");
+      songDiv.className = "songtitle";
+      songDiv.textContent = title;
+
+      // ✅ Save both URL and videoId
+      songDiv.dataset.url = `https://www.youtube.com/watch?v=${videoId}`;
+      songDiv.dataset.id = videoId;
+
+      attachSongbookInteractions(songDiv);
+      songList.appendChild(songDiv);
+
+      input.value = "";
+
+      setTimeout(() => {
+        showPopup("Saved!", "cyan", false, "cyan");
+        playSuccessSound();
+      }, 500);
     }
   
 
@@ -3161,7 +3179,8 @@
     //  ==============================
     function openSongOptions(target, onClose) {
       const songTitle = target.textContent;
-      const songUrl = target.dataset.url;
+      const songUrl = target.dataset.url;   // kept for reference
+      const songId = target.dataset.id;     // ✅ now available
 
       showModal({
         glowColor: "cyan",
@@ -3187,17 +3206,16 @@
                     {
                       label: "Confirm",
                       onClick: () => {
-                        // Animate removal first
                         target.classList.add("removing");
                         setTimeout(() => {
-                          playTrashSound()
+                          playTrashSound();
                           target.remove();
                           showPopup("Deleted!", "red", false, true);
                           onClose?.();
-                        }, 500); // match CSS transition time
+                        }, 500);
                       }
                     },
-                    { 
+                    {
                       label: "Cancel",
                       onClick: () => {
                         playClickSound();
@@ -3208,22 +3226,32 @@
               };
             }
           },
-        {
-          label: "Reserve",
-          onClick: () => {
-            // Add to queue
-            queue.push({ title: songTitle, url: songUrl });
-            updateQueueDisplay();
-            
-            setTimeout(() => {
-            showPopup("Reserved!", "cyan", false, true);
-              playSuccessSound();
-            }, 500);
-            
-            onClose?.();
-          }
-        },
-          { 
+          {
+            label: "Reserve",
+            onClick: () => {
+              // 🔧 Updated to use videoId like reserveFromDrawer
+              if (queue.length === 0 && currentIndex === -1) {
+                queue.push({ id: songId, title: songTitle });
+                currentIndex = 0;
+
+                player.loadVideoById(songId);
+                player.playVideo();
+                updateNowPlaying();
+              } else {
+                queue.push({ id: songId, title: songTitle });
+              }
+
+              updateQueueDisplay();
+
+              setTimeout(() => {
+                showPopup("Reserved!", "cyan", false, true);
+                playSuccessSound();
+              }, 500);
+
+              onClose?.();
+            }
+          },
+          {
             label: "Cancel",
             onClick: () => {
               playClickSound();
