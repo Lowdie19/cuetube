@@ -2,12 +2,41 @@
 <!doctype html>
 <html lang="en">
   <head>
+
+<!-- ==============================
+     Firebase Setup (Compat version)
+     ============================== -->
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDKY72fjO-tiu3otsBzh3F3xw5JyXJB_uk",
+    authDomain: "cuetube-cb101.firebaseapp.com",
+    projectId: "cuetube-cb101",
+    storageBucket: "cuetube-cb101.firebasestorage.app",
+    messagingSenderId: "364944752363",
+    appId: "1:364944752363:web:11279eeff48844073f88ae",
+    measurementId: "G-XXBQKLJRZT"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const analytics = firebase.analytics();
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  console.log("✅ Firebase initialized (compat)");
+</script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="CueTube Icon.png" />
     <title>CueTube</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
-    <style>
+    
+<style>
       h1 {
         font-family: "Orbitron", sans-serif;
         font-size: 2em;
@@ -16,7 +45,7 @@
           0 0 5px #0ff,
           0 0 10px #0ff;
       }
-
+  
       button {
         padding: 10px 20px;
         margin-left: 10px;
@@ -34,7 +63,7 @@
         border: 1px solid #333;
         margin-bottom: 5px;
       }
-
+  
       * {
         box-sizing: border-box;
       }
@@ -49,7 +78,7 @@
         height: 100vh;
         width: 100vw;
       }
-
+  
 /*  =============================
     CUETUBE TITLE +++++++
     ===================== */
@@ -67,7 +96,7 @@
       gap: 20px;
       user-select: none; /* prevent text selection */
     }
-
+  
     .title-icon {
       height: 30px;
       width: 30px;
@@ -79,7 +108,7 @@
       transform: scale(0.9); /* shrink slightly */
       opacity: 0.7; /* fade */
     }
-
+  
     /* Neon text animation */
     @keyframes neon-text {
       from {
@@ -93,7 +122,7 @@
           0 0 16px cyan;
       }
     }
-
+  
     /* Neon image glow using drop-shadow */
     @keyframes neon-glow {
       from {
@@ -103,7 +132,7 @@
         filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 8px cyan);
       }
     }
-
+  
     /* Neon glow for popups */
     @keyframes pulseGlow {
       from {
@@ -113,15 +142,15 @@
         filter: drop-shadow(0 0 4px var(--glow-color)) drop-shadow(0 0 8px var(--glow-color));
       }
     }
-
+  
     .glow-text {
       animation: pulseGlow 1.5s infinite alternate;
     }
-
+  
     .static-glow {
       filter: drop-shadow(0 0 4px var(--glow-color)) drop-shadow(0 0 8px var(--glow-color));
     }
-
+  
 /*  =============================
     YOUTUBE SCREEN ++++++++++++++
     =============================  */
@@ -134,7 +163,7 @@
       padding: 0;
       margin: 0;
     }
-
+  
     .youtube-wrapper iframe {
       width: 100%;
       height: 100%;
@@ -142,14 +171,14 @@
       outline: none !important;
       display: block;
     }
-
+  
     /* On wider screens (like PC), use 40% width */
     @media (min-width: 768px) {
       .drawer {
         width: 40% !important;
         left: -40% !important;
       }
-
+      
       .drawer.open {
         left: 0 !important;
       }
@@ -157,7 +186,7 @@
         width: 70vw !important;
       }
     }
-
+  
 /*  ============================
     NOTIFICATION +++++++++++++++
     ============================ */
@@ -169,7 +198,7 @@
       padding: 5px;
       box-sizing: border-box;
     }
-
+  
     .Notify {
       display: flex;
       align-items: center; /* vertical alignment (centered on y-axis) */
@@ -182,7 +211,7 @@
       height: 100%;
       background-color: none;
     }
-
+  
     /* Line */
     .Notify .line {
       width: 3px;
@@ -198,7 +227,7 @@
       animation: fadeIn 3s forwards;
       box-shadow: 5px 0 15px #7f95e4;
     }
-
+  
     /* Text */
     .Notify .text {
       color: white;
@@ -227,21 +256,21 @@
       position: relative;
       background-color: none;
     }
-
+  
     /* Show animations */
     @keyframes fadeIn {
       to {
         opacity: 1;
       }
     }
-
+  
     @keyframes slideOut {
       to {
         opacity: 1;
         transform: translateX(0);
       }
     }
-
+  
     /* Hide animations */
     @keyframes fadeOut {
       from {
@@ -251,7 +280,7 @@
         opacity: 0;
       }
     }
-
+  
     @keyframes slideIn {
       from {
         opacity: 1;
@@ -262,15 +291,15 @@
         transform: translateX(-100%);
       }
     }
-
+  
     .Notify.hide .line {
       animation: fadeOut 1.5s forwards;
     }
-
+  
     .Notify.hide .text {
       animation: slideIn 1.2s forwards;
     }
-
+  
 /*  ============================
     LEFT DRAWER ++++++++++++++++++
     ============================== */
@@ -290,7 +319,7 @@
       justify-content: flex-start;
       gap: 25px;
     }
-
+  
     .drawer::after {
       content: "";
       position: absolute;
@@ -302,12 +331,12 @@
       z-index: 10;
       pointer-events: none;
     }
-
+  
     .drawer.open {
       left: 0%; /* stop 20% before the right edge → looks like 80% */
       animation: shadowFloat 5s infinite ease-in-out;
     }
-
+  
     @keyframes shadowFloat {
       0% {
         box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01);
@@ -319,7 +348,7 @@
         box-shadow: 0 -10px 30px rgba(0, 255, 255, 0.01);
       }
     }
-
+  
 /*  ============================
     Left Drawer Handle
     =========================== */
@@ -393,7 +422,7 @@
     .drawer.open {
       display: flex;
     }
-
+  
 /*  ==================
     Nowplaying-box
     ================= */
@@ -406,7 +435,7 @@
       border: 1px solid var(--btn-glow, #000000);
       transition: box-shadow 0.5s;
     }
-
+  
     /* Hover or Active (when a song is playing) */
     .nowplaying-box:hover,
     .nowplaying-box.active {
@@ -416,7 +445,7 @@
         0 0 10px 0.5px var(--btn-glow, cyan),
         inset 0 0 10px 0.5px var(--btn-glow, cyan);
     }
-
+  
     /* Label default */
     .nowplaying-box .label {
       font-size: 0.7em;
@@ -425,14 +454,13 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
+  
     /* Label highlights when the BOX is hovered OR active */
     .nowplaying-box:hover .label,
     .nowplaying-box.active .label {
       color: cyan;
     }
-
-
+  
     /* Song titles inside Nowplaying-box */
     .nowplaying-box .title {
       font-family: Arial, sans-serif;
@@ -441,7 +469,7 @@
       word-wrap: break-word;
       font-weight: regular;
     }
-
+  
     /* Glowing effect for Now Playing title */
     .now-playing-glow {
       color: white;
@@ -452,7 +480,7 @@
         0 0 30px magenta;
       animation: glowPulse 2s infinite alternate;
     }
-
+  
     @keyframes glowPulse {
       from {
         text-shadow:
@@ -467,7 +495,7 @@
           0 0 20px magenta;
       }
     }
-
+  
 /*  ==========================
     Next-box
     ========================== */
@@ -480,7 +508,7 @@
       margin-left: 15px;
       flex: 1;
       min-height: 0;
-
+      
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
@@ -491,7 +519,7 @@
       will-change: transform;
       transition: transform 0.3s ease;
     }
-
+  
     /* Hide Scrollbar for WebKit Browsers */
     .next-box::-webkit-scrollbar {
       display: none;
@@ -499,11 +527,11 @@
     .next-box::-webkit-scrollbar-track {
       background: transparent;
     }
-
+  
     .next-box.hidden {
       display: none !important;
     }
-
+  
     #overflowCounter {
       text-align: center;
       font-size: 0.7em;
@@ -511,13 +539,13 @@
       margin-top: 5px;
       display: none;
     }
-
+  
     /* Label (NEXT) */
     .next-box .label {
       font-size: 0.7em;
       color: grey;
     }
-
+  
     /* Song Titles inside Next-box */
     .next-box .songtitle {
       font-family: Arial, sans-serif;
@@ -528,13 +556,13 @@
       overflow-wrap: break-word;
       font-weight: normal;
       padding: 5px;
-
+      
       position: relative;
       overflow: hidden;
       user-select: none;
       cursor: pointer;
     }
-
+  
 /*  ================================
     Song Deletion Animation
     =============================== */
@@ -545,7 +573,7 @@
         opacity 0.6s ease,
         transform 0.6s ease;
     }
-
+  
 /*  ================================
     Ripple Overlay (Base)
     =============================== */
@@ -561,26 +589,26 @@
       pointer-events: none;
       transition: opacity 0.4s ease;
     }
-
+  
       /* Click Ripple */
       .next-box .songtitle.ripple::after {
         opacity: 1;
         transition: opacity 0s;
       }
-
+  
       /* Hover Flash */
       .next-box .songtitle.hover-flash::after {
         opacity: 1;
         transition: opacity 0.5s ease;
       }
-
+  
       /* Long Press / Right-click Red Highlight */
       .next-box .songtitle.long-pressing {
         background-color: rgba(255, 0, 0, 0.25) !important;
         color: #ff4c4c !important;
         transition: background-color 0.3s ease !important;
       }
-
+  
 /*  =============================
     BOTTOM DRAWER +++++++++++++++
     =============================  */
@@ -600,13 +628,13 @@
       align-items: center;
       padding: 20px 15px 25px; /* bottom is 25px default */
     }
-
+  
     /* bottom-drawer When open --start */
     .bottom-drawer.open {
       bottom: 0;
       animation: shadowFloat 5s infinite ease-in-out;
     }
-
+  
     /* Shadow moves up and down */
     @keyframes shadowFloat {
       0% {
@@ -619,7 +647,7 @@
         box-shadow: -10px 0 30px rgba(0, 255, 255, 0.01);
       }
     }
-
+  
 /*  ==============================
     Bottom drawer Handle
     =============================  */
@@ -646,11 +674,11 @@
       padding: 10px; /* bigger tap zone */
       -webkit-tap-highlight-color: transparent; /* no blue/red flash */
     }
-
+  
     .bottom-drawer-handle.idle {
       opacity: 0.2; /* fade to 20% when idle */
     }
-
+  
     /* Hover/focus overrides idle */
     .bottom-drawer-handle:hover,
     .bottom-drawer-handle:focus-visible {
@@ -664,7 +692,7 @@
         0 0 12px cyan,
         0 0 24px cyan;
     }
-
+  
 /*  ===============================
     Url box + Paste button Group
     ============================== */
@@ -678,7 +706,7 @@
       gap: 8px;
       margin-bottom: 20px;
     }
-
+  
 /*  ==============================
     Url box
     =============================  */
@@ -692,30 +720,30 @@
       border: none;
       background-color: #1a1a1a;
       text-align: center;
-
+      
       cursor: pointer;
       transition:
         transform 1s,
         box-shadow 0.3s;
     }
-
+  
     /* Hover effect */
     .url-input:hover {
       box-shadow: 0 0 10px 0.5px var(--btn-glow, #222); /* outer glow */
     }
-
+  
     .url-input.glow {
       border: 1px solid var(--btn-glow, white);
       box-shadow:
         0 0 10px 0.5px var(--btn-glow, magenta),
         /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
     }
-
+  
     input[type="text"]::placeholder {
       color: white;
       opacity: 0.3;
     }
-
+  
     input[type="text"] {
       width: 60%;
       border: 2px magenta;
@@ -727,27 +755,27 @@
       box-shadow: 0 0 15px 1px var(--btn-glow, rgba(33, 32, 32, 0.32));
       transition: box-shadow 0.3s ease;
     }
-
+  
     input[type="text"]:focus {
       outline: 1px;
       border-color: solid white;
       border: 1px solid var(--btn-glow, white);
       box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),
-        /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
+        0 0 10px 0.5px var(--btn-glow, magenta),/* outer glow */
+        inset 0 0 5px 0.5px var(--btn-glow, magenta); /* inner glow */
       background-color: black !important; /* stay black when focused */
       color: white !important;
     }
-
+  
     /* for Suggested URL - Normal focus */
     input[type="text"]:focus {
       outline: none;
       border: 1px solid var(--btn-glow, white);
       box-shadow:
-        0 0 10px 0.5px var(--btn-glow, magenta),
-        /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
+        0 0 10px 0.5px var(--btn-glow, magenta),/* outer glow */
+        inset 0 0 5px 0.5px var(--btn-glow, magenta); /* inner glow */
     }
-
+  
     /* Autofill fix */
     input[type="text"]:-webkit-autofill {
       border: 1px solid white;
@@ -758,7 +786,7 @@
       -webkit-text-fill-color: white !important;
       caret-color: white;
     }
-
+  
 /*  =============================
     Paste button
     =============================  */
@@ -778,7 +806,7 @@
         transform 1s,
         filter 0.3s;
     }
-
+  
     .paste-btn-icon:active {
       transform: scale(0.95);
       transform: translateY(2px);
@@ -789,18 +817,18 @@
       height: 22px;
       content: url("Paste Icon.png"); /* default icon */
     }
-
+  
     /* Optional glow & Change imagewhen pressed */
     .paste-btn-icon:active img {
       content: url("Paste Icon 2.png"); /* works here */
       filter: drop-shadow(0 0 2px magenta) drop-shadow(0 0 6.5px magenta) drop-shadow(0 0 15px magenta);
     }
-
+  
     .paste-btn-icon:hover {
       filter: drop-shadow(0 0 3px black) drop-shadow(0 0 5px black) drop-shadow(0 0 1.5px #222)
         drop-shadow(0 0 8px #222);
     }
-
+  
 /*  =============================
     Bottom buttons
     =============================  */
@@ -813,7 +841,7 @@
       align-items: center;
       z-index: 5;
     }
-
+  
     .overlay {
       position: fixed;
       top: 0;
@@ -823,7 +851,7 @@
       background: linear-gradient(to bottom, rgba(13, 14, 14, 0) 0%, rgba(13, 14, 14, 0.5) 60%, #000000 100%);
       z-index: 999;
     }
-
+  
     /* Invisible overlay for Tap/close */
     .bot-drawer-overlay {
       position: fixed;
@@ -838,7 +866,7 @@
     .bot-drawer-overlay.visible {
       display: block;
     }
-
+  
 /*  =============================================
     Typical Buttons (Bottom buttons and Confirm's)
     ===============================================  */
@@ -862,14 +890,14 @@
         0 0 10px 0.5px var(--btn-glow, cyan),
         /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, cyan); /* inner glow */
     }
-
+  
       /* Hover effect */
       .cyan-btn:hover {
         background: var(--btn-hover-bg, rgba(0, 255, 255, 0.2)); /* set by JS */
         color: white;
         text-shadow: 0 0 16px var(--btn-glow, cyan);
       }
-
+  
       /* Press / click effect */
       .cyan-btn:active {
         transform: scale(0.9); /* shrink when pressed */
@@ -882,7 +910,7 @@
           transform 0.15s,
           box-shadow 0.15s; /* faster transition */
       }
-
+  
       /* Reset hover/glow after click (if you toggle this class in your code) */
       .cyan-btn.clicked {
         transform: scale(1);
@@ -890,7 +918,7 @@
           transform 0.2s,
           box-shadow 0.2s;
       }
-
+  
 /*  =========================
     Exit Modal
     ========================  */
@@ -909,12 +937,12 @@
       max-width: 320px;
       box-shadow: 0 0 20px red;
     }
-
+  
     .single-btn {
       width: 45%;
       max-width: 200px;
     }
-
+  
 /*  =============================
     Touchpad +++++++++++++++++++
     ============================  */
@@ -931,7 +959,7 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent; /* no blue/red flash */
     }
-
+  
 /*  ============================
     Landscape Mode
     ============================ */
@@ -954,16 +982,16 @@
         display: block; /* Make sure it's visible */
       }
     }
-
+  
     @media screen and (orientation: landscape) and (max-width: 915px) {
       .title-bar {
         display: none !important;
       }
-
+      
       .nowplaying-box {
         margin-top: 15px !important;
       }
-
+      
       .notify-box {
         position: fixed;
         top: 13vh;
@@ -972,7 +1000,7 @@
         transform: translateX(-50%);
         z-index: 1;
       }
-
+      
       .Notify {
         display: flex;
         align-items: center;
@@ -987,7 +1015,7 @@
       );*/
         backdrop-filter: blur(5px);
       }
-
+      
       .youtube-wrapper {
         position: fixed !important;
         left: 50vw !important;
@@ -996,14 +1024,14 @@
         height: 100vh !important;
         padding: 5px !important;
       }
-
+      
       #popupModal {
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
       }
-
+      
       .url-group {
         width: 40vw !important;
         position: absolute !important;
@@ -1012,11 +1040,11 @@
         transform: translate(0, -50%) !important;
         gap: 10px !important;
       }
-
+      
       .paste-btn-icon {
         margin-left: 5px !important;
       }
-
+      
       .bottom-buttons {
         width: 50vw !important;
         position: absolute !important;
@@ -1025,13 +1053,13 @@
         transform: translate(0, -50%) !important;
         gap: 2% !important;
       }
-
+      
       .bottom-drawer {
         bottom: -100px;
         width: 100vw !important;
         height: 100px !important;
       }
-
+      
       .bottom-drawer-handle,
       .drawer-handle {
         z-index: 9999 !important;
@@ -1043,17 +1071,17 @@
           0 0 12px magenta,
           0 0 24px magenta;
       }
-
+      
       .bottom-drawer-handle.idle,
       .drawer-handle.idle {
         opacity: 0.01 !important;
       }
-
+      
       .touchpad {
         display: block !important;
       }
     }
-
+  
 /*  ========================================
     Popups Text with glow (Reserve, etc.)
     ======================================= */
@@ -1069,12 +1097,12 @@
       transition: opacity 0.3s ease;
       z-index: 9998;
     }
-
+  
     #popupOverlay.visible {
       opacity: 1;
       visibility: visible;
     }
-
+  
     #popupModal {
       position: fixed;
       top: 75%;
@@ -1097,22 +1125,21 @@
       user-select: none;
       font-size: 1.8em !important;
     }
-
+  
     #popupModal.show {
       opacity: 1;
       visibility: visible;
     }
-
+  
     #confirmDelete {
       transition: opacity 0.3s ease;
       opacity: 1;
     }
-
+  
     #confirmDelete.show {
       opacity: 1;
     }
-
-
+  
 /*  =====================================
     Typical Tooltip Style
     ====================================  */
@@ -1138,14 +1165,12 @@
       box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
       transition: opacity 0.3s ease-in-out; /* smooth fade */
     }
-
+  
     /* Show tooltip when class is added */
     [data-tooltip].show-tooltip::after {
       opacity: 1;
     }
-
-    /*  Typical Tooltip Style +++++ end +++++ */
-
+  
 /*  =============================
     Generic Modal Base
     ============================= */
@@ -1172,13 +1197,13 @@
       border: 1px solid cyan; /* will be overridden by JS */
       box-shadow: 0 0 10px 0.5px cyan; /* will be overridden by JS */
     }
-
+  
     .modal-content p {
       margin: 8px 0;
       font-size: 1em;
       color: white;
     }
-
+  
 /*  ===============================
     SongBook Queue
     =============================== */
@@ -1199,7 +1224,7 @@
         max-height 0.5s ease;
       z-index: 999;
     }
-
+  
     /* Handle bar (Songbook Button) */
     .songbook-handle {
       text-align: center;
@@ -1211,7 +1236,7 @@
       user-select: none;
       transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
     }
-
+  
     /* Hover effect (PC) */
     .songbook-handle:hover {
       color: #dcd1ff;
@@ -1220,13 +1245,12 @@
           0 0 12px #9377ea,
           0 0 24px #9377ea;
     }
-
+  
     /* Click effect (JS toggled) */
     .songbook-handle.clicked {
       transform: scale(0.85);
     }
-
-
+  
     /* Songbook list container */
     .songbook-list {
       max-height: 0;
@@ -1234,19 +1258,19 @@
       transition: max-height 0.5s ease;
       padding: 0 10px;
     }
-
+  
     /* Expanded state */
     .songbook.open .songbook-list {
       max-height: 70vh; /* adjust as needed */
     }
-
+  
     .songbook-box-inner {
       height: 100%;           /* or fixed px like 300px */
       max-height: 100%;       /* adjust if needed */
       overflow-y: auto;       /* enable vertical scroll */
       -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
     }
-
+  
     /* Hide scrollbar */
     .songbook-box-inner::-webkit-scrollbar {
       display: none;
@@ -1255,7 +1279,7 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
+  
     /* Song Titles */
     .songbook .songtitle {
       font-family: Arial, sans-serif;
@@ -1270,12 +1294,12 @@
       user-select: none;
       cursor: pointer;
     }
-
+  
     /* SongBook search bar */
     .songbook-search {
       padding: 10px 5px;
     }
-
+  
     /* Search bar */
     .songbook-search {
       padding: 10px 5px;
@@ -1295,23 +1319,23 @@
       color: grey;
       text-align-last: center;
     }
-
+  
     /* Hide Scrollbar for WebKit Browsers */
     .next-box::-webkit-scrollbar {
       display: none;
     }
-
+  
     /* Hover effect */
     .songbook-search input:hover {
       box-shadow:
         0 0 10px 0.5px var(--btn-glow, #222);     /* outer glow */
     }
-
+  
     .songbook-search input::placeholder {
       color: grey;
       text-align-last: center;
     }
-
+  
 /*  ===============================
     SongBook Deletion Animation
     =============================== */
@@ -1322,7 +1346,7 @@
         opacity 0.6s ease,
         transform 0.6s ease;
     }
-
+  
 /*  ===============================
     SongBook Ripple Overlay
     ============================== */
@@ -1330,7 +1354,7 @@
       position: relative; /* needed for ripple */
       overflow: hidden;   /* hide ripple overflow */
     }
-
+  
     .songbook .songtitle::after {
       content: "";
       position: absolute;
@@ -1343,80 +1367,247 @@
       pointer-events: none;
       transition: opacity 0.4s ease;
     }
-
+  
     /* Triggered on Reserve click */
     .songbook .songtitle.ripple::after {
       opacity: 1;
       transition: opacity 0s;
     }
-
+  
     /* Hover flash */
     .songbook .songtitle.hover-flash::after {
       opacity: 1;
       transition: opacity 0.5s ease;
     }
-
+  
     /* Right-click (Delete Prep Highlight) */
     .songbook .songtitle.long-pressing {
       background-color: rgba(255, 0, 0, 0.25) !important;
       color: #ff4c4c !important;
       transition: background-color 0.3s ease !important;
     }
+</style>
+
+<style>
+/* ==================================================================================================== */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #120023;
+      color: #fff;
+    }
       
-    </style>
-  </head>
+/* Authentication Overlay ======= */
+    #authOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(#006c6c, black);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px; /* prevent overflow on small screens */
+    }
+
+    .authCard {
+      width: 360px;         /* default width */
+      max-width: 100%;      /* fit smaller screens */
+      background: #222;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 360px;
+      color: #fff;
+      text-align: center;
+      border: 1px solid var(--btn-glow, cyan);
+      box-shadow:
+        0 0 15px 2px var(--btn-glow, cyan),
+        inset 0 0 10px 0.5px var(--btn-glow, #00cece);
+    }
+
+    .authCard h2 { color: #91f7f7; margin-bottom: 20px; }
+    .authCard input {
+      width: 100%;
+      padding: 10px 15px;
+      margin: 10px 0;
+      outline: none;
+      font-size: 14px;
+      border-radius: 10px;
+
+      border: 1px solid var(--btn-glow, rgba(255, 255, 255, 0));
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, #353535);
+    }
+
+    .authCard input::placeholder { color: #ccc; }
+    .authCard button {
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 27px;
+      background: #ff66cc;
+      color: #fff;
+      cursor: pointer;
+      margin-left: 0;
+      transition: all 0.2s;
+      font-size: 14px; /* keep text size */
+      width: 100%;     /* inputs expand to card width */
+      box-sizing: border-box;
+    }
+    .authCard button:hover { background: #ff33aa; }
+
+    .authToggle { margin-top: 15px; font-size: 13px; color: #ccc; cursor: pointer; text-decoration: underline; }
+
+    /* Portrait & Landscape adjustments */
+    @media (max-width: 768px) {
+      .authCard h2 {margin: 20px;}
+      
+      .authCard button,
+      .authCard input  {
+        padding: 10px;
+        margin: 10px;
+        margin-left: 0; 
+      }
+      .authCard {
+        width: 90%;       /* fit better in landscape */
+        padding: 20px;
+      }
+      .authToggle { margin: 20px;}
+    }
+
+    @media (orientation: landscape) and (max-height: 480px) {
+      .authCard h2 {margin-bottom: 20px; }
+      
+      .authCard button,
+      .authCard input  {
+        padding: 10px;
+        margin: 5px;
+      }
+      .authCard {
+        width: 40%;       /* fit better in landscape */
+        padding: 10px 36px;
+      }
+      .authToggle { margin: 10px;}
+    }
+
+/* Main CueTube UI hidden initially ======= */
+    #mainCueTubeUI { display: none; }
+</style>
+
+<!-- ==============================
+Firebase Setup
+============================== -->
+  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js"></script>
+  <script>
+    // ---------- Firebase Config ----------
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "cuetube-cb101.firebaseapp.com",
+      projectId: "cuetube-cb101",
+      storageBucket: "cuetube-cb101.firebasestorage.app",
+      messagingSenderId: "364944752363",
+      appId: "1:364944752363:web:11279eeff48844073f88ae",
+      measurementId: "G-XXBQKLJRZT"
+    };
+
+    // ---------- Initialize Firebase ----------
+    const app = firebase.initializeApp(firebaseConfig);
+    const analytics = firebase.analytics();
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+</head>
   <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
+    
+    
+<!-- =============================
+Authentication Overlay
+============================== -->
+  <div id="authOverlay">
+    <!-- Register Card -->
+    <div class="authCard" id="registerCard">
+      <h2>Register</h2>
+      <input type="text" id="regUser" placeholder="User ID (max 5)" maxlength="5">
+      <input type="text" id="regNick" placeholder="Nickname (max 10)" maxlength="10">
+      <input type="password" id="regPass" placeholder="Password">
+      <button onclick="registerUser()">Register</button>
+      <div class="authToggle" onclick="toggleAuth()">Already have an account? Login</div>
+    </div>
+    
+    <!-- Login Card -->
+    <div class="authCard" id="loginCard" style="display:none;">
+      <h2>Login</h2>
+      <input type="text" id="loginUser" placeholder="User ID">
+      <input type="password" id="loginPass" placeholder="Password">
+      <button onclick="loginUser()">Login</button>
+      <div class="authToggle" onclick="toggleAuth()">Don't have an account? Register</div>
+    </div>
+  </div>
+
+<!-- ============================
+Main CueTube UI
+============================== -->
+<div id="mainCueTubeUI">
+
     <!-- Invisible touchpad -->
     <div class="touchpad"></div>
-
+  
     <!-- Title -->
     <div class="title-bar">
       <img src="CueTube Icon.png" class="title-icon" alt="CueTube Icon" />
       <span class="title-text">CueTube :)</span>
     </div>
-
-  <!-- Drawer -->
-  <div class="drawer" id="drawer">
-    <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-    <div>
-      <!-- Now Playing stays fixed -->
-      <div class="nowplaying-box">
-        <div class="label">NOW PLAYING</div>
-        <div class="title" id="nowTitle"></div>
-      </div>
-
-      <!-- Next list with smooth stretch -->
-      <div class="next-box hidden">
-        <div class="next-box-inner">
-          <div class="label">NEXT</div>
-          <div id="nextList"></div>
-          <div id="overflowCounter"></div>
+  
+    <!-- Drawer -->
+    <div class="drawer" id="drawer">
+      <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+      <div>
+        <!-- Now Playing stays fixed -->
+        <div class="nowplaying-box">
+          <div class="label">NOW PLAYING</div>
+          <div class="title" id="nowTitle"></div>
         </div>
-      </div>
-
-      <!-- SongBook -->
-      <div class="songbook" id="songbook">
-        <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
-        <div class="songbook-list">
-          <div class="songbook-search">
-            <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+        
+        <!-- Next list with smooth stretch -->
+        <div class="next-box hidden">
+          <div class="next-box-inner">
+            <div class="label">NEXT</div>
+            <div id="nextList"></div>
+            <div id="overflowCounter"></div>
           </div>
-
-          <!-- Scrollable inner like NextBox -->
-          <div class="songbook-box-inner">
-            <div id="songbookList"></div>
-            <div id="noResults" style="display:none; font-family: Arial; font-size: 0.9em; sans-serif; color: white; text-align: center;">" No results found "</div>
+        </div>
+        
+        <!-- SongBook -->
+        <div class="songbook" id="songbook">
+          <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
+          <div class="songbook-list">
+            <div class="songbook-search">
+              <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+            </div>
+            
+            <!-- Scrollable inner like NextBox -->
+            <div class="songbook-box-inner">
+              <div id="songbookList"></div>
+              <div id="noResults" style="display:none; font-family: Arial; font-size: 0.9em; sans-serif; color: white; text-align: center;">" No results found "</div>
+            </div>
+            
           </div>
-          
         </div>
       </div>
     </div>
-  </div>
-
+  
+  
     <!-- Overlays -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
     <div class="bot-drawer-overlay" id="bottomDrawerOverlay" onclick="closeBottomDrawer()"></div>
-
+  
     <!-- Notify -->
     <div class="notify-box">
       <div id="nowPlayingCopy"></div>
@@ -1428,19 +1619,19 @@
         src="https://www.youtube.com/embed/?enablejsapi=1&controls=1&autoplay=1&rel=0&modestbranding=1"
         allowfullscreen></iframe>
     </div>
-
+  
     <!-- Bottom Drawer -->
     <div class="bottom-drawer" id="bottomDrawer">
       <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
-
+      
       <div class="url-group">
         <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
-
+        
         <button id="pasteBtn" class="paste-btn-icon" data-tooltip="Paste (Ctrl + V)">
           <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
         </button>
       </div>
-
+      
       <div class="bottom-buttons">
         <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
         <button class="cyan-btn" onclick="saveToSongbook()">Save</button>
@@ -1449,31 +1640,36 @@
         </button>
       </div>
     </div>
-
+  
     <!-- Popup -->
     <div id="popupOverlay"></div>
     <div id="popupModal"></div>
-
+  
     <!-- Generic Overlay -->
     <!-- Overlay -->
     <div id="genericOverlay" class="overlay" style="display: none"></div>
-
+  
     <!-- Modal -->
     <div id="genericModal" class="modal" style="display: none">
       <div class="modal-content" id="genericContent">
         <!-- Dynamic content is injected by showModal(...) -->
       </div>
     </div>
-
+  
     <audio id="clickSound" src="click.wav" preload="auto"></audio>
     <audio id="successSound" src="success.wav" preload="auto"></audio>
     <audio id="errorSound" src="error.wav" preload="auto"></audio>
     <audio id="trashSound" src="trash.wav" preload="auto"></audio>
     <audio id="slideSound" src="slide.wav" preload="auto"></audio>
     <audio id="notifSound" src="notif.wav" preload="auto"></audio>
+  
+  
+</div>
 
-    <!-- JS -->
-    <script>
+<!-- =============================
+JavaScript Logic
+============================== -->
+<script>
     //  ==============================
     //  Drawer & Overlay Setup
     //  ==============================
@@ -3027,57 +3223,65 @@
       }
     }
 
-    // ==============================
-    // Save to Songbook (Unified validation + fetchTitle)
-    // ==============================
-    async function saveToSongbook() {
-      const input = document.getElementById("youtubeInputDrawer");
-      const url = input.value.trim();
+// ==============================
+// Save to Songbook (Unified validation + fetchTitle)
+// ==============================
+async function saveToSongbook() {
+  const input = document.getElementById("youtubeInputDrawer");
+  const url = input.value.trim();
 
-      if (!url) {
-        setTimeout(() => {
-          showPopup("⚠️ Please paste a URL first", "red", true, true);
-          playErrorSound();
-        }, 500);
-        return;
-      }
+  if (!url) {
+    setTimeout(() => {
+      showPopup("⚠️ Please paste a URL first", "red", true, true);
+      playErrorSound();
+    }, 500);
+    return;
+  }
 
-      const videoId = extractVideoId(url);
-      if (!videoId) {
-        input.value = "";
-        setTimeout(() => {
-          showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
-          playErrorSound();
-        }, 500);
-        return;
-      }
+  const videoId = extractVideoId(url);
+  if (!videoId) {
+    input.value = "";
+    setTimeout(() => {
+      showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
+      playErrorSound();
+    }, 500);
+    return;
+  }
 
-      const title = await fetchTitle(videoId);
-      if (title.startsWith("Invalid Song")) {
-        input.value = "";
-        return;
-      }
+  const title = await fetchTitle(videoId);
+  if (title.startsWith("Invalid Song")) {
+    input.value = "";
+    return;
+  }
 
-      // Create new song element
-      const songList = document.getElementById("songbookList");
-      const songDiv = document.createElement("div");
-      songDiv.className = "songtitle";
-      songDiv.textContent = title;
+  // ✅ Only save after validation & title fetched
+  await db.collection("users").doc(currentUser.id).update({
+    songbook: firebase.firestore.FieldValue.arrayUnion({
+      url: `https://www.youtube.com/watch?v=${videoId}`,
+      title: title
+    })
+  });
 
-      // ✅ Save both URL and videoId
-      songDiv.dataset.url = `https://www.youtube.com/watch?v=${videoId}`;
-      songDiv.dataset.id = videoId;
+  // Create new song element
+  const songList = document.getElementById("songbookList");
+  const songDiv = document.createElement("div");
+  songDiv.className = "songtitle";
+  songDiv.textContent = title;
 
-      attachSongbookInteractions(songDiv);
-      songList.appendChild(songDiv);
+  // Save both URL and videoId in dataset
+  songDiv.dataset.url = `https://www.youtube.com/watch?v=${videoId}`;
+  songDiv.dataset.id = videoId;
 
-      input.value = "";
+  attachSongbookInteractions(songDiv);
+  songList.appendChild(songDiv);
 
-      setTimeout(() => {
-        showPopup("Saved!", "cyan", false, "cyan");
-        playSuccessSound();
-      }, 500);
-    }
+  input.value = "";
+
+  setTimeout(() => {
+    showPopup("Saved!", "cyan", false, "cyan");
+    playSuccessSound();
+  }, 500);
+}
   
 
     //  ==============================
@@ -3276,9 +3480,113 @@
         ]
       });
     }
-      
-      
-    </script>
-    <script src="https://www.youtube.com/iframe_api"></script>
+</script>
+<!-------------------------------------------------------------------------------------------------->
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<!-------------------------------------------------------------------------------------------------->
+<script>
+let currentUser = null;
+
+// ---------- Toggle Register/Login Card ----------
+function toggleAuth() {
+  const reg = document.getElementById("registerCard");
+  const log = document.getElementById("loginCard");
+  if (reg.style.display === "none") {
+    reg.style.display = "block";
+    log.style.display = "none";
+  } else {
+    reg.style.display = "none";
+    log.style.display = "block";
+  }
+}
+
+// ---------- Show Main UI ----------
+function onLoginSuccess() {
+  document.getElementById("authOverlay").style.display = "none";
+  document.getElementById("mainCueTubeUI").style.display = "block";
+
+  // Load songbook after UI is visible
+  loadSongbook();
+}
+
+// ==============================
+// Load Songbook from Firestore
+// ==============================
+async function loadSongbook() {
+  if (!currentUser || !currentUser.id) return;
+
+  const userRef = db.collection("users").doc(currentUser.id);
+  const doc = await userRef.get();
+  if (!doc.exists) return;
+
+  const data = doc.data();
+  const songList = document.getElementById("songbookList");
+  songList.innerHTML = "";
+
+  if (Array.isArray(data.songbook)) {
+    data.songbook.forEach(song => {
+      const songDiv = document.createElement("div");
+      songDiv.className = "songtitle";
+      songDiv.textContent = song.title;
+      const videoId = extractVideoId(song.url);
+      songDiv.dataset.url = song.url;
+      songDiv.dataset.id = videoId;
+      attachSongbookInteractions(songDiv);
+      songList.appendChild(songDiv);
+    });
+  }
+}
+
+// ---------- Register User ----------
+async function registerUser() {
+  const userID = document.getElementById("regUser").value.trim();
+  const password = document.getElementById("regPass").value.trim();
+  const nickname = document.getElementById("regNick").value.trim();
+
+  if (!userID || !password || !nickname) {
+    alert("⚠️ Fill all fields");
+    return;
+  }
+  if (userID.length > 5 || nickname.length > 10) {
+    alert("⚠️ UserID max 5, Nickname max 10");
+    return;
+  }
+
+  const userRef = db.collection("users").doc(userID);
+  const doc = await userRef.get();
+  if (doc.exists) {
+    alert("⚠️ User ID already taken");
+    return;
+  }
+
+  // Save new user
+  await userRef.set({ password, nickname, songbook: [], queue: [] });
+
+  // AUTO-LOGIN using the nickname we just saved
+  currentUser = { id: userID, nickname: nickname };
+  alert(`✅ Welcome ${currentUser.nickname}`);
+  onLoginSuccess(); // Will also load songbook
+}
+
+// ---------- Login User ----------
+async function loginUser() {
+  const userID = document.getElementById("loginUser").value.trim();
+  const password = document.getElementById("loginPass").value.trim();
+
+  const userRef = db.collection("users").doc(userID);
+  const doc = await userRef.get();
+  if (!doc.exists || doc.data().password !== password) {
+    alert("❌ Invalid UserID or Password");
+    return;
+  }
+
+  currentUser = { id: userID, nickname: doc.data().nickname };
+  alert(`✅ Welcome ${currentUser.nickname}`);
+  onLoginSuccess(); // Will also load songbook
+}
+</script>
+    
   </body>
 </html>
