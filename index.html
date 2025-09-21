@@ -37,15 +37,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
     
 <style>
-      h1 {
-        font-family: "Orbitron", sans-serif;
-        font-size: 2em;
-        color: #0ff;
-        text-shadow:
-          0 0 5px #0ff,
-          0 0 10px #0ff;
-      }
-  
+
       button {
         padding: 10px 20px;
         margin-left: 10px;
@@ -71,7 +63,7 @@
       body {
         margin: 0;
         padding: 0;
-        font-family: "Orbitron", sans-serif;
+        font-family: "Segoe UI", sans-serif;
         background-color: black;
         color: white;
         overflow: hidden;
@@ -83,8 +75,9 @@
     CUETUBE TITLE +++++++
     ===================== */
     .title-bar {
-      text-align: center;
+      font-family: "Orbitron", sans-serif;
       font-size: 1.2em;
+      text-align: center;
       padding: 20px 0 10px 0;
       color: cyan;
       background-color: black;
@@ -203,7 +196,6 @@
       display: flex;
       align-items: center; /* vertical alignment (centered on y-axis) */
       justify-content: center; /* items aligned to the left (x-axis) */
-      font-family: "Orbitron", sans-serif;
       overflow: hidden;
       position: relative;
       border-radius: 1.5px;
@@ -236,10 +228,10 @@
         0 0 8px black,
         0 0 12px #222,
         0 0 24px #222;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.9em;
       font-weight: regular;
-      font-size: 1em;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       word-wrap: break-word;
       opacity: 0;
       transform: translateX(-100%);
@@ -446,13 +438,12 @@
         inset 0 0 10px 0.5px var(--btn-glow, cyan);
     }
   
-    /* Label default */
+    /* Label (Nowplaying) */
     .nowplaying-box .label {
+      font-family: "Orbitron", sans-serif;
       font-size: 0.7em;
       color: #222;
       margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
     }
   
     /* Label highlights when the BOX is hovered OR active */
@@ -463,8 +454,8 @@
   
     /* Song titles inside Nowplaying-box */
     .nowplaying-box .title {
-      font-family: Arial, sans-serif;
-      font-size: 1.1em;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.9em;
       margin: 5px 0;
       word-wrap: break-word;
       font-weight: regular;
@@ -542,13 +533,14 @@
   
     /* Label (NEXT) */
     .next-box .label {
+      font-family: "Orbitron", sans-serif;
       font-size: 0.7em;
       color: grey;
     }
   
     /* Song Titles inside Next-box */
     .next-box .songtitle {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", sans-serif;
       font-size: 0.9em;
       margin: 10px 0;
       text-align: left;
@@ -1113,6 +1105,7 @@
       border-radius: 10px;
       padding: 0 !important; /* 15px 25px; */
       color: inherit; /* white; */
+      font-family: "Orbitron", sans-serif;
       font-weight: bold;
       text-align: center !important;
       text-shadow: inherit;
@@ -1227,9 +1220,10 @@
   
     /* Handle bar (Songbook Button) */
     .songbook-handle {
+      font-family: "Orbitron", sans-serif;
+      font-size: 0.9em;
       text-align: center;
       padding: 10px;
-      font-size: 0.8em;
       color: #9377ea;
       background: none;
       cursor: pointer;
@@ -1282,7 +1276,7 @@
   
     /* Song Titles */
     .songbook .songtitle {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", sans-serif;
       font-size: 0.9em;
       margin: 10px;
       text-align: left;
@@ -1595,7 +1589,7 @@ Main CueTube UI
             <!-- Scrollable inner like NextBox -->
             <div class="songbook-box-inner">
               <div id="songbookList"></div>
-              <div id="noResults" style="display:none; font-family: Arial; font-size: 0.9em; sans-serif; color: white; text-align: center;">" No results found "</div>
+              <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 0.9em; color: white; text-align: center;">" No results found "</div>
             </div>
             
           </div>
@@ -2368,10 +2362,10 @@ JavaScript Logic
           <span class="now-playing-glow">${title}</span>
           <div id="noUpcoming"
             style="color: #7f95e4;
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", sans-serif;
             font-weight: normal;
             margin-top: 10px;
-            font-size: 0.8em;">
+            font-size: 0.7em;">
             No upcoming song . . .
           </div>`;
 
@@ -2467,7 +2461,7 @@ JavaScript Logic
         const messageHTML = `
     <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
       <span style="
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", sans-serif;
         font-weight: normal;
         font-size: 0.7em; 
         color: #7f95e4; 
@@ -2479,10 +2473,10 @@ JavaScript Logic
         margin-bottom: 4px;
       ">Up next:</span>
       <span style="
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", sans-serif;
         font-weight: regular;
-        letter-spacing: 0.1em;
-        font-size: 1em;
+        letter-spacing: 0.05em;
+        font-size: 0.9em;
         text-shadow:
           0 0 8px black,
           0 0 8px black,
@@ -3031,17 +3025,18 @@ JavaScript Logic
       showModal({
         glowColor: "cyan",
         title: "Up Next",
+        titleStyle: "font-family: 'Orbitron', sans-serif",
         titleColor: "cyan",
         messages: [
           {
             text: nextSong ? `"${nextSong.title}"` : "No song available.",
             color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;"
+            style: "font-family: 'Segoe UI', sans-serif;"
           },
           {
             text: "Proceed to the next song?",
             color: "gray",
-            style: "font-family: Arial, sans-serif;"
+            style: "font-family: 'Segoe UI', sans-serif;"
           }
         ],
         buttons: [{ label: "Confirm", onClick: confirmPlayNext }, { label: "Cancel" }]
@@ -3060,17 +3055,18 @@ JavaScript Logic
       showModal({
         glowColor: "magenta",
         title: "Exit CueTube ?",
+        titleStyle: "font-family: 'Orbitron', sans-serif",
         titleColor: "magenta",
         messages: [
           {
             text: "Press back twice to leave the app.",
             color: "white",
-            style: "font-family: Arial, sans-serif;"
+            style: "font-family: 'Segoe UI', sans-serif;"
           },
           {
             text: "Note: This action is irreversible",
             color: "gray",
-            style: "font-family: Arial, sans-serif;"
+            style: "font-family: 'Segoe UI', sans-serif;"
           }
         ],
         buttons: [{ label: "Cancel" }]
@@ -3087,17 +3083,18 @@ JavaScript Logic
       showModal({
         glowColor: "red",
         title: "Delete ?",
+        titleStyle: "font-family: 'Orbitron', sans-serif",
         titleColor: "red",
         messages: [
           {
             text: `"${songTitle}"`,
             color: "white",
-            style: "font-family: Arial, sans-serif; font-weight: normal;"
+            style: "font-family: 'Segoe UI', sans-serif"
           },
           {
             text: " ",
             color: "#ff4c4c",
-            style: "font-family: Arial, sans-serif;"
+            style: "font-family: 'Segoe UI', sans-serif"
           }
         ],
         buttons: [
@@ -3407,7 +3404,7 @@ async function saveToSongbook() {
         title: "Song Options",
         titleColor: "cyan",
         messages: [
-          { text: `"${songTitle}"`, color: "white", style: "font-family: Arial, sans-serif;" }
+          { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
         ],
         buttons: [
           {
@@ -3420,7 +3417,7 @@ async function saveToSongbook() {
                   title: "Delete Song?",
                   titleColor: "red",
                   messages: [
-                    { text: `"${songTitle}"`, color: "white", style: "font-family: Arial, sans-serif;" }
+                    { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
                   ],
                   buttons: [
                     {
