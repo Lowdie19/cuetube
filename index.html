@@ -1491,32 +1491,6 @@
     #mainCueTubeUI { display: none; }
 </style>
 
-<!-- ==============================
-Firebase Setup
-============================== -->
-  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js"></script>
-  <script>
-    // ---------- Firebase Config ----------
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "cuetube-cb101.firebaseapp.com",
-      projectId: "cuetube-cb101",
-      storageBucket: "cuetube-cb101.firebasestorage.app",
-      messagingSenderId: "364944752363",
-      appId: "1:364944752363:web:11279eeff48844073f88ae",
-      measurementId: "G-XXBQKLJRZT"
-    };
-
-    // ---------- Initialize Firebase ----------
-    const app = firebase.initializeApp(firebaseConfig);
-    const analytics = firebase.analytics();
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
-
 </head>
   <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" onclick="handleTap(event)">
     
@@ -3391,92 +3365,119 @@ async function saveToSongbook() {
       div.addEventListener("touchcancel", cancelHandler);
     }
 
-    //  ==============================
-    //  Song Options Modal
-    //  ==============================
-    function openSongOptions(target, onClose) {
-      const songTitle = target.textContent;
-      const songUrl = target.dataset.url;   // kept for reference
-      const songId = target.dataset.id;     // ✅ now available
+//  ==============================
+//  Song Options Modal
+//  ==============================
+function openSongOptions(target, onClose) {
+  const songTitle = target.textContent;
+  const songUrl = target.dataset.url;   // kept for reference
+  const songId = target.dataset.id;     // ✅ available for transfer
 
-      showModal({
-        glowColor: "cyan",
-        title: "Song Options",
-        titleColor: "cyan",
-        messages: [
-          { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
-        ],
-        buttons: [
-          {
-            label: "Delete",
-            onClick: () => {
-              playClickSound();
-              __modal_onClose = () => {
-                showModal({
-                  glowColor: "red",
-                  title: "Delete Song?",
-                  titleColor: "red",
-                  messages: [
-                    { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
-                  ],
-                  buttons: [
-                    {
-                      label: "Confirm",
-                      onClick: () => {
-                        target.classList.add("removing");
-                        setTimeout(() => {
-                          playTrashSound();
-                          target.remove();
-                          showPopup("Deleted!", "red", false, true);
-                          onClose?.();
-                        }, 500);
-                      }
-                    },
-                    {
-                      label: "Cancel",
-                      onClick: () => {
-                        playClickSound();
-                      }
-                    }
-                  ]
-                });
-              };
-            }
-          },
-          {
-            label: "Reserve",
-            onClick: () => {
-              // 🔧 Updated to use videoId like reserveFromDrawer
-              if (queue.length === 0 && currentIndex === -1) {
-                queue.push({ id: songId, title: songTitle });
-                currentIndex = 0;
+  showModal({
+    glowColor: "cyan",
+    title: "Song Options",
+    titleColor: "cyan",
+    messages: [
+      { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
+    ],
+    buttons: [
+      {
+        label: "Delete",
+        onClick: () => {
+          playClickSound();
+          __modal_onClose = () => {
+            showModal({
+              glowColor: "red",
+              title: "Delete Song?",
+              titleColor: "red",
+              messages: [
+                { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
+              ],
+              buttons: [
+                {
+                  label: "Confirm",
+                  onClick: () => {
+                    target.classList.add("removing");
+                    setTimeout(() => {
+                      playTrashSound();
+                      target.remove();
+                      showPopup("Deleted!", "red", false, true);
+                      onClose?.();
+                    }, 500);
+                  }
+                },
+                {
+                  label: "Cancel",
+                  onClick: () => {
+                    playClickSound();
+                  }
+                }
+              ]
+            });
+          };
+        }
+      },
+      {
+        label: "Reserve",
+        onClick: () => {
+          // 🔧 Same as reserveFromDrawer but using songId
+          if (queue.length === 0 && currentIndex === -1) {
+            queue.push({ id: songId, title: songTitle });
+            currentIndex = 0;
 
-                player.loadVideoById(songId);
-                player.playVideo();
-                updateNowPlaying();
-              } else {
-                queue.push({ id: songId, title: songTitle });
-              }
-
-              updateQueueDisplay();
-
-              setTimeout(() => {
-                showPopup("Reserved!", "cyan", false, true);
-                playSuccessSound();
-              }, 500);
-
-              onClose?.();
-            }
-          },
-          {
-            label: "Cancel",
-            onClick: () => {
-              playClickSound();
-            }
+            player.loadVideoById(songId);
+            player.playVideo();
+            updateNowPlaying();
+          } else {
+            queue.push({ id: songId, title: songTitle });
           }
-        ]
-      });
-    }
+
+          updateQueueDisplay();
+
+          setTimeout(() => {
+            showPopup("Reserved!", "cyan", false, true);
+            playSuccessSound();
+          }, 500);
+
+          onClose?.();
+        }
+      },
+      {
+        label: "Send",
+        onClick: async () => {
+          playClickSound();
+          const recipientId = prompt("Send to which user? (User ID)");
+          if (!recipientId) return;
+
+          try {
+            await db.collection("transfers").add({
+              to: recipientId,
+              from: currentUser.id,  // ✅ fixed
+              song: { id: songId, title: songTitle },
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            showPopup(`🎵 Sent "${songTitle}" to ${recipientId}`, "cyan", false, true);
+            playSuccessSound();
+          } catch (err) {
+            console.error("Send failed:", err);
+            showPopup("⚠️ Failed to send", "red", true, true);
+            playErrorSound();
+          }
+
+          onClose?.();
+        }
+      },
+      {
+        label: "Cancel",
+        onClick: () => {
+          playClickSound();
+        }
+      }
+    ]
+  });
+}
+
 </script>
 <!-------------------------------------------------------------------------------------------------->
 
@@ -3504,9 +3505,52 @@ function onLoginSuccess() {
   document.getElementById("authOverlay").style.display = "none";
   document.getElementById("mainCueTubeUI").style.display = "block";
 
+  // ✅ Start listening for incoming songs after login
+  if (currentUser && currentUser.id) {
+    listenForIncomingSongs(currentUser.id);
+  }
+
   // Load songbook after UI is visible
   loadSongbook();
 }
+
+
+// ==============================
+// Listen for Incoming Transfers
+// ==============================
+function listenForIncomingSongs(userId) {
+  db.collection("transfers")
+    .where("to", "==", userId)
+    .onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          const song = data.song;
+
+          // Add to queue
+          if (queue.length === 0 && currentIndex === -1) {
+            queue.push(song);
+            currentIndex = 0;
+            player.loadVideoById(song.id);
+            player.playVideo();
+            updateNowPlaying();
+          } else {
+            queue.push(song);
+            updateQueueDisplay();
+          }
+
+          // Notify
+          showPopup(`📩 Song received: "${song.title}"`, "magenta", false, true);
+          playNotifSound();
+
+          // Delete transfer after processing
+          db.collection("transfers").doc(change.doc.id).delete();
+        }
+      });
+    });
+}
+
+
 
 // ==============================
 // Load Songbook from Firestore
