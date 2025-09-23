@@ -1221,7 +1221,7 @@
     /* Handle bar (Songbook Button) */
     .songbook-handle {
       font-family: "Orbitron", sans-serif;
-      font-size: 0.9em;
+      font-size: 0.7em;
       text-align: center;
       padding: 10px;
       color: #9377ea;
@@ -1499,15 +1499,6 @@
 Authentication Overlay
 ============================== -->
   <div id="authOverlay">
-    <!-- Register Card -->
-    <div class="authCard" id="registerCard">
-      <h2>Register</h2>
-      <input type="text" id="regUser" placeholder="User ID (max 5)" maxlength="5">
-      <input type="text" id="regNick" placeholder="Nickname (max 10)" maxlength="10">
-      <input type="password" id="regPass" placeholder="Password">
-      <button onclick="registerUser()">Register</button>
-      <div class="authToggle" onclick="toggleAuth()">Already have an account? Login</div>
-    </div>
     
     <!-- Login Card -->
     <div class="authCard" id="loginCard" style="display:none;">
@@ -1516,6 +1507,16 @@ Authentication Overlay
       <input type="password" id="loginPass" placeholder="Password">
       <button onclick="loginUser()">Login</button>
       <div class="authToggle" onclick="toggleAuth()">Don't have an account? Register</div>
+    </div>
+    
+    <!-- Register Card -->
+    <div class="authCard" id="registerCard">
+      <h2>Register</h2>
+      <input type="text" id="regUser" placeholder="User ID (max 5)" maxlength="5">
+      <input type="text" id="regNick" placeholder="Nickname (max 10)" maxlength="10">
+      <input type="password" id="regPass" placeholder="Password">
+      <button onclick="registerUser()">Register</button>
+      <div class="authToggle" onclick="toggleAuth()">Already have an account? Login</div>
     </div>
   </div>
 
@@ -2574,12 +2575,6 @@ JavaScript Logic
       persistentPopupActive = false;
     };
 
-    // ===============================
-    // On page load
-    // ===============================
-    window.onload = () => {
-      hideNextConfirm();
-    };
 
     // =====================
     // Flexible Rubber Band Stretch Effect
@@ -2834,162 +2829,227 @@ JavaScript Logic
     document.getElementById("pasteBtn").addEventListener("click", pasteFromClipboard);
 
 
-    //   ==========================================
-    //   GENERIC MODAL SYSTEM
-    //   ==========================================
-    let __modal_onClose = null;
-    let __modal_keydownHandler = null;
-    let __modal_prevActive = null;
-    let isModalOpen = false;
+// ==========================================
+// GENERIC MODAL SYSTEM
+// ==========================================
+let __modal_onClose = null;
+let __modal_keydownHandler = null;
+let __modal_prevActive = null;
+let isModalOpen = false;
 
-    function showModal(settings) {
-      isModalOpen = true;
-      const overlay = document.getElementById("genericOverlay");
-      const modal = document.getElementById("genericModal");
-      const content = document.getElementById("genericContent");
+function showModal(settings) {
+  isModalOpen = true;
+  const overlay = document.getElementById("genericOverlay");
+  const modal = document.getElementById("genericModal");
+  const content = document.getElementById("genericContent");
 
-      if (!overlay || !modal || !content) {
-        console.error("[Modal] Missing genericOverlay/genericModal/genericContent in HTML.");
-        return;
-      }
+  if (!overlay || !modal || !content) {
+    console.error("[Modal] Missing genericOverlay/genericModal/genericContent in HTML.");
+    return;
+  }
 
-      const {
-        glowColor = "cyan",
-        title = "",
-        titleColor = "white", // NEW
-        messages = [], // [{ text, color?, style? }]
-        buttons = [], // [{ label, onClick?, className? }]
-        closeOnOverlay = true,
-        onClose = null
-      } = settings || {};
+  const {
+    glowColor = "cyan",
+    title = "",
+    titleColor = "white",
+    titleStyle,
+    messages = [],
+    buttons = [],
+    closeOnOverlay = true,
+    onClose = null,
+    showCloseButton = false // optional top-right X button
+  } = settings || {};
 
-      __modal_onClose = typeof onClose === "function" ? onClose : null;
-      __modal_prevActive = document.activeElement;
+  __modal_onClose = typeof onClose === "function" ? onClose : null;
+  __modal_prevActive = document.activeElement;
 
-      let html = "";
-      if (title) {
-        html += `<p class="gm-title" style="font-weight:bold; font-size:1.1em; margin-bottom:10px; color:${titleColor};">${_escapeHtml(title)}</p>`;
-      }
-      for (const msg of messages) {
-        const color = msg?.color || "white";
-        const text = msg?.text || "";
-        const extraStyle = msg?.style || "";
-        html += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
-      }
-      html += `<div style="height:0.5px;"></div>`;
+  content.innerHTML = "";
 
-      if (buttons.length > 0) {
-        html += `<div class="modal-buttons" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">`;
-        buttons.forEach((btn, i) => {
-          const extra = btn?.className ? " " + btn.className : "";
-          const label = btn?.label || "OK";
-          html += `<button id="modalBtn${i}" class="cyan-btn${extra}">${_escapeHtml(label)}</button>`;
-        });
-        html += `</div>`;
-      }
-      content.innerHTML = html;
+  // Title
+  if (title) {
+    let baseStyle = `font-family: 'Orbitron', sans-serif; font-size:1.1em; margin-bottom:10px; color:${titleColor};`;
+    if (titleStyle) baseStyle += " " + titleStyle;
+    content.innerHTML += `<p class="gm-title" style="${baseStyle}">${_escapeHtml(title)}</p>`;
+  }
 
-      _applyModalGlow(modal, glowColor);
+  // Messages
+  for (const msg of messages) {
+    const color = msg?.color || "white";
+    const text = msg?.text || "";
+    const extraStyle = msg?.style || "";
+    content.innerHTML += `<p class="gm-msg" style="color:${color}; ${extraStyle}">${_escapeHtml(text)}</p>`;
+  }
 
-      overlay.style.display = "block";
-      modal.style.display = "inline-block";
+  content.innerHTML += `<div style="height:0.5px;"></div>`;
 
-      buttons.forEach((btn, i) => {
-        const el = document.getElementById(`modalBtn${i}`);
-        if (!el) return;
-        el.addEventListener(
-          "click",
-          () => {
-            try {
-              if (typeof btn.onClick === "function") btn.onClick();
-            } finally {
-              setTimeout(() => hideModal(), 200); // <-- delay 0.2s
-            }
-          },
-          { once: true }
-        );
-      });
+// Buttons
+if (buttons.length > 0) {
+  // Remove Cancel buttons if X button is used
+  const filteredButtons = showCloseButton
+    ? buttons.filter(btn => btn.label.toLowerCase() !== "cancel")
+    : buttons;
 
-      overlay.onclick = closeOnOverlay
-        ? () => setTimeout(() => hideModal(), 200) // 0.2s delay for overlay clicks
-        : null;
+  if (filteredButtons.length > 0) {
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "modal-buttons";
+    btnContainer.style.display = "flex";
+    btnContainer.style.justifyContent = "center";
+    btnContainer.style.gap = "10px"; // spacing between buttons
+    btnContainer.style.marginTop = "20px";
 
-      __modal_keydownHandler = (ev) => {
-        if (ev.key === "Escape") hideModal();
-      };
-      document.addEventListener("keydown", __modal_keydownHandler);
-
-      const firstBtn = content.querySelector("button");
-      if (firstBtn) firstBtn.focus();
-    }
-
-    function hideModal() {
-      isModalOpen = false;
-      const overlay = document.getElementById("genericOverlay");
-      const modal = document.getElementById("genericModal");
-
-      if (overlay) overlay.style.display = "none";
-      if (modal) modal.style.display = "none";
-
-      if (__modal_keydownHandler) {
-        document.removeEventListener("keydown", __modal_keydownHandler);
-        __modal_keydownHandler = null;
-      }
-
-      if (__modal_prevActive?.focus) {
-        try {
-          __modal_prevActive.focus();
-        } catch (_) {}
-      }
-      __modal_prevActive = null;
-
-      if (__modal_onClose) {
-        const cb = __modal_onClose;
-        __modal_onClose = null;
-        try {
-          cb();
-        } catch (err) {
-          console.error(err);
+    filteredButtons.forEach((btn, i) => {
+      const extra = btn?.className ? " " + btn.className : "";
+      const label = btn?.label || "OK";
+      const buttonEl = document.createElement("button");
+      buttonEl.id = `modalBtn${i}`;
+      buttonEl.className = `cyan-btn${extra}`;
+      buttonEl.style.minWidth = "85px";   // minimum width
+      buttonEl.style.maxWidth = "150px";  // maximum width
+      buttonEl.innerHTML = _escapeHtml(label);
+        // Apply custom styles if provided
+        if (btn?.style) {
+          buttonEl.style.cssText += btn.style;
         }
-      }
+      btnContainer.appendChild(buttonEl);
+    });
+
+    content.appendChild(btnContainer);
+  }
+}
+
+// Optional top-right X button
+if (showCloseButton) {
+  const xBtn = document.createElement("button");
+  xBtn.innerHTML = "&times;"; // × symbol
+  xBtn.style.position = "absolute";
+  xBtn.style.top = "10px";
+  xBtn.style.right = "10px";
+  xBtn.style.background = "transparent";
+  xBtn.style.border = "none";
+  xBtn.style.color = "gray";
+  xBtn.style.fontSize = "1.3em";
+  xBtn.style.cursor = "pointer";
+  xBtn.style.transition = "all 0.2s ease"; // smooth animation
+  xBtn.title = "Close";
+
+  // Hover effect
+  xBtn.addEventListener("mouseenter", () => {
+    xBtn.style.color = "#ff4c4c";   // highlight on hover
+    xBtn.style.transform = "scale(1.2)"; // slight zoom
+  });
+  xBtn.addEventListener("mouseleave", () => {
+    xBtn.style.color = "gray"; 
+    xBtn.style.transform = "scale(1)";
+  });
+
+  xBtn.onclick = () => hideModal();
+  modal.appendChild(xBtn);
+}
+
+  _applyModalGlow(modal, glowColor);
+
+  overlay.style.display = "block";
+  modal.style.display = "inline-block";
+
+  // Button click handlers
+  buttons.forEach((btn, i) => {
+    const el = document.getElementById(`modalBtn${i}`);
+    if (!el) return;
+    el.addEventListener(
+      "click",
+      () => {
+        try {
+          if (typeof btn.onClick === "function") btn.onClick();
+        } finally {
+          setTimeout(() => hideModal(), 200);
+        }
+      },
+      { once: true }
+    );
+  });
+
+  overlay.onclick = closeOnOverlay ? () => setTimeout(() => hideModal(), 200) : null;
+
+  __modal_keydownHandler = (ev) => {
+    if (ev.key === "Escape") hideModal();
+  };
+  document.addEventListener("keydown", __modal_keydownHandler);
+
+  const firstBtn = content.querySelector("button");
+  if (firstBtn) firstBtn.focus();
+}
+
+function hideModal() {
+  isModalOpen = false;
+  const overlay = document.getElementById("genericOverlay");
+  const modal = document.getElementById("genericModal");
+
+  if (overlay) overlay.style.display = "none";
+  if (modal) modal.style.display = "none";
+
+  // Remove any X button from previous modal
+  const oldXBtn = modal.querySelector("button[title='Close']");
+  if (oldXBtn) modal.removeChild(oldXBtn);
+
+  if (__modal_keydownHandler) {
+    document.removeEventListener("keydown", __modal_keydownHandler);
+    __modal_keydownHandler = null;
+  }
+
+  if (__modal_prevActive?.focus) {
+    try {
+      __modal_prevActive.focus();
+    } catch (_) {}
+  }
+  __modal_prevActive = null;
+
+  if (__modal_onClose) {
+    const cb = __modal_onClose;
+    __modal_onClose = null;
+    try {
+      cb();
+    } catch (err) {
+      console.error(err);
     }
+  }
+}
 
-    //  Helpers =========================
-    function _escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
+// Helpers
+function _escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-    function _applyModalGlow(modalEl, glowColor) {
-      modalEl.style.border = `1px solid ${glowColor}`;
-      modalEl.style.boxShadow = `0 0 10px 0.5px ${glowColor}`;
-      modalEl.style.setProperty("--btn-glow", glowColor);
+function _applyModalGlow(modalEl, glowColor) {
+  modalEl.style.border = `1px solid ${glowColor}`;
+  modalEl.style.boxShadow = `0 0 10px 0.5px ${glowColor}`;
+  modalEl.style.setProperty("--btn-glow", glowColor);
 
-      const rgba020 = _colorToRGBA(glowColor, 0.2);
-      modalEl.style.setProperty("--btn-hover-bg", rgba020);
-    }
+  const rgba020 = _colorToRGBA(glowColor, 0.2);
+  modalEl.style.setProperty("--btn-hover-bg", rgba020);
+}
 
-    function _colorToRGBA(colorStr, alpha) {
-      const tmp = document.createElement("span");
-      tmp.style.color = colorStr;
-      tmp.style.display = "none";
-      document.body.appendChild(tmp);
+function _colorToRGBA(colorStr, alpha) {
+  const tmp = document.createElement("span");
+  tmp.style.color = colorStr;
+  tmp.style.display = "none";
+  document.body.appendChild(tmp);
 
-      const rgb = getComputedStyle(tmp).color;
-      document.body.removeChild(tmp);
+  const rgb = getComputedStyle(tmp).color;
+  document.body.removeChild(tmp);
 
-      const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-      if (!m) return `rgba(0, 255, 255, ${alpha || 1})`;
-      const r = Number(m[1]),
-        g = Number(m[2]),
-        b = Number(m[3]);
-      const a = typeof alpha === "number" ? alpha : 1;
-      return `rgba(${r}, ${g}, ${b}, ${a})`;
-    }
+  const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!m) return `rgba(0, 255, 255, ${alpha || 1})`;
+  const r = Number(m[1]),
+    g = Number(m[2]),
+    b = Number(m[3]);
+  const a = typeof alpha === "number" ? alpha : 1;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
 
     //   ==========================================
     //   NEXT MODAL
@@ -2998,22 +3058,22 @@ JavaScript Logic
       const nextSong = queue[currentIndex + 1];
       showModal({
         glowColor: "cyan",
-        title: "Up Next",
-        titleStyle: "font-family: 'Orbitron', sans-serif",
+        title: "UP NEXT",
         titleColor: "cyan",
         messages: [
           {
             text: nextSong ? `"${nextSong.title}"` : "No song available.",
             color: "white",
-            style: "font-family: 'Segoe UI', sans-serif;"
+            style: "font-family: Segoe UI, sans-serif;"
           },
           {
             text: "Proceed to the next song?",
             color: "gray",
-            style: "font-family: 'Segoe UI', sans-serif;"
+            style: "font-family: Segoe UI, sans-serif;"
           }
         ],
-        buttons: [{ label: "Confirm", onClick: confirmPlayNext }, { label: "Cancel" }]
+        buttons: [{ label: "Confirm", onClick: confirmPlayNext }, { label: "Cancel" }],
+        showCloseButton: false // ❌ No X button
       });
     }
 
@@ -3028,8 +3088,7 @@ JavaScript Logic
     function showExitConfirm() {
       showModal({
         glowColor: "magenta",
-        title: "Exit CueTube ?",
-        titleStyle: "font-family: 'Orbitron', sans-serif",
+        title: "EXIT ?",
         titleColor: "magenta",
         messages: [
           {
@@ -3038,12 +3097,13 @@ JavaScript Logic
             style: "font-family: 'Segoe UI', sans-serif;"
           },
           {
-            text: "Note: This action is irreversible",
+            text: "⚠️ Irreversible action: your queue will be cleared and cannot be restored.",
             color: "gray",
             style: "font-family: 'Segoe UI', sans-serif;"
           }
         ],
-        buttons: [{ label: "Cancel" }]
+        buttons: [{ label: "Cancel" }],
+        showCloseButton: false // ❌ No X button
       });
       playErrorSound();
     }
@@ -3056,8 +3116,7 @@ JavaScript Logic
 
       showModal({
         glowColor: "red",
-        title: "Delete ?",
-        titleStyle: "font-family: 'Orbitron', sans-serif",
+        title: "DELETE ?",
         titleColor: "red",
         messages: [
           {
@@ -3109,7 +3168,8 @@ JavaScript Logic
         ],
         onClose: () => {
           if (typeof onCloseCallback === "function") onCloseCallback();
-        }
+        },
+        showCloseButton: false // Classic modal: Cancel button stays, no X  
       });
     }
 
@@ -3375,7 +3435,7 @@ function openSongOptions(target, onClose) {
 
   showModal({
     glowColor: "cyan",
-    title: "Song Options",
+    title: "SONG OPTIONS",
     titleColor: "cyan",
     messages: [
       { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
@@ -3383,12 +3443,13 @@ function openSongOptions(target, onClose) {
     buttons: [
       {
         label: "Delete",
+        style: "font-size:0.9em", // smaller font
         onClick: () => {
           playClickSound();
           __modal_onClose = () => {
             showModal({
               glowColor: "red",
-              title: "Delete Song?",
+              title: "DELETE ?",
               titleColor: "red",
               messages: [
                 { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
@@ -3419,6 +3480,7 @@ function openSongOptions(target, onClose) {
       },
       {
         label: "Reserve",
+        style: "font-size:0.9em", // smaller font
         onClick: () => {
           // 🔧 Same as reserveFromDrawer but using songId
           if (queue.length === 0 && currentIndex === -1) {
@@ -3444,6 +3506,7 @@ function openSongOptions(target, onClose) {
       },
       {
         label: "Send",
+        style: "font-size:0.9em", // smaller font
         onClick: async () => {
           playClickSound();
           const recipientId = prompt("Send to which user? (User ID)");
@@ -3467,14 +3530,10 @@ function openSongOptions(target, onClose) {
 
           onClose?.();
         }
-      },
-      {
-        label: "Cancel",
-        onClick: () => {
-          playClickSound();
-        }
       }
-    ]
+      // ❌ Cancel button removed here as well
+    ],
+    showCloseButton: true // ✅ Enable top-right X button
   });
 }
 
@@ -3489,8 +3548,8 @@ let currentUser = null;
 
 // ---------- Toggle Register/Login Card ----------
 function toggleAuth() {
-  const reg = document.getElementById("registerCard");
   const log = document.getElementById("loginCard");
+  const reg = document.getElementById("registerCard");
   if (reg.style.display === "none") {
     reg.style.display = "block";
     log.style.display = "none";
