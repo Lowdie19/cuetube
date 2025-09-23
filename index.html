@@ -1383,9 +1383,9 @@
 
     /* box */
     .authCard {
-      min-width: 250px;
-      max-width: 300px;      /* fit smaller screens */
-      padding: 0px 50px;
+      min-width: 300px;
+      max-width: 350px;      /* fit smaller screens */
+      padding: 0px 30px;
       background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
       border-radius: 20px;
       color: #fff;
@@ -1399,26 +1399,58 @@
     /* title */
     .authCard h2 {
       color: #91f7f7;
-      margin: 30px;
+      margin: 40px 0;
     }
 
-    /* Input box */
-    .authCard input {
-      width: 100%;
-      padding: 10px 20px;
-      margin: 5px 0;
-      outline: none;
-      font-size: 1em;
-      border-radius: 10px;
-      border: 1px solid var(--btn-glow, rgba(255, 255, 255, 0));
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, #222);
+    /* input group for floating label */
+    .inputGroup {
+      position: relative;
+      margin: 32px 0;
+      text-align: left;
     }
-    .authCard input:hover {
+
+    .inputGroup input {
+      min-width: 229px;
+      width: 100%;
+      padding: 10px 15px;
+      background: transparent;
+      border: 1px solid var(--btn-glow, rgba(255,255,255,0));
+      border-radius: 10px;
+      font-size: 1em;
+      color: white;
+      box-shadow: 0 0 10px 0.5px var(--btn-glow, #222);
+    }
+    .inputGroup input:hover {
       box-shadow: 0 0 10px 0.5px var(--btn-glow, #696969);
     }
 
-    /* Register button */
+    /* floating label */
+    .inputGroup label {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #aaa;
+      font-size: 0.9em;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      background: transparent;
+      backdrop-filter: blur(6px);      /* blur effect */
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .inputGroup input:focus + label,
+    .inputGroup input:not(:placeholder-shown) + label {
+      top: -15px;                /* move above input */
+      left: 20px;
+      font-size: 0.80em;         /* smaller font */
+      color: #e7e7e7;              /* text color */
+      background: transparent;    /* remove background when floating */
+      padding: 0;                /* remove padding */
+    }
+
+    /* Register/Login button */
     .authCard button {
       padding: 10px;
       border: none;
@@ -1426,26 +1458,39 @@
       background: #ff5fff;
       color: white;
       cursor: pointer;
-      margin: 6px 0;
+      margin: 0px 0;
       transition: all 0.2s;
-      font-size: 1em; /* keep text size */
-      width: 100%;     /* inputs expand to card width */
+      font-size: 1em;
+      width: 100%;
       box-sizing: border-box;
     }
     .authCard button:hover { background: #ff2fff; }
-  
     .authCard button:active {
-      transform: scale(0.90); /* shrink when pressed */
+      transform: scale(0.90);
       background: var(--btn-glow, magenta);
       color: #ffffff;
-      transition:
-        transform 0.15s,
-        box-shadow 0.15s; /* faster transition */
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    
-    /* Underline text */
+  
+    /* Default: all inputs normal */
+    .authCard .inputGroup {
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    /* When any input inside the card is focused → dim all */
+    .authCard:focus-within .inputGroup {
+      opacity: 0.5;
+    }
+
+    /* But keep the focused one at full opacity */
+    .authCard .inputGroup:focus-within {
+      opacity: 1;
+    }
+
+    /* underline toggle text */
     .authToggle {
-      margin: 25px;
+      margin: 30px;
       font-size: 0.9em;
       color: #989898;
       cursor: pointer;
@@ -1495,27 +1540,49 @@
 <!-- =============================
 Authentication Overlay
 ============================== -->
-  <div id="authOverlay">
-    
-    <!-- Login Card -->
-    <div class="authCard" id="loginCard" style="display:none;">
-      <h2>Login</h2>
-      <input type="text" id="loginUser" placeholder="User ID">
-      <input type="password" id="loginPass" placeholder="Password">
-      <button onclick="loginUser()">Login</button>
-      <div class="authToggle" onclick="toggleAuth()">Don't have an account? Register</div>
+<div id="authOverlay">
+  
+  <!-- Login Card -->
+  <div class="authCard" id="loginCard" style="display:none;">
+    <h2>Login</h2>
+
+    <div class="inputGroup">
+      <input type="text" id="loginUser" placeholder=" " required>
+      <label for="loginUser">User ID</label>
     </div>
-    
-    <!-- Register Card -->
-    <div class="authCard" id="registerCard">
-      <h2>Register</h2>
-      <input type="text" id="regUser" placeholder="User ID (max 5)" maxlength="5">
-      <input type="text" id="regNick" placeholder="Nickname (max 10)" maxlength="10">
-      <input type="password" id="regPass" placeholder="Password">
-      <button onclick="registerUser()">Register</button>
-      <div class="authToggle" onclick="toggleAuth()">Already have an account? Login</div>
+
+    <div class="inputGroup">
+      <input type="password" id="loginPass" placeholder=" " required>
+      <label for="loginPass">Password</label>
     </div>
+
+    <button onclick="loginUser()">Login</button>
+    <div class="authToggle" onclick="toggleAuth()">Don't have an account? Register</div>
   </div>
+  
+  <!-- Register Card -->
+  <div class="authCard" id="registerCard">
+    <h2>Register</h2>
+
+    <div class="inputGroup">
+      <input type="text" id="regUser" placeholder=" " maxlength="5" required>
+      <label for="regUser">User ID (max.5 character)</label>
+    </div>
+
+    <div class="inputGroup">
+      <input type="text" id="regNick" placeholder=" " maxlength="10" required>
+      <label for="regNick">Nickname (max.10 character)</label>
+    </div>
+
+    <div class="inputGroup">
+      <input type="password" id="regPass" placeholder=" " required>
+      <label for="regPass">Password</label>
+    </div>
+
+    <button onclick="registerUser()">Register</button>
+    <div class="authToggle" onclick="toggleAuth()">Already have an account? Login</div>
+  </div>
+</div>
 
 <!-- ============================
 Main CueTube UI
