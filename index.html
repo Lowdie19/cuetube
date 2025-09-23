@@ -1398,8 +1398,9 @@
 
     /* title */
     .authCard h2 {
+      font-family: "Orbitron", sans-serif;
       color: #91f7f7;
-      margin: 40px 0;
+      margin: 50px 0;
     }
 
     /* input group for floating label */
@@ -1504,7 +1505,6 @@
       .authCard button,
       .authCard input  {
         padding: 10px;
-        margin: 10px;
         margin-left: 0; 
       }
       .authCard {
@@ -1515,18 +1515,32 @@
     }
 
     @media (orientation: landscape) and (max-height: 480px) {
-      .authCard h2 {margin-bottom: 20px; }
+      .authCard {
+        background: none;
+        border: none;
+        box-shadow: none;
+      }
+      
+      .inputGroup {
+        margin: 25px 0;
+      }
+
+      .inputGroup input {
+        padding: 0px 15px;
+      }
+      
+      .authCard h2 {margin-bottom: 40px; }
       
       .authCard button,
       .authCard input  {
-        padding: 10px;
-        margin: 5px;
+        padding: 8px;
+        margin: 0px;
       }
       .authCard {
         width: 40%;       /* fit better in landscape */
-        padding: 10px 36px;
+        padding: 0px 40px;
       }
-      .authToggle { margin: 10px;}
+      .authToggle { margin: 40px 0px;}
     }
 
 /* Main CueTube UI hidden initially ======= */
