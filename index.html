@@ -63,9 +63,7 @@
       body {
         margin: 0;
         padding: 0;
-        font-family: "Segoe UI", sans-serif;
         background-color: black;
-        color: white;
         overflow: hidden;
         height: 100vh;
         width: 100vw;
@@ -229,7 +227,7 @@
         0 0 12px #222,
         0 0 24px #222;
       font-family: "Segoe UI", sans-serif;
-      font-size: 0.9em;
+      font-size: 1em;
       font-weight: regular;
       letter-spacing: 0.05em;
       word-wrap: break-word;
@@ -441,7 +439,7 @@
     /* Label (Nowplaying) */
     .nowplaying-box .label {
       font-family: "Orbitron", sans-serif;
-      font-size: 0.7em;
+      font-size: .95em;
       color: #222;
       margin-bottom: 15px;
     }
@@ -455,7 +453,7 @@
     /* Song titles inside Nowplaying-box */
     .nowplaying-box .title {
       font-family: "Segoe UI", sans-serif;
-      font-size: 0.9em;
+      font-size: 1em;
       margin: 5px 0;
       word-wrap: break-word;
       font-weight: regular;
@@ -525,7 +523,7 @@
   
     #overflowCounter {
       text-align: center;
-      font-size: 0.7em;
+      font-size: 1em;
       color: #888;
       margin-top: 5px;
       display: none;
@@ -541,7 +539,7 @@
     /* Song Titles inside Next-box */
     .next-box .songtitle {
       font-family: "Segoe UI", sans-serif;
-      font-size: 0.9em;
+      font-size: 1em;
       margin: 10px 0;
       text-align: left;
       word-wrap: break-word;
@@ -731,24 +729,30 @@
         /* outer glow */ inset 0 0 10px 0.5px var(--btn-glow, magenta); /* inner glow */
     }
   
-    input[type="text"]::placeholder {
-      color: white;
+
+    /* General Input text/password box*/
+
+    input[type="text"]::placeholder,
+    input[type="password"]:::placeholder   {
+      color: #222;
       opacity: 0.3;
     }
   
-    input[type="text"] {
+    input[type="text"],
+    input[type="password"] {
       width: 60%;
       border: 2px magenta;
       border-radius: 8px;
       padding: 10px;
-      font-size: 0.9em;
+      font-size: 1em;
       background-color: black; /*#121212;*/
       color: white;
       box-shadow: 0 0 15px 1px var(--btn-glow, rgba(33, 32, 32, 0.32));
       transition: box-shadow 0.3s ease;
     }
   
-    input[type="text"]:focus {
+    input[type="text"]:focus,
+    input[type="password"]:focus  {
       outline: 1px;
       border-color: solid white;
       border: 1px solid var(--btn-glow, white);
@@ -760,7 +764,8 @@
     }
   
     /* for Suggested URL - Normal focus */
-    input[type="text"]:focus {
+    input[type="text"]:focus,
+    input[type="password"]:focus {
       outline: none;
       border: 1px solid var(--btn-glow, white);
       box-shadow:
@@ -769,7 +774,8 @@
     }
   
     /* Autofill fix */
-    input[type="text"]:-webkit-autofill {
+    input[type="text"]:-webkit-autofill,
+    input[type="password"]:-webkit-autofill {
       border: 1px solid white;
       -webkit-box-shadow:
         0 0 10px 0.5px var(--btn-glow, magenta),
@@ -887,7 +893,7 @@
       .cyan-btn:hover {
         background: var(--btn-hover-bg, rgba(0, 255, 255, 0.2)); /* set by JS */
         color: white;
-        text-shadow: 0 0 16px var(--btn-glow, cyan);
+        text-shadow: 0 0 16px var(--btn-glow, #222);
       }
   
       /* Press / click effect */
@@ -1116,7 +1122,7 @@
       max-width: 90vw;
       box-shadow: none !important; /* 0 0 20px cyan; */
       user-select: none;
-      font-size: 1.8em !important;
+      font-size: 2em !important;
     }
   
     #popupModal.show {
@@ -1133,36 +1139,6 @@
       opacity: 1;
     }
   
-/*  =====================================
-    Typical Tooltip Style
-    ====================================  */
-    [data-tooltip] {
-      position: relative;
-    }
-
-    /* Tooltip base style */
-    [data-tooltip]::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 120%; /* above button */
-      left: 50%;
-      transform: translateX(-50%);
-      background: #111;
-      color: cyan;
-      padding: 6px 10px;
-      border-radius: 8px;
-      white-space: nowrap;
-      font-size: 13px;
-      pointer-events: none;
-      opacity: 0; /* hidden by default */
-      box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); /* subtle glow */
-      transition: opacity 0.3s ease-in-out; /* smooth fade */
-    }
-  
-    /* Show tooltip when class is added */
-    [data-tooltip].show-tooltip::after {
-      opacity: 1;
-    }
   
 /*  =============================
     Generic Modal Base
@@ -1221,7 +1197,7 @@
     /* Handle bar (Songbook Button) */
     .songbook-handle {
       font-family: "Orbitron", sans-serif;
-      font-size: 0.7em;
+      font-size: 1em;
       text-align: center;
       padding: 10px;
       color: #9377ea;
@@ -1277,7 +1253,7 @@
     /* Song Titles */
     .songbook .songtitle {
       font-family: "Segoe UI", sans-serif;
-      font-size: 0.9em;
+      font-size: 1em;
       margin: 10px;
       text-align: left;
       word-wrap: break-word;
@@ -1388,7 +1364,6 @@
       margin: 0;
       font-family: "Segoe UI", sans-serif;
       background: #120023;
-      color: #fff;
     }
       
 /* Authentication Overlay ======= */
@@ -1406,14 +1381,13 @@
       padding: 20px; /* prevent overflow on small screens */
     }
 
+    /* box */
     .authCard {
-      width: 360px;         /* default width */
-      max-width: 100%;      /* fit smaller screens */
-      background: #222;
-      padding: 40px 30px;
+      min-width: 250px;
+      max-width: 300px;      /* fit smaller screens */
+      padding: 0px 50px;
+      background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      width: 360px;
       color: #fff;
       text-align: center;
       border: 1px solid var(--btn-glow, cyan);
@@ -1422,38 +1396,61 @@
         inset 0 0 10px 0.5px var(--btn-glow, #00cece);
     }
 
-    .authCard h2 { color: #91f7f7; margin-bottom: 20px; }
-    .authCard input {
-      width: 100%;
-      padding: 10px 15px;
-      margin: 10px 0;
-      outline: none;
-      font-size: 14px;
-      border-radius: 10px;
-
-      border: 1px solid var(--btn-glow, rgba(255, 255, 255, 0));
-      box-shadow:
-        0 0 10px 0.5px var(--btn-glow, #353535);
+    /* title */
+    .authCard h2 {
+      color: #91f7f7;
+      margin: 30px;
     }
 
-    .authCard input::placeholder { color: #ccc; }
+    /* Input box */
+    .authCard input {
+      width: 100%;
+      padding: 10px 20px;
+      margin: 5px 0;
+      outline: none;
+      font-size: 1em;
+      border-radius: 10px;
+      border: 1px solid var(--btn-glow, rgba(255, 255, 255, 0));
+      box-shadow:
+        0 0 10px 0.5px var(--btn-glow, #222);
+    }
+    .authCard input:hover {
+      box-shadow: 0 0 10px 0.5px var(--btn-glow, #696969);
+    }
+
+    /* Register button */
     .authCard button {
-      padding: 12px;
-      margin-top: 20px;
+      padding: 10px;
       border: none;
-      border-radius: 27px;
-      background: #ff66cc;
-      color: #fff;
+      border-radius: 30px;
+      background: #ff5fff;
+      color: white;
       cursor: pointer;
-      margin-left: 0;
+      margin: 6px 0;
       transition: all 0.2s;
-      font-size: 14px; /* keep text size */
+      font-size: 1em; /* keep text size */
       width: 100%;     /* inputs expand to card width */
       box-sizing: border-box;
     }
-    .authCard button:hover { background: #ff33aa; }
-
-    .authToggle { margin-top: 15px; font-size: 13px; color: #ccc; cursor: pointer; text-decoration: underline; }
+    .authCard button:hover { background: #ff2fff; }
+  
+    .authCard button:active {
+      transform: scale(0.90); /* shrink when pressed */
+      background: var(--btn-glow, magenta);
+      color: #ffffff;
+      transition:
+        transform 0.15s,
+        box-shadow 0.15s; /* faster transition */
+    }
+    
+    /* Underline text */
+    .authToggle {
+      margin: 25px;
+      font-size: 0.9em;
+      color: #989898;
+      cursor: pointer;
+      text-decoration: underline;
+    }
 
     /* Portrait & Landscape adjustments */
     @media (max-width: 768px) {
@@ -1564,7 +1561,7 @@ Main CueTube UI
             <!-- Scrollable inner like NextBox -->
             <div class="songbook-box-inner">
               <div id="songbookList"></div>
-              <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 0.9em; color: white; text-align: center;">" No results found "</div>
+              <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 1em; color: white; text-align: center;">" No results found "</div>
             </div>
             
           </div>
@@ -1594,7 +1591,7 @@ Main CueTube UI
       <button class="bottom-drawer-handle" onclick="toggleBottomDrawer()">_</button>
       
       <div class="url-group">
-        <input type="text" class="url-input" placeholder="Paste the YouTube URL here" id="youtubeInputDrawer" />
+        <input type="text" class="url-input" placeholder="Paste YouTube URL here" id="youtubeInputDrawer" />
         
         <button id="pasteBtn" class="paste-btn-icon" data-tooltip="Paste (Ctrl + V)">
           <img src="Paste Icon.png" alt="Paste" class="paste-icon-image" />
@@ -1602,8 +1599,8 @@ Main CueTube UI
       </div>
       
       <div class="bottom-buttons">
-        <button class="cyan-btn" onclick="reserveFromDrawer()">Reserve</button>
-        <button class="cyan-btn" onclick="saveToSongbook()">Save</button>
+        <button class="cyan-btn" data-tooltip="Reserve to queue" onclick="reserveFromDrawer()">Reserve</button>
+        <button class="cyan-btn" data-tooltip="Save to songbook" onclick="saveToSongbook()">Save</button>
         <button id="nextBtnDrawer" class="cyan-btn" data-tooltip="Next Song (Ctrl + →)" onclick="showNextConfirm()">
           Next
         </button>
@@ -1873,6 +1870,13 @@ JavaScript Logic
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
         e.preventDefault();
         await pasteFromClipboard();
+        return;
+      }
+
+      // Ctrl+S / Cmd+S: Save from Songbook → auto-reserve
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        await saveToSongbook();
         return;
       }
 
@@ -2319,7 +2323,7 @@ JavaScript Logic
 
       if (!current) {
         nowTitleEl.innerHTML = "";
-        labelEl.textContent = "Now Playing";
+        labelEl.textContent = "NOW PLAYING";
         nowBoxEl.classList.remove("active"); // 🔹 remove glow + label highlight
         stopProgressChecker();
         return;
@@ -2337,14 +2341,14 @@ JavaScript Logic
           <span class="now-playing-glow">${title}</span>
           <div id="noUpcoming"
             style="color: #7f95e4;
-            font-family: "Segoe UI", sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             font-weight: normal;
             margin-top: 10px;
-            font-size: 0.7em;">
+            font-size: 1em;">
             No upcoming song . . .
           </div>`;
 
-        labelEl.textContent = "Now Playing"; // keep label updated
+        labelEl.textContent = "NOW PLAYING"; // keep label updated
 
         notifyShowTimeout = setTimeout(() => {
           showNotify("No upcoming song");
@@ -2358,7 +2362,7 @@ JavaScript Logic
       } else {
         // Update the title with glow
         nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
-        labelEl.textContent = "Now Playing"; // keep label updated
+        labelEl.textContent = "NOW PLAYING"; // keep label updated
         hideNotify();
         removeNoUpcoming(); // Remove "No upcoming song" immediately
         startProgressChecker();
@@ -2434,33 +2438,32 @@ JavaScript Logic
         const nextSongTitle = queue[currentIndex + 1].title || "Untitled song";
 
         const messageHTML = `
-    <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
-      <span style="
-        font-family: "Segoe UI", sans-serif;
-        font-weight: normal;
-        font-size: 0.7em; 
-        color: #7f95e4; 
-        text-shadow:
-          0 0 8px black,
-          0 0 8px black,
-          0 0 12px #222,
-          0 0 24px #222;
-        margin-bottom: 4px;
-      ">Up next:</span>
-      <span style="
-        font-family: "Segoe UI", sans-serif;
-        font-weight: regular;
-        letter-spacing: 0.05em;
-        font-size: 0.9em;
-        text-shadow:
-          0 0 8px black,
-          0 0 8px black,
-          0 0 12px #222,
-          0 0 24px #222;
-        word-wrap: break-word;
-      ">${nextSongTitle}</span>
-    </div>
-  `;
+        <div style="display: flex; flex-direction: column; white-space: normal; max-width: 90%;">
+          <span style="
+            font-family: 'Orbitron', sans-serif;
+            font-weight: normal;
+            font-size: 1em; 
+            color: #7f95e4; 
+            text-shadow:
+              0 0 8px black,
+              0 0 8px black,
+              0 0 12px #222,
+              0 0 24px #222;
+            margin-bottom: 4px;
+          ">UP NEXT:</span>
+          <span style="
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: normal;
+            letter-spacing: 0.05em;
+            font-size: 1em;
+            text-shadow:
+              0 0 8px black,
+              0 0 8px black,
+              0 0 12px #222,
+              0 0 24px #222;
+            word-wrap: break-word;
+          ">${nextSongTitle}</span>
+        </div>`;
 
         showTempNotify(messageHTML); // plays notif sound on show, slide sound on hide
         return true;
@@ -2630,43 +2633,90 @@ JavaScript Logic
       });
     }
 
-    // =====================
-    // Universal Tooltip
-    // =====================
-    // note: add new tooltip use this script ex. <button data-tooltip="My new tooltip">Click Me</button>
-    // Select all elements with data-tooltip
-    const tooltipElements = document.querySelectorAll("[data-tooltip]");
+// =====================
+// Universal Tooltip
+// =====================
+// note: to add new tooltip use this script to html ex. <button data-tooltip="Example">Click Me</button>
+// Create a single floating tooltip element
+const tooltip = document.createElement("div");
+tooltip.id = "universalTooltip";
+Object.assign(tooltip.style, {
+  position: "absolute",
+  pointerEvents: "none",
+  background: "#222",
+  color: "#fff",
+  padding: "5px 10px",
+  borderRadius: "4px",
+  fontFamily: "sans-serif",
+  fontSize: "0.85em",
+  whiteSpace: "nowrap",
+  opacity: "0",
+  transition: "opacity 0.2s",
+  zIndex: "9999",
+});
+document.body.appendChild(tooltip);
 
-    tooltipElements.forEach((el) => {
-      let tooltipTimeout;
+document.querySelectorAll("[data-tooltip]").forEach(el => {
+  let timeout;
 
-      // Desktop hover
-      el.addEventListener("mouseenter", () => {
-        tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000);
-      });
-      el.addEventListener("mouseleave", () => {
-        clearTimeout(tooltipTimeout);
-        el.classList.remove("show-tooltip");
-      });
+  const showTooltip = () => {
+    tooltip.textContent = el.getAttribute("data-tooltip");
+    tooltip.style.opacity = "1";
 
-      // Mobile/Android long-press
-      el.addEventListener("touchstart", (e) => {
-        // Only trigger on first finger
-        if (e.touches.length > 1) return;
+    const rect = el.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
 
-        tooltipTimeout = setTimeout(() => el.classList.add("show-tooltip"), 3000); // 3-sec press
-      });
+    // Default: above element
+    let top = rect.top - tooltipRect.height - 8 + window.scrollY;
+    let left = rect.left + rect.width / 2 - tooltipRect.width / 2 + window.scrollX;
 
-      el.addEventListener("touchend", () => {
-        clearTimeout(tooltipTimeout);
-        el.classList.remove("show-tooltip");
-      });
+    // --- Adjust if off-screen horizontally ---
+    if (left < 4) left = 4; // small padding from left
+    if (left + tooltipRect.width > window.innerWidth - 4)
+      left = window.innerWidth - tooltipRect.width - 4;
 
-      el.addEventListener("touchcancel", () => {
-        clearTimeout(tooltipTimeout);
-        el.classList.remove("show-tooltip");
-      });
-    });
+    // --- Adjust vertically if off-screen ---
+    if (top < 4) top = rect.bottom + 8 + window.scrollY; // show below if not enough space above
+
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+  };
+
+  const hideTooltip = () => {
+    clearTimeout(timeout);
+    tooltip.style.opacity = "0";
+  };
+
+  // --- Desktop hover ---
+  el.addEventListener("mouseenter", () => {
+    timeout = setTimeout(showTooltip, 500);
+  });
+  el.addEventListener("mouseleave", hideTooltip);
+
+  // --- Mobile long-press ---
+  el.addEventListener("touchstart", e => {
+    if (e.touches.length > 1) return;
+
+    const startX = e.touches[0].clientX;
+    const startY = e.touches[0].clientY;
+
+    timeout = setTimeout(showTooltip, 700); // show after 700ms press
+
+    const moveHandler = e2 => {
+      const dx = e2.touches[0].clientX - startX;
+      const dy = e2.touches[0].clientY - startY;
+      if (Math.sqrt(dx*dx + dy*dy) > 10) { // finger moved >10px
+        clearTimeout(timeout);
+        el.removeEventListener("touchmove", moveHandler);
+      }
+    };
+
+    el.addEventListener("touchmove", moveHandler, { passive: true });
+  });
+
+  el.addEventListener("touchend", hideTooltip);
+  el.addEventListener("touchcancel", hideTooltip);
+});
 
     // ======================================
     // Exit Modal
@@ -3258,6 +3308,8 @@ function _colorToRGBA(colorStr, alpha) {
 // Save to Songbook (Unified validation + fetchTitle)
 // ==============================
 async function saveToSongbook() {
+  playClickSound(); // Play click sound immediately
+
   const input = document.getElementById("youtubeInputDrawer");
   const url = input.value.trim();
 
@@ -3443,7 +3495,7 @@ function openSongOptions(target, onClose) {
     buttons: [
       {
         label: "Delete",
-        style: "font-size:0.9em", // smaller font
+        style: "font-size: 0.9em", // smaller font
         onClick: () => {
           playClickSound();
           __modal_onClose = () => {
@@ -3480,7 +3532,7 @@ function openSongOptions(target, onClose) {
       },
       {
         label: "Reserve",
-        style: "font-size:0.9em", // smaller font
+        style: "font-size: 0.9em", // smaller font
         onClick: () => {
           // 🔧 Same as reserveFromDrawer but using songId
           if (queue.length === 0 && currentIndex === -1) {
@@ -3506,7 +3558,7 @@ function openSongOptions(target, onClose) {
       },
       {
         label: "Send",
-        style: "font-size:0.9em", // smaller font
+        style: "font-size: 0.9em", // smaller font
         onClick: async () => {
           playClickSound();
           const recipientId = prompt("Send to which user? (User ID)");
