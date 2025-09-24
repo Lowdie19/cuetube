@@ -71,6 +71,7 @@
         
       }
   
+  
 /*  =============================
     CUETUBE TITLE +++++++
     ===================== */
@@ -298,6 +299,8 @@
     ============================== */
     /* Left Drawer body */
     .drawer {
+      flex: 1;
+      flex-direction: column;
       position: fixed;
       top: 0;
       left: -80%; /* hidden off-screen */
@@ -307,10 +310,6 @@
       padding: 20px;
       z-index: 99;
       transition: left 0.3s cubic-bezier(0.25, 1.15, 0.5, 1);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 25px;
     }
   
     .drawer::after {
@@ -419,12 +418,14 @@
 /*  ==================
     Nowplaying-box
     ================= */
+
     /* Box */
     .nowplaying-box {
+      display: flex;
+      flex-direction: column;
       border-radius: 20px;
       padding: 18px;
       background: black;
-      margin: 50px 10px 15px 15px;
       border: 1px solid var(--btn-glow, #000000);
       transition: box-shadow 0.5s;
     }
@@ -442,7 +443,7 @@
     /* Label (Nowplaying) */
     .nowplaying-box .label {
       font-family: "Orbitron", sans-serif;
-      font-size: .95em;
+      font-size: .90em;
       color: #222;
       margin-bottom: 15px;
     }
@@ -487,6 +488,44 @@
           0 0 20px magenta;
       }
     }
+  
+/*  ==========================
+    Group A
+    ========================== */
+    .group-a {
+      background-color: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 10px;
+      overflow: hidden;
+    }
+  
+/*  ==========================
+    Group B
+    ========================== */
+    .group-b {
+      background-color: none;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 10px;
+      overflow: hidden;
+    }
+  
+    /* Wide screens → YT left, Songbook right */
+    @media (min-width: 900px) {
+      .main-group {
+        flex-direction: row;
+      }
+      .group-a,
+      .group-a {
+        flex: 1;
+      }
+    }
+  
+  
   
 /*  ==========================
     Next-box
@@ -541,6 +580,7 @@
   
     /* Song Titles inside Next-box */
     .next-box .songtitle {
+      color: white;
       font-family: "Segoe UI", sans-serif;
       font-size: 1em;
       margin: 10px 0;
@@ -1180,21 +1220,20 @@
     SongBook Queue
     =============================== */
     .songbook {
-      position: relative;
-      bottom: 0;
+      display: flex;
+      flex-direction: column;
       border: 1px solid var(--btn-glow, white);
       border-radius: 20px;
       padding: 10px; /* top/right/bott/left */
       background: black;
-      margin: 0px 10px 15px 15px; /* top/right/bott/left */
       box-shadow:
         0 0 10px 0.5px var(--btn-glow, magenta),
         inset 0 0 10px 0.5px var(--btn-glow, magenta);
-      overflow: hidden;
       transition:
         transform 0.5s ease,
         max-height 0.5s ease;
       z-index: 999;
+      overflow: hidden;
     }
   
     /* Handle bar (Songbook Button) */
@@ -1234,7 +1273,7 @@
   
     /* Expanded state */
     .songbook.open .songbook-list {
-      max-height: 70vh; /* adjust as needed */
+      max-height: 65vh; /* adjust as needed */
     }
   
     .songbook-box-inner {
@@ -1600,43 +1639,48 @@ Main CueTube UI
       <span class="title-text">CueTube :)</span>
     </div>
   
-    <!-- Drawer -->
-    <div class="drawer" id="drawer">
-      <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
-      <div>
-        <!-- Now Playing stays fixed -->
-        <div class="nowplaying-box">
-          <div class="label">NOW PLAYING</div>
-          <div class="title" id="nowTitle"></div>
-        </div>
-        
-        <!-- Next list with smooth stretch -->
-        <div class="next-box hidden">
-          <div class="next-box-inner">
-            <div class="label">NEXT</div>
-            <div id="nextList"></div>
-            <div id="overflowCounter"></div>
+<!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div id="drawerHandle" class="drawer-handle" onclick="toggleDrawer()">☰</div>
+      
+      <div class="main-group">
+<!-- Group A -->
+        <div class="group-a">
+          <!-- Now Playing stays fixed -->
+          <div class="nowplaying-box">
+            <div class="label">NOW PLAYING</div>
+            <div class="title" id="nowTitle"></div>
+          </div>
+          <!-- Next list with smooth stretch -->
+          <div class="next-box hidden">
+            <div class="next-box-inner">
+              <div class="label">NEXT</div>
+              <div id="nextList"></div>
+              <div id="overflowCounter"></div>
+            </div>
           </div>
         </div>
-        
-        <!-- SongBook -->
-        <div class="songbook" id="songbook">
-          <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
-          <div class="songbook-list">
-            <div class="songbook-search">
-              <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+<!-- Group B -->
+          <div class="group-b">
+            <!-- SongBook -->
+            <div class="songbook" id="songbook">
+              <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
+
+              <div class="songbook-list">
+                <div class="songbook-search">
+                  <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+                </div>
+                <!-- Scrollable inner like NextBox -->
+                <div class="songbook-box-inner">
+                  <div id="songbookList"></div>
+                  <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 1em; color: white; text-align: center;">" No results found "</div>
+                </div>
+              </div>
             </div>
-            
-            <!-- Scrollable inner like NextBox -->
-            <div class="songbook-box-inner">
-              <div id="songbookList"></div>
-              <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 1em; color: white; text-align: center;">" No results found "</div>
-            </div>
-            
           </div>
-        </div>
-      </div>
-    </div>
+        
+    </div>    <!-- end of Main Group -->
+</div>    <!-- end of Drawer -->
   
   
     <!-- Overlays -->
