@@ -166,21 +166,6 @@
       display: block;
     }
   
-    /* On wider screens (like PC), use 40% width */
-    @media (min-width: 768px) {
-      .drawer {
-        width: 40% !important;
-        left: -40% !important;
-      }
-      
-      .drawer.open {
-        left: 0 !important;
-      }
-      .bottom-buttons {
-        width: 70vw !important;
-      }
-    }
-  
 /*  ============================
     NOTIFICATION +++++++++++++++
     ============================ */
@@ -299,11 +284,11 @@
       flex-direction: column;
       position: fixed;
       top: 0;
-      left: -80%; /* hidden off-screen */
-      width: 80%; /* always full width */
+      left: -90%; /* hidden off-screen */
+      width: 90%;
       height: 100%;
       background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
-      padding: 20px;
+      padding: 0px;
       z-index: 99;
       transition: left 0.3s cubic-bezier(0.25, 1.15, 0.5, 1);
     }
@@ -323,6 +308,17 @@
     .drawer.open {
       left: 0%; /* stop 20% before the right edge → looks like 80% */
       animation: shadowFloat 5s infinite ease-in-out;
+    }
+  
+    /* Left Drawer size on monitor */
+  @media (min-width: 1025px) and (orientation: landscape) {
+    .drawer {
+      left: -40%; /* hidden off-screen */
+      width: 40%;
+      }
+    .group-a {
+      margin-top: 15px;
+      } 
     }
   
     @keyframes shadowFloat {
@@ -484,6 +480,13 @@
           0 0 20px magenta;
       }
     }
+
+/*  ==========================
+    Main Group
+    ========================== */  
+    .main-group {
+      padding: 15px 15px 15px 20px; /* top/Right/bott/Left*/
+    }
   
 /*  ==========================
     Group A
@@ -494,7 +497,6 @@
       display: flex;
       flex-direction: column;
       padding: 10px;
-      gap: 10px;
       overflow: hidden;
     }
   
@@ -506,22 +508,8 @@
       display: flex;
       flex-direction: column;
       padding: 10px;
-      gap: 10px;
       overflow: hidden;
     }
-  
-    /* Wide screens → YT left, Songbook right */
-    @media (min-width: 900px) {
-      .main-group {
-        flex-direction: row;
-      }
-      .group-a,
-      .group-a {
-        flex: 1;
-      }
-    }
-  
-  
   
 /*  ==========================
     Next-box
@@ -532,9 +520,7 @@
       display: flex;
       flex-direction: column;
       padding: 10px;
-      margin-left: 15px;
-      flex: 1;
-      min-height: 0;
+      margin-top: 10px;
       
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
@@ -879,6 +865,13 @@
       z-index: 5;
     }
   
+    /* On wider screens (like PC), use 70% width */
+    @media (min-width: 768px) {
+      .bottom-buttons {
+        width: 70vw !important;
+      }
+    }
+  
     .overlay {
       position: fixed;
       top: 0;
@@ -997,36 +990,17 @@
       -webkit-tap-highlight-color: transparent; /* no blue/red flash */
     }
   
+
 /*  ============================
     Landscape Mode
     ============================ */
-    @media (orientation: landscape) {
-      .youtube-wrapper {
-        height: 65vh;
-      }
-      .drawer {
-        width: 65% !important;
-        left: -65% !important;
-        height: 100vh; /* Full screen height in landscape */
-        justify-content: space-between; /* Keep space for top + bottom parts */
-        padding-bottom: 20px; /* Add some space at the bottom */
-      }
-      .drawer.open {
-        left: 0 !important;
-      }
-      .url-input,
-      .search-bar {
-        display: block; /* Make sure it's visible */
-      }
-    }
-  
-    @media screen and (orientation: landscape) and (max-width: 915px) {
-      .title-bar {
-        display: none !important;
+     @media screen and (orientation: landscape) and (max-width: 915px) {
+      .touchpad {
+        display: block !important;
       }
       
-      .nowplaying-box {
-        margin-top: 15px !important;
+      .title-bar {
+        display: none !important;
       }
       
       .notify-box {
@@ -1049,7 +1023,7 @@
         to left,
         rgba(0, 0, 0, 0) 0,
         rgba(0, 0, 0, 0.050) 0 0%
-      );*/
+        );*/
         backdrop-filter: blur(5px);
       }
       
@@ -1059,7 +1033,6 @@
         transform: translateX(-50%) !important;
         width: 100vw !important;
         height: 100vh !important;
-        padding: 5px !important;
       }
       
       #popupModal {
@@ -1069,28 +1042,34 @@
         transform: translate(-50%, -50%) !important;
       }
       
-      .url-group {
-        width: 40vw !important;
-        position: absolute !important;
-        top: 50% !important;
-        right: 3% !important;
-        transform: translate(0, -50%) !important;
-        gap: 10px !important;
+      /* Drawer landscape*/
+      .drawer {
+        width: 90% !important;
+        left: -90% !important;
+        height: 100vh; /* Full screen height in landscape */
+      }
+      .drawer.open {
+        left: 0px !important;
+      }
+        
+      .nowplaying-box {
+        margin-top: 4% !important;
+        left: 0px !important;
+      }
+
+      .group-a,
+      .group-b {
+        padding: 8px;
+      }
+      .songbook,
+      .nowplaying-box,
+      .next-box {
+        scale: .90;
+        margin: 0px;
+        width: 105%;
       }
       
-      .paste-btn-icon {
-        margin-left: 5px !important;
-      }
-      
-      .bottom-buttons {
-        width: 50vw !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 4% !important;
-        transform: translate(0, -50%) !important;
-        gap: 2% !important;
-      }
-      
+      /* Bottom Drawer landscape*/
       .bottom-drawer {
         bottom: -100px;
         width: 100vw !important;
@@ -1114,9 +1093,32 @@
         opacity: 0.01 !important;
       }
       
-      .touchpad {
-        display: block !important;
+      .url-group {
+        width: 40vw !important;
+        position: absolute !important;
+        top: 50% !important;
+        right: 3% !important;
+        transform: translate(0, -50%) !important;
+        gap: 10px !important;
       }
+      
+      .paste-btn-icon {
+        margin-left: 5px !important;
+      }
+
+      .bottom-buttons {
+        width: 50vw !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 4% !important;
+        transform: translate(0, -50%) !important;
+        gap: 2% !important;
+      }
+      .url-input,
+      .search-bar {
+        display: block; /* Make sure it's visible */
+      }
+      
     }
   
 /*  ========================================
@@ -1222,7 +1224,7 @@
       padding: 10px; /* top/right/bott/left */
       overflow: hidden;
       
-      background: black;
+      background: none;
       border: 1px solid var(--btn-glow, white);
       box-shadow:
         0 0 10px 0.5px var(--btn-glow, magenta),
