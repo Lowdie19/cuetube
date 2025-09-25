@@ -1420,7 +1420,7 @@
       width: 100%;
       min-width: 250px;
       max-width: 400px;      /* fit smaller screens */
-      padding: 2%;
+      padding: 5%;
       background: linear-gradient(to bottom, rgba(13, 14, 14, 0.6) 0%, #000000 100%);
       border-radius: 20px;
       color: #fff;
@@ -1565,7 +1565,33 @@
       .authToggle {
         margin: 14px 0px;
       }
-    } 
+    }
+  
+      /* Custom Alert */
+      .custom-alert {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 9999;
+    }
+    .custom-alert.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
+    /* how to use: Ex. showAlert("❌ Invalid UserID or Password", "error"); */
+    .custom-alert.success { background: #28a745; } /* green */
+    .custom-alert.error { background: #dc3545; }  /* red */
+    .custom-alert.info { background: #007bff; }   /* blue */
       
 
 /* Main CueTube UI hidden initially ======= */
@@ -1717,7 +1743,10 @@ Main CueTube UI
         </button>
       </div>
     </div>
-  
+    
+    <!-- Alert -->
+    <div id="customAlert" class="custom-alert"></div>
+
     <!-- Popup -->
     <div id="popupOverlay"></div>
     <div id="popupModal"></div>
@@ -3793,23 +3822,27 @@ async function loadSongbook() {
 
 // ---------- Register User ----------
 async function registerUser() {
+  playClickSound();
   const userID = document.getElementById("regUser").value.trim();
   const password = document.getElementById("regPass").value.trim();
   const nickname = document.getElementById("regNick").value.trim();
 
   if (!userID || !password || !nickname) {
-    alert("⚠️ Fill all fields");
+    playErrorSound();
+    showAlert("⚠️ Fill all fields");
     return;
   }
   if (userID.length > 5 || nickname.length > 10) {
-    alert("⚠️ UserID max 5, Nickname max 10");
+    playErrorSound();
+    showAlert("⚠️ UserID max 5, Nickname max 10");
     return;
   }
 
   const userRef = db.collection("users").doc(userID);
   const doc = await userRef.get();
   if (doc.exists) {
-    alert("⚠️ User ID already taken");
+    playErrorSound();
+    showAlert("⚠️ User ID already taken");
     return;
   }
 
@@ -3818,25 +3851,41 @@ async function registerUser() {
 
   // AUTO-LOGIN using the nickname we just saved
   currentUser = { id: userID, nickname: nickname };
-  alert(`✅ Welcome ${currentUser.nickname}`);
+  showAlert(`✅ Welcome ${currentUser.nickname}`);
+  playSuccessSound();
   onLoginSuccess(); // Will also load songbook
 }
 
 // ---------- Login User ----------
 async function loginUser() {
+  playClickSound();
   const userID = document.getElementById("loginUser").value.trim();
   const password = document.getElementById("loginPass").value.trim();
 
   const userRef = db.collection("users").doc(userID);
   const doc = await userRef.get();
   if (!doc.exists || doc.data().password !== password) {
-    alert("❌ Invalid UserID or Password");
+    playErrorSound();
+    showAlert("❌ Invalid UserID or Password");
     return;
   }
 
   currentUser = { id: userID, nickname: doc.data().nickname };
-  alert(`✅ Welcome ${currentUser.nickname}`);
+  showAlert(`✅ Welcome ${currentUser.nickname}`);
+  playSuccessSound();
   onLoginSuccess(); // Will also load songbook
+}
+
+
+// ---------- Alert ----------
+function showAlert(message, type = "info") {
+  const alertBox = document.getElementById("customAlert");
+  alertBox.textContent = message;
+  alertBox.className = `custom-alert ${type} show`;
+
+  setTimeout(() => {
+    alertBox.classList.remove("show");
+  }, 2500); // hide after 2.5s
 }
 </script>
     
