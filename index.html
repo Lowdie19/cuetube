@@ -309,17 +309,7 @@
       left: 0%; /* stop 20% before the right edge → looks like 80% */
       animation: shadowFloat 5s infinite ease-in-out;
     }
-  
-    /* Left Drawer size on monitor */
-  @media (min-width: 1025px) and (orientation: landscape) {
-    .drawer {
-      left: -40%; /* hidden off-screen */
-      width: 40%;
-      }
-    .group-a {
-      margin-top: 15px;
-      } 
-    }
+
   
     @keyframes shadowFloat {
       0% {
@@ -865,13 +855,6 @@
       z-index: 5;
     }
   
-    /* On wider screens (like PC), use 70% width */
-    @media (min-width: 768px) {
-      .bottom-buttons {
-        width: 70vw !important;
-      }
-    }
-  
     .overlay {
       position: fixed;
       top: 0;
@@ -990,7 +973,22 @@
       -webkit-tap-highlight-color: transparent; /* no blue/red flash */
     }
   
-
+  
+/*  ============================
+    On wider screens (like PC), use 70% width
+    ============================ */  
+    @media (min-width: 768px) {
+      .bottom-buttons {
+        width: 70vw !important;
+      }
+      .drawer {
+        left: -40%; /* hidden off-screen */
+        width: 40%;
+      }
+      .group-a {
+        margin-top: 15px;
+      } 
+    }
 /*  ============================
     Landscape Mode
     ============================ */
