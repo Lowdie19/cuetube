@@ -63,12 +63,11 @@
       body {
         margin: 0;
         padding: 0;
-        background: linear-gradient(#006c6c, black);
+        background: linear-gradient(#003535, black);
         font-family: "Segoe UI", sans-serif;
         overflow: hidden;
         height: 100vh;
         width: 100vw;
-        
       }
   
   
@@ -210,8 +209,8 @@
     .Notify .line {
       width: 3px;
       height: 100%;
-      background-color: #7f95e4;
-      /*rgba(91, 24, 194, 1);*/
+      background-color: chartreuse;
+      /*rgba(91, 24, 194, 1);= #7f95e4;*/
       opacity: 0;
       position: absolute;
       left: 0;
@@ -219,21 +218,18 @@
       transform: translateY(-50%);
       z-index: 10;
       animation: fadeIn 3s forwards;
-      box-shadow: 5px 0 15px #7f95e4;
     }
   
     /* Text */
     .Notify .text {
       color: white;
-      text-shadow:
+      /*text-shadow:
         0 0 8px black,
         0 0 8px black,
         0 0 12px #222,
-        0 0 24px #222;
+        0 0 24px #222;*/
       font-family: "Segoe UI", sans-serif;
       font-size: 1em;
-      font-weight: regular;
-      letter-spacing: 0.05em;
       word-wrap: break-word;
       opacity: 0;
       transform: translateX(-100%);
@@ -443,7 +439,7 @@
     /* Label (Nowplaying) */
     .nowplaying-box .label {
       font-family: "Orbitron", sans-serif;
-      font-size: .90em;
+      font-size: 1em;
       color: #222;
       margin-bottom: 15px;
     }
@@ -574,7 +570,7 @@
     /* Label (NEXT) */
     .next-box .label {
       font-family: "Orbitron", sans-serif;
-      font-size: 0.7em;
+      font-size: 0.8em;
       color: grey;
     }
   
@@ -1222,10 +1218,12 @@
     .songbook {
       display: flex;
       flex-direction: column;
-      border: 1px solid var(--btn-glow, white);
       border-radius: 20px;
       padding: 10px; /* top/right/bott/left */
+      overflow: hidden;
+      
       background: black;
+      border: 1px solid var(--btn-glow, white);
       box-shadow:
         0 0 10px 0.5px var(--btn-glow, magenta),
         inset 0 0 10px 0.5px var(--btn-glow, magenta);
@@ -1233,13 +1231,12 @@
         transform 0.5s ease,
         max-height 0.5s ease;
       z-index: 999;
-      overflow: hidden;
     }
   
     /* Handle bar (Songbook Button) */
     .songbook-handle {
       font-family: "Orbitron", sans-serif;
-      font-size: 1em;
+      font-size: 1.1em;
       text-align: center;
       padding: 10px;
       color: #9377ea;
@@ -1648,7 +1645,7 @@ Main CueTube UI
         <div class="group-a">
           <!-- Now Playing stays fixed -->
           <div class="nowplaying-box">
-            <div class="label">NOW PLAYING</div>
+            <div class="label">Now Playing :</div>
             <div class="title" id="nowTitle"></div>
           </div>
           <!-- Next list with smooth stretch -->
@@ -1664,7 +1661,7 @@ Main CueTube UI
           <div class="group-b">
             <!-- SongBook -->
             <div class="songbook" id="songbook">
-              <div class="songbook-handle" onclick="toggleSongbook()">SONGBOOK 🎵</div>
+              <div class="songbook-handle" onclick="toggleSongbook()">Songbook 🎵</div>
 
               <div class="songbook-list">
                 <div class="songbook-search">
@@ -2115,7 +2112,7 @@ JavaScript Logic
           }
         } else if (event.data === YT.PlayerState.PAUSED) {
           pauseTimeout = setTimeout(() => {
-            showPopup("Paused", "magenta", true, true);
+            showPopup("II Paused", "magenta", true, true);
           }, 300);
           playClickSound()
           stopProgressChecker();
@@ -2436,7 +2433,7 @@ JavaScript Logic
 
       if (!current) {
         nowTitleEl.innerHTML = "";
-        labelEl.textContent = "NOW PLAYING";
+        labelEl.textContent = "Now Playing :";
         nowBoxEl.classList.remove("active"); // 🔹 remove glow + label highlight
         stopProgressChecker();
         return;
@@ -2453,7 +2450,7 @@ JavaScript Logic
         nowTitleEl.innerHTML = `
           <span class="now-playing-glow">${title}</span>
           <div id="noUpcoming"
-            style="color: #7f95e4;
+            style="color: darkcyan;
             font-family: 'Segoe UI', sans-serif;
             font-weight: normal;
             margin-top: 10px;
@@ -2461,7 +2458,7 @@ JavaScript Logic
             No upcoming song . . .
           </div>`;
 
-        labelEl.textContent = "NOW PLAYING"; // keep label updated
+        labelEl.textContent = "Now Playing :"; // keep label updated
 
         notifyShowTimeout = setTimeout(() => {
           showNotify("No upcoming song");
@@ -2475,7 +2472,7 @@ JavaScript Logic
       } else {
         // Update the title with glow
         nowTitleEl.innerHTML = `<span class="now-playing-glow">${title}</span>`;
-        labelEl.textContent = "NOW PLAYING"; // keep label updated
+        labelEl.textContent = "Now Playing :"; // keep label updated
         hideNotify();
         removeNoUpcoming(); // Remove "No upcoming song" immediately
         startProgressChecker();
@@ -2556,24 +2553,13 @@ JavaScript Logic
             font-family: 'Orbitron', sans-serif;
             font-weight: normal;
             font-size: 1em; 
-            color: #7f95e4; 
-            text-shadow:
-              0 0 8px black,
-              0 0 8px black,
-              0 0 12px #222,
-              0 0 24px #222;
+            color: white; 
             margin-bottom: 4px;
-          ">UP NEXT:</span>
+          ">Up Next :</span>
           <span style="
             font-family: 'Segoe UI', sans-serif;
             font-weight: normal;
-            letter-spacing: 0.05em;
             font-size: 1em;
-            text-shadow:
-              0 0 8px black,
-              0 0 8px black,
-              0 0 12px #222,
-              0 0 24px #222;
             word-wrap: break-word;
           ">${nextSongTitle}</span>
         </div>`;
@@ -2647,7 +2633,7 @@ JavaScript Logic
         }
 
         // 🎯 Anywhere click/tap when paused will unpause
-        if (message === "Paused") {
+        if (message === "II Paused") {
           overlay.style.cursor = "pointer";
           overlay.onclick = () => {
             if (player && player.playVideo) {
