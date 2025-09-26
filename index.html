@@ -1754,9 +1754,9 @@ function showAlert(message, type = "info") {
     ============================== */ 
     .alert-container {
       position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 80%;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
       display: flex;
       flex-direction: column;
       gap: 10px;       /* spacing between alerts */
@@ -1773,6 +1773,7 @@ function showAlert(message, type = "info") {
       color: white;
       font-size: 16px;
       font-weight: bold;
+      text-align: center;
       opacity: 0;
       pointer-events: none;
       transform: translateY(20px);
@@ -2211,12 +2212,36 @@ JavaScript Logic
         return;
       }
 
-      // Ctrl+S / Cmd+S: Save from Songbook → auto-reserve
+
+      // Ctrl+S / Cmd+S → Save to Songbook 
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
-        await saveToSongbook();
-        return;
+
+        const urlInput = document.getElementById("youtubeInputDrawer");
+
+        // Case 1: Use whatever is in the input
+        if (urlInput && urlInput.value.trim() !== "") {
+          saveToSongbook();
+          playSuccessSound();
+          showPopup("Saved!", "cyan", true, "cyan");
+          return;
+        }
+
+        // Case 2: If input empty but a video is playing, auto-fill and save
+        if (queue.length > 0 && currentIndex >= 0) {
+          const currentSong = queue[currentIndex];
+          urlInput.value = `https://www.youtube.com/watch?v=${currentSong.id}`;
+          saveToSongbook();
+          playSuccessSound();
+          showPopup("Saved!", "cyan", true, "cyan");
+          return;
+        }
+
+        // Case 3: Nothing to save
+        showPopup("⚠️ No copied URL to save", "red", true, true);
+        playErrorSound();
       }
+
 
       // Ctrl + Right Arrow → Next button
       if (e.ctrlKey && e.key === "ArrowRight") {
@@ -2258,7 +2283,29 @@ JavaScript Logic
         e.preventDefault();
       }
     });
+  
 
+      // Enter: Login/Register Button
+      document.querySelectorAll("#loginCard input").forEach(input => {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            loginUser();
+          }
+        });
+      });
+
+      document.querySelectorAll("#registerCard input").forEach(input => {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            registerUser();
+          }
+        });
+      });
+
+  
+  
     //  ==============================
     //  URL Input Enter Key
     //  ==============================
@@ -2431,12 +2478,14 @@ JavaScript Logic
       input.value = "";
 
       if (!persistentPopupActive) {
+        playSuccessSound();
         setTimeout(() => {
           showPopup("Reserved!", "cyan", false, "cyan");
-          playSuccessSound();
         }, 500);
+        setTimeout(() => {
+          showAlert("✅ New Song added to Queue", "success");
+        }, 1800);
       }
-
       closeBottomDrawer();
     }
 
@@ -3688,9 +3737,12 @@ async function saveToSongbook() {
   input.value = "";
 
   setTimeout(() => {
-    showPopup("Saved!", "cyan", false, "cyan");
     playSuccessSound();
+    showPopup("Saved!", "cyan", false, "cyan");
   }, 500);
+    setTimeout(() => {
+      showAlert("✅ New Song added to Songbook", "success");
+  }, 1800);
 }
   
 
