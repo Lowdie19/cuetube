@@ -3,6 +3,8 @@
 <html lang="en">
   <head>
 
+<script src="https://www.youtube.com/iframe_api"></script>
+    
 <!-- ==============================
      Firebase Setup (Compat version)
      ============================== -->
@@ -29,7 +31,188 @@
 
   console.log("✅ Firebase initialized (compat)");
 </script>
+    
+<script>
+let currentUser = null;
 
+// ---------- Toggle Register/Login Card ----------
+function toggleAuth() {
+  const log = document.getElementById("loginCard");
+  const reg = document.getElementById("registerCard");
+  if (reg.style.display === "none") {
+    reg.style.display = "block";
+    log.style.display = "none";
+  } else {
+    reg.style.display = "none";
+    log.style.display = "block";
+  }
+}
+
+// ---------- Show Main UI ----------
+function onLoginSuccess() {
+  document.getElementById("authOverlay").style.display = "none";
+  document.getElementById("mainCueTubeUI").style.display = "block";
+
+  // ✅ Start listening for incoming songs after login
+  if (currentUser && currentUser.id) {
+    listenForIncomingSongs(currentUser.id);
+  }
+
+  // Load songbook after UI is visible
+  loadSongbook();
+}
+
+
+// ==============================
+// Listen for Incoming Transfers
+// ==============================
+function listenForIncomingSongs(userId) {
+  db.collection("transfers")
+    .where("to", "==", userId)
+    .onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          const song = data.song;
+
+          // Add to queue
+          if (queue.length === 0 && currentIndex === -1) {
+            queue.push(song);
+            currentIndex = 0;
+            player.loadVideoById(song.id);
+            player.playVideo();
+            updateNowPlaying();
+          } else {
+            queue.push(song);
+            updateQueueDisplay();
+          }
+
+          // Notify
+          showPopup(`📩 Song received: "${song.title}"`, "magenta", false, true);
+          playNotifSound();
+
+          // Delete transfer after processing
+          db.collection("transfers").doc(change.doc.id).delete();
+        }
+      });
+    });
+}
+
+
+// ==============================
+// Load Songbook from Firestore
+// ==============================
+async function loadSongbook() {
+  if (!currentUser || !currentUser.id) return;
+
+  const userRef = db.collection("users").doc(currentUser.id);
+  const doc = await userRef.get();
+  if (!doc.exists) return;
+
+  const data = doc.data();
+  const songList = document.getElementById("songbookList");
+  songList.innerHTML = "";
+
+  if (Array.isArray(data.songbook)) {
+    data.songbook.forEach(song => {
+      const songDiv = document.createElement("div");
+      songDiv.className = "songtitle";
+      songDiv.textContent = song.title;
+      const videoId = extractVideoId(song.url);
+      songDiv.dataset.url = song.url;
+      songDiv.dataset.id = videoId;
+      attachSongbookInteractions(songDiv);
+      songList.appendChild(songDiv);
+    });
+  }
+}
+
+// ---------- Register User ----------
+async function registerUser() {
+  playClickSound();
+  const userID = document.getElementById("regUser").value.trim();
+  const password = document.getElementById("regPass").value.trim();
+  const nickname = document.getElementById("regNick").value.trim();
+
+  if (!userID || !password || !nickname) {
+    playErrorSound();
+    showAlert("⚠️ Fill all fields", "info");
+    return;
+  }
+  if (userID.length > 5 || nickname.length > 10) {
+    playErrorSound();
+    showAlert("⚠️ UserID max 5, Nickname max 10", "info");
+    return;
+  }
+
+  const userRef = db.collection("users").doc(userID);
+  const doc = await userRef.get();
+  if (doc.exists) {
+    playErrorSound();
+    showAlert("⚠️ User ID already taken", "info");
+    return;
+  }
+
+  // Save new user
+  await userRef.set({ password, nickname, songbook: [], queue: [] });
+
+  // AUTO-LOGIN using the nickname we just saved
+  currentUser = { id: userID, nickname: nickname };
+
+  // 🔹 Different message for register
+  playSuccessSound();
+  showAlert(`🎉 Account created! Welcome ${currentUser.nickname}`, "success");
+  onLoginSuccess(); // Will also load songbook
+}
+
+// ---------- Login User ----------
+async function loginUser() {
+  playClickSound();
+  const userID = document.getElementById("loginUser").value.trim();
+  const password = document.getElementById("loginPass").value.trim();
+
+  const userRef = db.collection("users").doc(userID);
+  const doc = await userRef.get();
+  if (!doc.exists || doc.data().password !== password) {
+    playErrorSound();
+    showAlert("❌ Invalid UserID or Password", "error");
+    return;
+  }
+
+  currentUser = { id: userID, nickname: doc.data().nickname };
+
+  // 🔹 Different message for login
+  playSuccessSound();
+  showAlert(`✅ Logged in as ${currentUser.nickname}`, "success");
+  onLoginSuccess(); // Will also load songbook
+}
+
+
+// ---------- Alert (Toast System) ----------
+function showAlert(message, type = "info") {
+  const container = document.getElementById("alertContainer");
+
+  // Create a new alert
+  const alertBox = document.createElement("div");
+  alertBox.className = `custom-alert ${type}`;
+  alertBox.textContent = message;
+
+  container.appendChild(alertBox);
+
+  // Animate in
+  setTimeout(() => {
+    alertBox.classList.add("show");
+  }, 10);
+
+  // Auto remove after 2.5s
+  setTimeout(() => {
+    alertBox.classList.remove("show");
+    setTimeout(() => alertBox.remove(), 300); // wait for transition
+  }, 2500);
+}
+</script>
+
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="CueTube Icon.png" />
@@ -1411,7 +1594,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 8888;
       padding: 18px; /* prevent overflow on small screens */
     }
 
@@ -1566,13 +1749,25 @@
         margin: 14px 0px;
       }
     }
-  
-      /* Custom Alert */
-      .custom-alert {
+/*  =============================
+    Custom Alert 
+    ============================== */ 
+    .alert-container {
       position: fixed;
-      bottom: 50px;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;       /* spacing between alerts */
+      align-items: center;
+      z-index: 99999;
+    /* delete "background" to use Variants - background color */
+      background: none;
+    }
+    
+    /* Individual alert (same style as before) */
+    .custom-alert {
       padding: 12px 20px;
       border-radius: 8px;
       color: white;
@@ -1580,18 +1775,20 @@
       font-weight: bold;
       opacity: 0;
       pointer-events: none;
+      transform: translateY(20px);
       transition: opacity 0.3s ease, transform 0.3s ease;
-      z-index: 9999;
     }
+    
     .custom-alert.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(-10px);
+      transform: translateY(0);
     }
+    
+    /* Variants - how to use: Ex. showAlert("❌ Invalid UserID or Password", "error"); 
+    .custom-alert.success { background: #28a745; }
+    .custom-alert.error   { background: #dc3545; }
+    .custom-alert.info    { background: #007bff; } */
 
-    /* how to use: Ex. showAlert("❌ Invalid UserID or Password", "error"); */
-    .custom-alert.success { background: #28a745; } /* green */
-    .custom-alert.error { background: #dc3545; }  /* red */
-    .custom-alert.info { background: #007bff; }   /* blue */
       
 
 /* Main CueTube UI hidden initially ======= */
@@ -1652,6 +1849,9 @@ Authentication Overlay
 <!-- ============================
 Main CueTube UI
 ============================== -->
+    <!-- Alert -->
+    <div id="alertContainer" class="alert-container"></div>
+    
 <div id="mainCueTubeUI">
 
     <!-- Invisible touchpad -->
@@ -1744,8 +1944,6 @@ Main CueTube UI
       </div>
     </div>
     
-    <!-- Alert -->
-    <div id="customAlert" class="custom-alert"></div>
 
     <!-- Popup -->
     <div id="popupOverlay"></div>
@@ -3717,177 +3915,7 @@ function openSongOptions(target, onClose) {
     showCloseButton: true // ✅ Enable top-right X button
   });
 }
-
 </script>
-<!-------------------------------------------------------------------------------------------------->
 
-<script src="https://www.youtube.com/iframe_api"></script>
-
-<!-------------------------------------------------------------------------------------------------->
-<script>
-let currentUser = null;
-
-// ---------- Toggle Register/Login Card ----------
-function toggleAuth() {
-  const log = document.getElementById("loginCard");
-  const reg = document.getElementById("registerCard");
-  if (reg.style.display === "none") {
-    reg.style.display = "block";
-    log.style.display = "none";
-  } else {
-    reg.style.display = "none";
-    log.style.display = "block";
-  }
-}
-
-// ---------- Show Main UI ----------
-function onLoginSuccess() {
-  document.getElementById("authOverlay").style.display = "none";
-  document.getElementById("mainCueTubeUI").style.display = "block";
-
-  // ✅ Start listening for incoming songs after login
-  if (currentUser && currentUser.id) {
-    listenForIncomingSongs(currentUser.id);
-  }
-
-  // Load songbook after UI is visible
-  loadSongbook();
-}
-
-
-// ==============================
-// Listen for Incoming Transfers
-// ==============================
-function listenForIncomingSongs(userId) {
-  db.collection("transfers")
-    .where("to", "==", userId)
-    .onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-          const song = data.song;
-
-          // Add to queue
-          if (queue.length === 0 && currentIndex === -1) {
-            queue.push(song);
-            currentIndex = 0;
-            player.loadVideoById(song.id);
-            player.playVideo();
-            updateNowPlaying();
-          } else {
-            queue.push(song);
-            updateQueueDisplay();
-          }
-
-          // Notify
-          showPopup(`📩 Song received: "${song.title}"`, "magenta", false, true);
-          playNotifSound();
-
-          // Delete transfer after processing
-          db.collection("transfers").doc(change.doc.id).delete();
-        }
-      });
-    });
-}
-
-
-
-// ==============================
-// Load Songbook from Firestore
-// ==============================
-async function loadSongbook() {
-  if (!currentUser || !currentUser.id) return;
-
-  const userRef = db.collection("users").doc(currentUser.id);
-  const doc = await userRef.get();
-  if (!doc.exists) return;
-
-  const data = doc.data();
-  const songList = document.getElementById("songbookList");
-  songList.innerHTML = "";
-
-  if (Array.isArray(data.songbook)) {
-    data.songbook.forEach(song => {
-      const songDiv = document.createElement("div");
-      songDiv.className = "songtitle";
-      songDiv.textContent = song.title;
-      const videoId = extractVideoId(song.url);
-      songDiv.dataset.url = song.url;
-      songDiv.dataset.id = videoId;
-      attachSongbookInteractions(songDiv);
-      songList.appendChild(songDiv);
-    });
-  }
-}
-
-// ---------- Register User ----------
-async function registerUser() {
-  playClickSound();
-  const userID = document.getElementById("regUser").value.trim();
-  const password = document.getElementById("regPass").value.trim();
-  const nickname = document.getElementById("regNick").value.trim();
-
-  if (!userID || !password || !nickname) {
-    playErrorSound();
-    showAlert("⚠️ Fill all fields");
-    return;
-  }
-  if (userID.length > 5 || nickname.length > 10) {
-    playErrorSound();
-    showAlert("⚠️ UserID max 5, Nickname max 10");
-    return;
-  }
-
-  const userRef = db.collection("users").doc(userID);
-  const doc = await userRef.get();
-  if (doc.exists) {
-    playErrorSound();
-    showAlert("⚠️ User ID already taken");
-    return;
-  }
-
-  // Save new user
-  await userRef.set({ password, nickname, songbook: [], queue: [] });
-
-  // AUTO-LOGIN using the nickname we just saved
-  currentUser = { id: userID, nickname: nickname };
-  showAlert(`✅ Welcome ${currentUser.nickname}`);
-  playSuccessSound();
-  onLoginSuccess(); // Will also load songbook
-}
-
-// ---------- Login User ----------
-async function loginUser() {
-  playClickSound();
-  const userID = document.getElementById("loginUser").value.trim();
-  const password = document.getElementById("loginPass").value.trim();
-
-  const userRef = db.collection("users").doc(userID);
-  const doc = await userRef.get();
-  if (!doc.exists || doc.data().password !== password) {
-    playErrorSound();
-    showAlert("❌ Invalid UserID or Password");
-    return;
-  }
-
-  currentUser = { id: userID, nickname: doc.data().nickname };
-  showAlert(`✅ Welcome ${currentUser.nickname}`);
-  playSuccessSound();
-  onLoginSuccess(); // Will also load songbook
-}
-
-
-// ---------- Alert ----------
-function showAlert(message, type = "info") {
-  const alertBox = document.getElementById("customAlert");
-  alertBox.textContent = message;
-  alertBox.className = `custom-alert ${type} show`;
-
-  setTimeout(() => {
-    alertBox.classList.remove("show");
-  }, 2500); // hide after 2.5s
-}
-</script>
-    
   </body>
 </html>
