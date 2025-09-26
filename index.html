@@ -139,9 +139,21 @@ async function registerUser() {
     showAlert("⚠️ Fill all fields", "info");
     return;
   }
-  if (userID.length > 5 || nickname.length > 10) {
+
+  // ✅ Length validations
+  if (userID.length < 3 || userID.length > 5) {
     playErrorSound();
-    showAlert("⚠️ UserID max 5, Nickname max 10", "info");
+    showAlert("⚠️ User ID must be 3–5 characters", "info");
+    return;
+  }
+  if (password.length < 5) {
+    playErrorSound();
+    showAlert("⚠️ Password must be at least 5 characters", "info");
+    return;
+  }
+  if (nickname.length < 3 || nickname.length > 10) {
+    playErrorSound();
+    showAlert("⚠️ Nickname must be 3–10 characters", "info");
     return;
   }
 
@@ -159,10 +171,9 @@ async function registerUser() {
   // AUTO-LOGIN using the nickname we just saved
   currentUser = { id: userID, nickname: nickname };
 
-  // 🔹 Different message for register
   playSuccessSound();
   showAlert(`🎉 Account created! Welcome ${currentUser.nickname}`, "success");
-  onLoginSuccess(); // Will also load songbook
+  onLoginSuccess();
 }
 
 // ---------- Login User ----------
@@ -1619,8 +1630,14 @@ function showAlert(message, type = "info") {
     .authCard h2 {
       font-family: "Orbitron", sans-serif;
       color: #91f7f7;
-      margin-bottom: 5%;
+      margin-bottom: 50px;
     }
+  
+    .authcard-note {
+      margin: 30px 0px;
+      font-size: 0.8em;
+      color: #989898;
+    } 
 
     /* input group for floating label */
     .inputGroup {
@@ -1711,7 +1728,7 @@ function showAlert(message, type = "info") {
 
     /* underline toggle text */
     .authToggle {
-      margin: 30px 0px;
+      margin-top: 30px;
       font-size: 0.9em;
       color: #989898;
       cursor: pointer;
@@ -1826,20 +1843,21 @@ Authentication Overlay
   <!-- Register Card -->
   <div class="authCard" id="registerCard">
     <h2>Register</h2>
+    <div class="authcard-note"><b>Note:</b> User ID is used for receiving songs. </div>
 
     <div class="inputGroup">
       <input type="text" id="regUser" placeholder=" " maxlength="5" required>
-      <label for="regUser">User ID (max. 5 character)</label>
+      <label for="regUser">User ID &nbsp;&nbsp;(3-5 characters)</label>
     </div>
 
     <div class="inputGroup">
       <input type="text" id="regNick" placeholder=" " maxlength="10" required>
-      <label for="regNick">Nickname (max. 10 character)</label>
+      <label for="regNick">Nickname &nbsp;&nbsp;(3-10 characters)</label>
     </div>
 
     <div class="inputGroup">
       <input type="password" id="regPass" placeholder=" " required>
-      <label for="regPass">Password</label>
+      <label for="regPass">Password &nbsp;&nbsp;(min. 5 characters)</label>
     </div>
 
     <button onclick="registerUser()">Register</button>
