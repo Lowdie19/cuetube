@@ -88,8 +88,8 @@ function listenForIncomingSongs(userId) {
           }
 
           // Notify
-          showPopup(`📩 Song received: "${song.title}"`, "magenta", false, true);
           playNotifSound();
+          showAlert("✅ New Song added to Queue", "success");
 
           // Delete transfer after processing
           db.collection("transfers").doc(change.doc.id).delete();
@@ -2238,8 +2238,8 @@ JavaScript Logic
         }
 
         // Case 3: Nothing to save
-        showPopup("⚠️ No copied URL to save", "red", true, true);
         playErrorSound();
+        showPopup("⚠️ No copied URL to save", "red", true, true);
       }
 
 
@@ -2377,7 +2377,8 @@ JavaScript Logic
 
             player.stopVideo();
             player.clearVideo();
-
+            
+            playNotifSound();
             showPopup("That's the last tune!", "magenta", true, true);
           } else {
             currentIndex++;
@@ -2386,10 +2387,10 @@ JavaScript Logic
             updateQueueDisplay();
           }
         } else if (event.data === YT.PlayerState.PAUSED) {
+          playClickSound();
           pauseTimeout = setTimeout(() => {
             showPopup("II Paused", "magenta", true, true);
           }, 300);
-          playClickSound()
           stopProgressChecker();
         } else if (event.data === YT.PlayerState.PLAYING) {
           clearTimeout(pauseTimeout);
@@ -2438,9 +2439,9 @@ JavaScript Logic
         return data.title || `Invalid Song ${++invalidSongCount}`;
       } catch (err) {
         invalidSongCount++;
+          playErrorSound();
           setTimeout(() => {
           showPopup("⚠️ Oops! Try choosing another video", "red", true, true);
-          playErrorSound();
         }, 500);
         return `Invalid Song ${invalidSongCount}`;
       }
@@ -2498,9 +2499,9 @@ JavaScript Logic
 
       // Empty input
       if (!url) {
+        playErrorSound();
         setTimeout(() => {
           showPopup("⚠️ Please paste a URL first", "red", true, true);
-          playErrorSound();
         }, 500);
         return null;
       }
@@ -2509,9 +2510,9 @@ JavaScript Logic
       const videoId = extractVideoId(url);
       if (!videoId) {
         input.value = "";
+        playErrorSound();
         setTimeout(() => {
           showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
-          playErrorSound();
         }, 500);
         return null;
       }
@@ -2524,9 +2525,9 @@ JavaScript Logic
     // =====================
     function playNextFromQueue() {
       if (queue.length === 0 || currentIndex + 1 >= queue.length) {
+        playErrorSound();
         setTimeout(() => {
           showPopup("Queue is Empty!", "red", true, true);
-          playErrorSound();
         }, 500);
         return;
       }
@@ -2537,8 +2538,8 @@ JavaScript Logic
       updateQueueDisplay();
 
       setTimeout(() => {
-        showPopup("Next", "cyan", false, "cyan");
         playSuccessSound();
+        showPopup("Next!", "cyan", false, "cyan");
       }, 500);
     }
 
@@ -3236,18 +3237,18 @@ document.querySelectorAll("[data-tooltip]").forEach(el => {
 
         if (!videoId) {
           input.value = "";
+        playErrorSound();
         setTimeout(() => {
           showPopup("⚠️ Invalid Youtube URL!", "red", false, "red");
-          playErrorSound();
         }, 500);
         } else {
           input.dispatchEvent(new Event("input")); // Trigger glow if needed
           await reserveFromDrawer(); // ✅ Auto-reserve if valid
         }
       } catch (err) {
+        playErrorSound();
         setTimeout(() => {
           showPopup("⚠️ Failed! Paste manually", "red", true, true);
-          playErrorSound();
         }, 500);
         console.error("Clipboard error:", err);
       }
@@ -3690,9 +3691,9 @@ async function saveToSongbook() {
   const url = input.value.trim();
 
   if (!url) {
+    playErrorSound();
     setTimeout(() => {
       showPopup("⚠️ Please paste a URL first", "red", true, true);
-      playErrorSound();
     }, 500);
     return;
   }
@@ -3700,9 +3701,9 @@ async function saveToSongbook() {
   const videoId = extractVideoId(url);
   if (!videoId) {
     input.value = "";
+    playErrorSound();
     setTimeout(() => {
       showPopup("⚠️ Invalid Youtube URL!", "red", true, true);
-      playErrorSound();
     }, 500);
     return;
   }
@@ -3926,10 +3927,10 @@ function openSongOptions(target, onClose) {
           }
 
           updateQueueDisplay();
-
+          
+          playSuccessSound();
           setTimeout(() => {
             showPopup("Reserved!", "cyan", false, true);
-            playSuccessSound();
           }, 500);
 
           onClose?.();
@@ -3950,13 +3951,13 @@ function openSongOptions(target, onClose) {
               song: { id: songId, title: songTitle },
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            showPopup(`🎵 Sent "${songTitle}" to ${recipientId}`, "cyan", false, true);
             playSuccessSound();
+            showPopup("Sent!", "cyan", false, true);
+
           } catch (err) {
+            playErrorSound();
             console.error("Send failed:", err);
             showPopup("⚠️ Failed to send", "red", true, true);
-            playErrorSound();
           }
 
           onClose?.();
