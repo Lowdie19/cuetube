@@ -3853,40 +3853,18 @@ async function saveToSongbook() {
     // Initial binding for existing songs
     document.querySelectorAll("#songbookList .songtitle").forEach(attachSongbookInteractions);
 
-    // Attach interactions (ripple + long press + context menu)
+    // ===============================
+    // Attach interactions (single tap)
+    // ===============================
     function attachSongbookInteractions(div) {
-      let longPressTimer;
-      let longPressTriggered = false;
-
-      // ---------- Long Press Handling ----------
-      const startHandler = (e) => {
-        longPressTriggered = false;
-        if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
-          longPressTimer = setTimeout(() => {
-            longPressTriggered = true;
-            div.classList.add("long-pressing");
-            navigator.vibrate?.(50);
-
-            // Open modal for delete (same as contextmenu)
-            openSongOptions(div);
-          }, 2000);
-        }
-      };
-
-      const endHandler = () => {
-        clearTimeout(longPressTimer);
-        if (!longPressTriggered) div.classList.remove("long-pressing");
-      };
-
-      const cancelHandler = () => {
-        clearTimeout(longPressTimer);
-        div.classList.remove("long-pressing");
-      };
-
       // ---------- Ripple Effect ----------
       div.addEventListener("click", () => {
+        // ripple feel
         div.classList.add("ripple");
         setTimeout(() => div.classList.remove("ripple"), 500);
+
+        // open song options (single press)
+        openSongOptions(div);
       });
 
       // ---------- Hover Flash (desktop only) ----------
@@ -3898,18 +3876,8 @@ async function saveToSongbook() {
       // ---------- Context Menu (right-click) ----------
       div.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        div.classList.add("long-pressing");
-        openSongOptions(div, () => div.classList.remove("long-pressing"));
+        openSongOptions(div);
       });
-
-      // ---------- Event Bindings ----------
-      div.addEventListener("mousedown", startHandler);
-      div.addEventListener("touchstart", startHandler, { passive: true });
-
-      div.addEventListener("mouseup", endHandler);
-      div.addEventListener("mouseleave", cancelHandler);
-      div.addEventListener("touchend", endHandler);
-      div.addEventListener("touchcancel", cancelHandler);
     }
 
 //  ==============================
