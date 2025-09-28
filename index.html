@@ -1467,21 +1467,22 @@ function showAlert(message, type = "info") {
       max-height: 65vh; /* adjust as needed */
     }
   
+    .songbook-box {
+      position: relative;
+      overflow: hidden; /* ensures text never leaves */
+      height: 100%;     /* or fixed height */
+    }
+
     .songbook-box-inner {
-      height: 100%;           /* or fixed px like 300px */
-      max-height: 100%;       /* adjust if needed */
-      overflow-y: auto;       /* enable vertical scroll */
-      -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+      height: 100%;
+      max-height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
-  
-    /* Hide scrollbar */
-    .songbook-box-inner::-webkit-scrollbar {
-      display: none;
-    }
-    .songbook-box-inner {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+
+    /* keep your scrollbar hiding */
+    .songbook-box-inner::-webkit-scrollbar { display: none; }
+    .songbook-box-inner { -ms-overflow-style: none; scrollbar-width: none; }
   
     /* Song Titles */
     .songbook .songtitle {
@@ -1501,12 +1502,13 @@ function showAlert(message, type = "info") {
     /* SongBook search bar */
     .songbook-search {
       padding: 10px 5px;
+      margin-bottom: 5px;
     }
   
-    /* Search bar */
-    .songbook-search {
-      padding: 10px 5px;
+    #songbookSearchWrapper {
+      display: none; /* hidden by default */
     }
+  
     .songbook-search input {
       width: 100%;
       padding: 10px;
@@ -1904,23 +1906,26 @@ Main CueTube UI
           </div>
         </div>
 <!-- Group B -->
-          <div class="group-b">
-            <!-- SongBook -->
-            <div class="songbook" id="songbook">
-              <div class="songbook-handle" onclick="toggleSongbook()">Songbook 🎵</div>
+      <div class="group-b">
+        <!-- SongBook -->
+        <div class="songbook" id="songbook">
+          <div class="songbook-handle" onclick="toggleSongbook()">Songbook 🎵</div>
 
-              <div class="songbook-list">
-                <div class="songbook-search">
-                  <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
-                </div>
-                <!-- Scrollable inner like NextBox -->
-                <div class="songbook-box-inner">
-                  <div id="songbookList"></div>
-                  <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 1em; color: white; text-align: center;">" No results found "</div>
-                </div>
+          <div class="songbook-search" id="songbookSearchWrapper">
+            <input type="text" id="songbookSearch" placeholder="Search Songs" onkeyup="filterSongbook()" />
+          </div>
+
+          <div class="songbook-list">
+            <!-- Scrollable inner like NextBox -->
+            <div class="songbook-box">
+              <div class="songbook-box-inner">
+                <div id="songbookList"></div>
+                <div id="noResults" style="display:none; font-family: Segoe UI, sans-serif; font-size: 1em; color: white; text-align: center;">" No results found "</div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
         
     </div>    <!-- end of Main Group -->
 </div>    <!-- end of Drawer -->
@@ -3644,17 +3649,32 @@ function _colorToRGBA(colorStr, alpha) {
     resetIdle();
 
     //  ==============================
-    //  Songbook Toggle
+    //  Songbook Toggle (with search show/hide)
     //  ==============================
     function toggleSongbook() {
       playClickSound();
-      const sb = document.getElementById("songbook");
-      const handle = document.querySelector(".songbook-handle");
 
+      const sb = document.getElementById("songbook");                   // Songbook container
+      const handle = document.querySelector(".songbook-handle");        // Handle button
+      const searchWrapper = document.getElementById("songbookSearchWrapper"); // Search bar wrapper
+
+      // ------------------------------
       // Toggle songbook open/close
+      // ------------------------------
       sb.classList.toggle("open");
 
-      // Trigger click animation
+      // ------------------------------
+      // Show/hide search bar based on open state
+      // ------------------------------
+      if (sb.classList.contains("open")) {
+        searchWrapper.style.display = "block";  // show search when open
+      } else {
+        searchWrapper.style.display = "none";   // hide search when closed
+      }
+
+      // ------------------------------
+      // Trigger handle click animation
+      // ------------------------------
       handle.classList.add("clicked");
 
       // Normal reset after 200ms
@@ -3662,7 +3682,7 @@ function _colorToRGBA(colorStr, alpha) {
         handle.classList.remove("clicked");
       }, 200);
 
-      // Safety reset after 1s (just in case)
+      // Safety reset after 1s (in case it didn't reset)
       setTimeout(() => {
         if (handle.classList.contains("clicked")) {
           handle.classList.remove("clicked");
@@ -3765,49 +3785,66 @@ async function saveToSongbook() {
 }
   
 
-    //  ==============================
-    //  Smooth overscroll effect for SongBook
+    //  ============================== 
+    //  Smooth Overscroll Effect for SongBook (with auto bottom padding)
     //  ==============================
     (function smoothStretchScrollSongbook() {
+      const wrapper = document.querySelector(".songbook-box");
       const box = document.querySelector(".songbook-box-inner");
-      if (!box) return;
+      if (!wrapper || !box) return;
 
       let startY = 0;
       let isTouching = false;
       let pulling = false;
+      let stretch = 0;
+      let rafId = null;
       const maxStretch = 60;
 
-      box.addEventListener("touchstart", (e) => {
+      // 🔹 Auto add bottom padding so last item is always visible
+      box.style.paddingBottom = `${maxStretch}px`;
+
+      const updateTransform = () => {
+        wrapper.style.transform = `translateY(${stretch}px)`;
+        rafId = null;
+      };
+
+      wrapper.addEventListener("touchstart", (e) => {
         startY = e.touches[0].clientY;
         isTouching = true;
         pulling = false;
-        box.style.transition = "";
+        stretch = 0;
+        wrapper.style.transition = "";
       }, { passive: true });
 
-      box.addEventListener("touchmove", (e) => {
+      wrapper.addEventListener("touchmove", (e) => {
         if (!isTouching) return;
+
         const currentY = e.touches[0].clientY;
         const deltaY = currentY - startY;
         const maxScroll = box.scrollHeight - box.clientHeight;
 
         if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
-          const stretch = Math.max(-maxStretch, Math.min(deltaY / 2, maxStretch));
-          box.style.transform = `translateY(${stretch}px)`;
           pulling = true;
+          const resistance = 1 - Math.min(Math.abs(deltaY) / (maxStretch * 4), 0.75);
+          stretch = Math.max(-maxStretch, Math.min(deltaY * resistance, maxStretch));
+
+          if (!rafId) rafId = requestAnimationFrame(updateTransform);
           e.preventDefault();
         }
       }, { passive: false });
 
-      box.addEventListener("touchend", () => {
+      wrapper.addEventListener("touchend", () => {
         if (pulling) {
-          box.style.transition = "transform 0.3s ease";
-          box.style.transform = "translateY(0)";
+          wrapper.style.transition = "transform 0.35s cubic-bezier(.25,.46,.45,.94)";
+          wrapper.style.transform = "translateY(0)";
         }
         isTouching = false;
         pulling = false;
+        stretch = 0;
       });
     })();
-
+  
+  
     //  ==============================
     //  SongBook Right-Click Actions + Ripple + Long-Press
     //  ==============================
