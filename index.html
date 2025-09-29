@@ -3392,7 +3392,7 @@ if (showCloseButton) {
     xBtn.style.transform = "scale(1)";
   });
 
-  xBtn.onclick = () => hideModal();
+  xBtn.onclick = () => setTimeout(() => hideModal(), 200);
   modal.appendChild(xBtn);
 }
 
@@ -3623,101 +3623,101 @@ function _colorToRGBA(colorStr, alpha) {
       });
     }
 
-    //  =========================================================
-    //  Idle Fucntion for Left and Bottom drawer handles
-    //  =========================================================
-    let idleTimer;
-    const idleDelay = 3000; // 3 seconds
-    const idleTargets = document.querySelectorAll(".drawer-handle, .bottom-drawer-handle");
+//  =========================================================
+//  Idle Fucntion for Left and Bottom drawer handles
+//  =========================================================
+let idleTimer;
+const idleDelay = 3000; // 3 seconds
+const idleTargets = document.querySelectorAll(".drawer-handle, .bottom-drawer-handle");
 
-    function setIdle() {
-      idleTargets.forEach((el) => el.classList.add("idle"));
-    }
+function setIdle() {
+  idleTargets.forEach((el) => el.classList.add("idle"));
+}
 
-    function resetIdle() {
-      idleTargets.forEach((el) => el.classList.remove("idle"));
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(setIdle, idleDelay);
-    }
+function resetIdle() {
+  idleTargets.forEach((el) => el.classList.remove("idle"));
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(setIdle, idleDelay);
+}
 
-    // Events that reset idle
-    ["mousemove", "keydown", "click", "scroll", "touchstart", "touchmove"].forEach((event) => {
-      window.addEventListener(event, resetIdle, { passive: true });
-    });
+// Events that reset idle
+["mousemove", "keydown", "click", "scroll", "touchstart", "touchmove"].forEach((event) => {
+  window.addEventListener(event, resetIdle, { passive: true });
+});
 
-    // Start on load
-    resetIdle();
+// Start on load
+resetIdle();
 
-    //  ==============================
-    //  Songbook Toggle (with search show/hide)
-    //  ==============================
-    function toggleSongbook() {
-      playClickSound();
+//  ==============================
+//  Songbook Toggle (with search show/hide)
+//  ==============================
+function toggleSongbook() {
+  playClickSound();
 
-      const sb = document.getElementById("songbook");                   // Songbook container
-      const handle = document.querySelector(".songbook-handle");        // Handle button
-      const searchWrapper = document.getElementById("songbookSearchWrapper"); // Search bar wrapper
+  const sb = document.getElementById("songbook");                   // Songbook container
+  const handle = document.querySelector(".songbook-handle");        // Handle button
+  const searchWrapper = document.getElementById("songbookSearchWrapper"); // Search bar wrapper
 
-      // ------------------------------
-      // Toggle songbook open/close
-      // ------------------------------
-      sb.classList.toggle("open");
+// ------------------------------
+// Toggle songbook open/close
+// ------------------------------
+sb.classList.toggle("open");
 
-      // ------------------------------
-      // Show/hide search bar based on open state
-      // ------------------------------
-      if (sb.classList.contains("open")) {
-        searchWrapper.style.display = "block";  // show search when open
-      } else {
-        searchWrapper.style.display = "none";   // hide search when closed
-      }
+// ------------------------------
+// Show/hide search bar based on open state
+// ------------------------------
+if (sb.classList.contains("open")) {
+  searchWrapper.style.display = "block";  // show search when open
+} else {
+  searchWrapper.style.display = "none";   // hide search when closed
+}
 
-      // ------------------------------
-      // Trigger handle click animation
-      // ------------------------------
-      handle.classList.add("clicked");
+// ------------------------------
+// Trigger handle click animation
+// ------------------------------
+handle.classList.add("clicked");
 
-      // Normal reset after 200ms
-      setTimeout(() => {
-        handle.classList.remove("clicked");
-      }, 200);
+// Normal reset after 200ms
+setTimeout(() => {
+  handle.classList.remove("clicked");
+}, 200);
 
-      // Safety reset after 1s (in case it didn't reset)
-      setTimeout(() => {
-        if (handle.classList.contains("clicked")) {
-          handle.classList.remove("clicked");
-        }
-      }, 1000);
-    }
+// Safety reset after 1s (in case it didn't reset)
+setTimeout(() => {
+  if (handle.classList.contains("clicked")) {
+    handle.classList.remove("clicked");
+  }
+}, 1000);
+}
 
  
-    // ==============================
-    // Songbook Search-Bar
-    // ==============================
-    function filterSongbook() {
-      const input = document.getElementById("songbookSearch").value.toLowerCase();
-      const songs = document.querySelectorAll("#songbookList .songtitle");
-      const noResults = document.getElementById("noResults");
+// ==============================
+// Songbook Search-Bar
+// ==============================
+function filterSongbook() {
+  const input = document.getElementById("songbookSearch").value.toLowerCase();
+  const songs = document.querySelectorAll("#songbookList .songtitle");
+  const noResults = document.getElementById("noResults");
 
-      let hasMatch = false;
+  let hasMatch = false;
 
-      songs.forEach(song => {
-        const text = song.textContent.toLowerCase();
-        if (text.includes(input)) {
-          song.style.display = "";
-          hasMatch = true;
-        } else {
-          song.style.display = "none";
-        }
-      });
-
-      // Hide "No results found" if search is empty
-      if (input === "") {
-        noResults.style.display = "none";
-      } else {
-        noResults.style.display = hasMatch ? "none" : "block";
-      }
+  songs.forEach(song => {
+    const text = song.textContent.toLowerCase();
+    if (text.includes(input)) {
+      song.style.display = "";
+      hasMatch = true;
+    } else {
+      song.style.display = "none";
     }
+  });
+
+  // Hide "No results found" if search is empty
+  if (input === "") {
+    noResults.style.display = "none";
+  } else {
+    noResults.style.display = hasMatch ? "none" : "block";
+  }
+}
 
 // ==============================
 // Save to Songbook (Unified validation + fetchTitle)
@@ -3785,100 +3785,108 @@ async function saveToSongbook() {
 }
   
 
-    //  ============================== 
-    //  Smooth Overscroll Effect for SongBook (with auto bottom padding)
-    //  ==============================
-    (function smoothStretchScrollSongbook() {
-      const wrapper = document.querySelector(".songbook-box");
-      const box = document.querySelector(".songbook-box-inner");
-      if (!wrapper || !box) return;
+//  ============================== 
+//  Smooth Overscroll Effect for SongBook (with auto bottom padding)
+//  ==============================
+(function smoothStretchScrollSongbook() {
+  const wrapper = document.querySelector(".songbook-box");
+  const box = document.querySelector(".songbook-box-inner");
+  if (!wrapper || !box) return;
 
-      let startY = 0;
-      let isTouching = false;
-      let pulling = false;
-      let stretch = 0;
-      let rafId = null;
-      const maxStretch = 60;
+  let startY = 0;
+  let isTouching = false;
+  let pulling = false;
+  let stretch = 0;
+  let rafId = null;
+  const maxStretch = 60;
 
-      // 🔹 Auto add bottom padding so last item is always visible
-      box.style.paddingBottom = `${maxStretch}px`;
+  // 🔹 Auto add bottom padding so last item is always visible
+  box.style.paddingBottom = `${maxStretch}px`;
 
-      const updateTransform = () => {
-        wrapper.style.transform = `translateY(${stretch}px)`;
-        rafId = null;
-      };
+  const updateTransform = () => {
+    wrapper.style.transform = `translateY(${stretch}px)`;
+    rafId = null;
+  };
 
-      wrapper.addEventListener("touchstart", (e) => {
-        startY = e.touches[0].clientY;
-        isTouching = true;
-        pulling = false;
-        stretch = 0;
-        wrapper.style.transition = "";
-      }, { passive: true });
+  wrapper.addEventListener("touchstart", (e) => {
+    startY = e.touches[0].clientY;
+    isTouching = true;
+    pulling = false;
+    stretch = 0;
+    wrapper.style.transition = "";
+  }, { passive: true });
 
-      wrapper.addEventListener("touchmove", (e) => {
-        if (!isTouching) return;
+  wrapper.addEventListener("touchmove", (e) => {
+    if (!isTouching) return;
 
-        const currentY = e.touches[0].clientY;
-        const deltaY = currentY - startY;
-        const maxScroll = box.scrollHeight - box.clientHeight;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+    const maxScroll = box.scrollHeight - box.clientHeight;
 
-        if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
-          pulling = true;
-          const resistance = 1 - Math.min(Math.abs(deltaY) / (maxStretch * 4), 0.75);
-          stretch = Math.max(-maxStretch, Math.min(deltaY * resistance, maxStretch));
+    if ((box.scrollTop <= 0 && deltaY > 0) || (box.scrollTop >= maxScroll && deltaY < 0)) {
+      pulling = true;
+      const resistance = 1 - Math.min(Math.abs(deltaY) / (maxStretch * 4), 0.75);
+      stretch = Math.max(-maxStretch, Math.min(deltaY * resistance, maxStretch));
 
-          if (!rafId) rafId = requestAnimationFrame(updateTransform);
-          e.preventDefault();
-        }
-      }, { passive: false });
-
-      wrapper.addEventListener("touchend", () => {
-        if (pulling) {
-          wrapper.style.transition = "transform 0.35s cubic-bezier(.25,.46,.45,.94)";
-          wrapper.style.transform = "translateY(0)";
-        }
-        isTouching = false;
-        pulling = false;
-        stretch = 0;
-      });
-    })();
-  
-  
-    //  ==============================
-    //  SongBook Right-Click Actions + Ripple + Long-Press
-    //  ==============================
-    const songbookList = document.getElementById("songbookList");
-
-    // Initial binding for existing songs
-    document.querySelectorAll("#songbookList .songtitle").forEach(attachSongbookInteractions);
-
-    // ===============================
-    // Attach interactions (single tap)
-    // ===============================
-    function attachSongbookInteractions(div) {
-      // ---------- Ripple Effect ----------
-      div.addEventListener("click", () => {
-        // ripple feel
-        div.classList.add("ripple");
-        setTimeout(() => div.classList.remove("ripple"), 500);
-
-        // open song options (single press)
-        openSongOptions(div);
-      });
-
-      // ---------- Hover Flash (desktop only) ----------
-      div.addEventListener("mouseenter", () => {
-        div.classList.add("hover-flash");
-        setTimeout(() => div.classList.remove("hover-flash"), 500);
-      });
-
-      // ---------- Context Menu (right-click) ----------
-      div.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        openSongOptions(div);
-      });
+      if (!rafId) rafId = requestAnimationFrame(updateTransform);
+      e.preventDefault();
     }
+  }, { passive: false });
+
+  wrapper.addEventListener("touchend", () => {
+    if (pulling) {
+      wrapper.style.transition = "transform 0.35s cubic-bezier(.25,.46,.45,.94)";
+      wrapper.style.transform = "translateY(0)";
+    }
+    isTouching = false;
+    pulling = false;
+    stretch = 0;
+  });
+})();
+
+
+//  ==============================
+//  SongBook Right-Click Actions + Ripple + Long-Press
+//  ==============================
+const songbookList = document.getElementById("songbookList");
+
+// Initial binding for existing songs
+document.querySelectorAll("#songbookList .songtitle").forEach(attachSongbookInteractions);
+
+
+
+// ===============================
+// Attach interactions (single tap)
+// ===============================
+function attachSongbookInteractions(div) {
+  // ---------- Ripple Effect ----------
+  div.addEventListener("click", () => {
+    // ripple feel
+    div.classList.add("ripple");
+    setTimeout(() => div.classList.remove("ripple"), 500);
+
+    // delay modal popup (200ms)
+    setTimeout(() => {
+      openSongOptions(div);
+    }, 200);
+  });
+
+  // ---------- Hover Flash (desktop only) ----------
+  div.addEventListener("mouseenter", () => {
+    div.classList.add("hover-flash");
+    setTimeout(() => div.classList.remove("hover-flash"), 500);
+  });
+
+  // ---------- Context Menu (right-click) ----------
+  div.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+
+    // delay modal popup a bit longer (350ms)
+    setTimeout(() => {
+      openSongOptions(div);
+    }, 350);
+  });
+}
 
 //  ==============================
 //  Song Options Modal
@@ -3912,14 +3920,25 @@ function openSongOptions(target, onClose) {
               buttons: [
                 {
                   label: "Confirm",
-                  onClick: () => {
-                    target.classList.add("removing");
-                    setTimeout(() => {
-                      playTrashSound();
-                      target.remove();
-                      showPopup("Deleted!", "red", false, true);
-                      onClose?.();
-                    }, 500);
+                  onClick: async () => {
+                    try {
+                      target.classList.add("removing");
+
+                      // 🔥 Delete from Firestore
+                      await db.collection("songs").doc(songId).delete();
+
+                      setTimeout(() => {
+                        playTrashSound();
+                        target.remove();
+                        showPopup("Deleted!", "red", false, true);
+                        onClose?.();
+                      }, 500);
+
+                    } catch (err) {
+                      playErrorSound();
+                      console.error("Delete failed:", err);
+                      showPopup("⚠️ Failed to delete", "red", true, true);
+                    }
                   }
                 },
                 {
