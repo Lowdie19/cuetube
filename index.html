@@ -2547,6 +2547,7 @@ JavaScript Logic
     // Play Next from Queue
     // =====================
     function playNextFromQueue() {
+      playClickSound();
       if (queue.length === 0 || currentIndex + 1 >= queue.length) {
         playErrorSound();
         setTimeout(() => {
@@ -2561,147 +2562,204 @@ JavaScript Logic
       updateQueueDisplay();
 
       setTimeout(() => {
-        playSuccessSound();
-        showPopup("Next!", "cyan", false, "cyan");
+        showPopup("Next!", "cyan", false, "cyan"); playSuccessSound();
       }, 500);
     }
 
-    // =====================
-    // Queue Display
-    // =====================
-    function updateQueueDisplay() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      list.innerHTML = "";
+// =====================
+// Queue Display
+// =====================
+function updateQueueDisplay() {
+  const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
+  list.innerHTML = "";
 
-      for (let i = currentIndex + 1; i < queue.length; i++) {
-        const div = document.createElement("div");
-        div.className = "songtitle";
-        div.textContent = queue[i].title; // Title - Artist
-        div.style.cursor = "pointer";
+  // ----- Loop all upcoming songs -----
+  for (let i = currentIndex + 1; i < queue.length; i++) {
+    const div = document.createElement("div");
+    div.className = "songtitle";
+    div.textContent = queue[i].title;
+    div.style.cursor = "pointer";
 
-        let longPressTimer;
-        let longPressTriggered = false;
-
-        const startHandler = (e) => {
-          longPressTriggered = false;
-          if (e.type === "touchstart" || (e.type === "mousedown" && e.button === 0)) {
-            longPressTimer = setTimeout(() => {
-              longPressTriggered = true;
-              div.classList.add("long-pressing");
-              navigator.vibrate?.(50);
-
-              showDeleteConfirm(i, () => {
-                div.classList.remove("long-pressing");
-              });
-            }, 2000);
-          }
-        };
-
-        const endHandler = () => {
-          clearTimeout(longPressTimer);
-          if (!longPressTriggered) div.classList.remove("long-pressing");
-        };
-
-        const cancelHandler = () => {
-          clearTimeout(longPressTimer);
-          div.classList.remove("long-pressing");
-        };
-
-    // ==============================
-    // Ripple Effect (tap/click)
-    // ==============================
+    // ---------- (A) Single Click ----------
     div.addEventListener("click", () => {
       div.classList.add("ripple");
       setTimeout(() => div.classList.remove("ripple"), 500);
+      openQueueSongOptions(queue[i], div, i);
     });
 
-    // ==============================
-    // Hover Ripple Effect (desktop pointer)
-    // ==============================
+    // ---------- (B) Hover Flash ----------
     div.addEventListener("mouseenter", () => {
       div.classList.add("hover-flash");
-      setTimeout(() => {
-        div.classList.remove("hover-flash");
-      }, 500); // stay for 0.5s
+      setTimeout(() => div.classList.remove("hover-flash"), 500);
     });
 
-    // ==============================
-    // Right-click support (desktop)
-    // ==============================
+    // ---------- (C) Right-Click ----------
     div.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      div.classList.add("long-pressing"); // highlight red
-      showDeleteConfirm(i, () => {
-        div.classList.remove("long-pressing"); // remove highlight when modal closes
-      });
+      openQueueSongOptions(queue[i], div, i);
     });
 
-    // ==============================
-    // Event Handlers
-    // ==============================
-    div.addEventListener("mousedown", startHandler);
-    div.addEventListener("touchstart", startHandler, { passive: true });
-
-    div.addEventListener("mouseup", endHandler);
-    div.addEventListener("mouseleave", cancelHandler);
-    div.addEventListener("touchend", endHandler);
-    div.addEventListener("touchcancel", cancelHandler);
-
-    // Add item to the list
+    // ----- Add to list -----
     list.appendChild(div);
   }
 
-    updateOverflowCounter();
+  // ----- Update overflow counter -----
+  updateOverflowCounter();
 
-    const nextBtn = document.getElementById("nextBtnDrawer");
-    const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
-    nextBtn.disabled = !hasNext;
-    nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
-    nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
+  // ----- Enable/disable next button -----
+  const nextBtn = document.getElementById("nextBtnDrawer");
+  const hasNext = queue.length > 0 && currentIndex + 1 < queue.length;
+  nextBtn.disabled = !hasNext;
+  nextBtn.style.opacity = hasNext ? "1.0" : "0.4";
+  nextBtn.style.cursor = hasNext ? "pointer" : "not-allowed";
 
-    const nextBox = document.querySelector(".next-box");
-    const upcomingCount = queue.length - (currentIndex + 1);
-
-    // Hide or show next-box based on upcoming songs
-    if (upcomingCount >= 1) {
-      nextBox.classList.remove("hidden");
-    } else {
-      nextBox.classList.add("hidden");
-    }
+  // ----- Show/hide next box -----
+  const nextBox = document.querySelector(".next-box");
+  const upcomingCount = queue.length - (currentIndex + 1);
+  if (upcomingCount >= 1) {
+    nextBox.classList.remove("hidden");
+  } else {
+    nextBox.classList.add("hidden");
   }
+}
 
-    // =====================
-    // Overflow Counter
-    // =====================
-    function updateOverflowCounter() {
-      const list = document.getElementById("nextList");
-      const overflow = document.getElementById("overflowCounter");
-      if (!list || !overflow) return;
+// =====================
+// Overflow Counter
+// =====================
+function updateOverflowCounter() {
+  const list = document.getElementById("nextList");
+  const overflow = document.getElementById("overflowCounter");
+  if (!list || !overflow) return;
 
-      const totalHeight = list.scrollHeight;
-      const visibleHeight = list.clientHeight;
-      const scrollable = totalHeight > visibleHeight;
+  const totalHeight = list.scrollHeight;
+  const visibleHeight = list.clientHeight;
+  const scrollable = totalHeight > visibleHeight;
 
-      if (scrollable) {
-        const items = list.children;
-        let shown = 0;
-        let accHeight = 0;
-        for (let i = 0; i < items.length; i++) {
-          accHeight += items[i].offsetHeight;
-          if (accHeight < visibleHeight) shown++;
-        }
-        const remainingCount = items.length - shown;
-        overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? "s" : ""}`;
-        overflow.style.display = "block";
-      } else {
-        overflow.style.display = "none";
+  if (scrollable) {
+    const items = list.children;
+    let shown = 0;
+    let accHeight = 0;
+    for (let i = 0; i < items.length; i++) {
+      accHeight += items[i].offsetHeight;
+      if (accHeight < visibleHeight) shown++;
+    }
+    const remainingCount = items.length - shown;
+    overflow.innerText = `${remainingCount} more song${remainingCount > 1 ? "s" : ""}`;
+    overflow.style.display = "block";
+  } else {
+    overflow.style.display = "none";
+  }
+}
+
+// =====================
+// Queue Song Options Modal
+// =====================
+function openQueueSongOptions(song, target, index) {
+  showModal({
+    glowColor: "cyan",
+    title: "QUEUE OPTIONS",
+    titleColor: "cyan",
+    messages: [
+      { text: `"${song.title}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
+    ],
+    buttons: [
+      // ---------- (1) DELETE ----------
+    {
+      label: "Delete",
+      onClick: () => {
+        playClickSound();
+        __modal_onClose = () => {
+          showModal({
+            glowColor: "red",
+            title: "DELETE ?",
+            titleColor: "red",
+            messages: [{ text: `"${song.title}"`, color: "white" }],
+            buttons: [
+              {
+                label: "Confirm",
+                onClick: () => {
+                  // 🔊 Play trash sound agad
+                  playTrashSound();
+
+                  // 🎬 Trigger animation
+                  target.classList.add("removing");
+
+                  // ⏳ Wait 600ms bago tanggalin sa queue at i-refresh
+                  setTimeout(() => {
+                    queue.splice(index, 1); // remove song from queue
+                    updateQueueDisplay();
+                    showPopup("Deleted!", "red", false, true);
+                  }, 600); // match CSS transition time
+                }
+              },
+              {
+                label: "Cancel",
+                onClick: () => playClickSound()
+              }
+            ]
+          });
+        };
+      }
+    },
+    // ---------- (2) PLAY NOW ----------
+    {
+      label: "Play",
+      onClick: () => {
+        playClickSound();
+        __modal_onClose = () => {
+          showModal({
+            glowColor: "cyan",
+            title: "PLAY NOW ?",
+            titleColor: "cyan",
+            messages: [
+              { text: `"${song.title}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" },
+              { text: "Note: The current song will be skipped.", color: "gray" }
+            ],
+            buttons: [
+              {
+                label: "Confirm",
+                onClick: () => {
+                  playClickSound();
+                  // Remove the chosen song from its current position
+                  const [chosenSong] = queue.splice(index, 1);
+
+                  // Insert it right after the currentIndex
+                  queue.splice(currentIndex + 1, 0, chosenSong);
+
+                  // Advance to it
+                  currentIndex++;
+                  player.loadVideoById(chosenSong.id);
+                  player.playVideo();
+
+                  updateNowPlaying();
+                  updateQueueDisplay();
+                  
+                  setTimeout(() => {
+                  showPopup("Now Playing!", "cyan", false, true); playSuccessSound();
+                }, 500);
+                }
+              },
+              {
+                label: "Cancel",
+                onClick: () => playClickSound()
+              }
+            ]
+          });
+        };
       }
     }
+    ],
+    showCloseButton: true
+  });
+}
 
-    document.addEventListener("DOMContentLoaded", () => {
-      updateQueueDisplay();
-    });
+// =====================
+// Init when ready
+// =====================
+document.addEventListener("DOMContentLoaded", () => {
+  updateQueueDisplay();
+});
 
     // =====================
     // Notify Animation & Now Playing
@@ -2721,6 +2779,10 @@ JavaScript Logic
       const nowBoxEl = document.querySelector(".nowplaying-box");
       const labelEl = nowBoxEl.querySelector(".label");
       const current = queue[currentIndex];
+
+      if (!player || typeof player.getCurrentTime !== "function") {
+        stopProgressChecker();
+      }
 
       // Cancel any pending notify timers
       if (notifyShowTimeout) {
@@ -2826,6 +2888,10 @@ JavaScript Logic
       if (progressChecker) return; // already running
       nextSongNotifyShown = false;
       progressChecker = setInterval(() => {
+        if (!player || typeof player.getCurrentTime !== "function") {
+          return; // 🚫 skip if player not ready
+        }
+
         const currentTime = player.getCurrentTime();
         const duration = player.getDuration();
 
@@ -3595,17 +3661,17 @@ function _colorToRGBA(colorStr, alpha) {
                 item.addEventListener(
                   "transitionend",
                   () => {
+                    playTrashSound();
                     queue.splice(index, 1);
                     updateQueueDisplay();
-                    playTrashSound();
                   },
                   { once: true }
                 );
               } else {
                 // fallback if something goes wrong
+                playTrashSound();
                 queue.splice(index, 1);
                 updateQueueDisplay();
-                playTrashSound();
               }
             }
           },
@@ -3776,8 +3842,7 @@ async function saveToSongbook() {
   input.value = "";
 
   setTimeout(() => {
-    playSuccessSound();
-    showPopup("Saved!", "cyan", false, "cyan");
+    showPopup("Saved!", "cyan", false, "cyan"); playSuccessSound();
   }, 500);
     setTimeout(() => {
       showAlert("✅ New Song added to Songbook", "success");
@@ -3956,6 +4021,7 @@ function openSongOptions(target, onClose) {
         label: "Reserve",
         style: "font-size: 0.9em", // smaller font
         onClick: () => {
+          playClickSound();
           // 🔧 Same as reserveFromDrawer but using songId
           if (queue.length === 0 && currentIndex === -1) {
             queue.push({ id: songId, title: songTitle });
@@ -3970,9 +4036,8 @@ function openSongOptions(target, onClose) {
 
           updateQueueDisplay();
           
-          playSuccessSound();
           setTimeout(() => {
-            showPopup("Reserved!", "cyan", false, true);
+            showPopup("Reserved!", "cyan", false, true); playSuccessSound();
           }, 500);
 
           onClose?.();
