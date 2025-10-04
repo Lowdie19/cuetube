@@ -4056,32 +4056,42 @@ function openSongOptions(target, onClose) {
         }
       },
       {
-        label: "Send",
-        style: "font-size: 0.9em", // smaller font
-        onClick: async () => {
-          playClickSound();
-          const recipientId = prompt("Send to which user? (User ID)");
-          if (!recipientId) return;
+      label: "Send",
+      style: "font-size: 0.9em", // smaller font
+      onClick: async () => {
+        playClickSound();
+        const recipientId = prompt("Send to which user? (User ID)");
+        if (!recipientId) return;
 
-          try {
-            await db.collection("transfers").add({
-              to: recipientId,
-              from: currentUser.id,  // ✅ fixed
-              song: { id: songId, title: songTitle },
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            playSuccessSound();
-            showPopup("Sent!", "cyan", false, true);
-
-          } catch (err) {
+        try {
+          // Check if recipient exists
+          const userDoc = await db.collection("users").doc(recipientId).get();
+          if (!userDoc.exists) {
             playErrorSound();
-            console.error("Send failed:", err);
-            showPopup("⚠️ Failed to send", "red", true, true);
+            showAlert("⚠️ Invalid User ID!", "error"); // <-- use your toast
+            return;
           }
 
-          onClose?.();
+          // Send the song
+          await db.collection("transfers").add({
+            to: recipientId,
+            from: currentUser.id,
+            song: { id: songId, title: songTitle },
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          playSuccessSound();
+          showPopup("Sent!", "cyan", false, true);
+
+        } catch (err) {
+          playErrorSound();
+          console.error("Send failed:", err);
+          showPopup("⚠️ Failed to send", "red", true, true);
         }
+
+        onClose?.();
       }
+    }
       // ❌ Cancel button removed here as well
     ],
     showCloseButton: true // ✅ Enable top-right X button
