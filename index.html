@@ -1313,61 +1313,83 @@ function showAlert(message, type = "info") {
       
     }
   
-/*  ========================================
-    Popups Text with glow (Reserve, etc.)
-    ======================================= */
+/* ========================================
+   Popup Overlay
+   Dimmed background behind popup
+   ======================================= */
     #popupOverlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(to bottom, rgba(13, 14, 14, 0.4) 0%, #000000 80%); /* Dimming effect */
+      top: 80%;
+      left: 50%;
+      width: 100%;
+      height: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #000000 80%);
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease;
-      z-index: 9998;
+      transition: opacity 0.3s ease; /* normal fade */
+      z-index: 9999;
     }
-  
+
     #popupOverlay.visible {
       opacity: 1;
       visibility: visible;
     }
-  
+
+    /* Slow fade for overlay */
+    #popupOverlay.slow-fade {
+      transition: opacity 1.0s ease;
+    }
+
+/* ========================================
+   Popup Modal Base
+   Centered text with glow
+   ======================================= */
     #popupModal {
       position: fixed;
-      top: 75%;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      background: none !important; /* #222; */
-      border: none !important; /* 2px solid cyan; */
+      top: 80%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: none !important;
+      border: none !important;
       border-radius: 10px;
-      padding: 0 !important; /* 15px 25px; */
-      color: inherit; /* white; */
+      padding: 0 !important;
+      color: inherit;
       font-family: "Orbitron", sans-serif;
       font-weight: bold;
       text-align: center !important;
       text-shadow: inherit;
-      z-index: 9999;
+      z-index: 99999;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease; /* normal fade */
       max-width: 90vw;
-      box-shadow: none !important; /* 0 0 20px cyan; */
+      box-shadow: none !important;
       user-select: none;
       font-size: 2em !important;
     }
-  
+
+    /* Popup show: fade in */
     #popupModal.show {
       opacity: 1;
       visibility: visible;
     }
-  
+
+    /* Popup hide: fade out */
+    #popupModal.hide {
+      opacity: 0;
+    }
+
+    /* Slow fade for popup auto-close */
+    #popupModal.slow-fade {
+      transition: opacity 1.0s ease;
+    }
+
+    /* Confirm Delete (your other popup) */
     #confirmDelete {
       transition: opacity 0.3s ease;
       opacity: 1;
     }
-  
     #confirmDelete.show {
       opacity: 1;
     }
@@ -2964,85 +2986,124 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // =====================
-    // PopUps
-    // =====================
-    let persistentPopupActive = false;
+// =====================
+// Popups with Fade Only & Slow Auto-Close
+// =====================
+let persistentPopupActive = false;
+let autoCloseTimeout;
 
-    function showPopup(message, color = "magenta", persistent = false, glow = false, delay = 0) {
-      setTimeout(() => {
-        const popup = document.getElementById("popupModal");
-        const overlay = document.getElementById("popupOverlay");
+// 🔹 Show Popup Function
+function showPopup(message, color = "magenta", persistent = false, glow = false, delay = 0, autoCloseTime = 800) {
+  setTimeout(() => {
+    const popup = document.getElementById("popupModal");
+    const overlay = document.getElementById("popupOverlay");
 
-        popup.textContent = message;
-        popup.style.color = "white";
-        popup.classList.remove("glow-text", "static-glow");
+    // --- Set message and glow style ---
+    popup.textContent = message;
+    popup.style.color = "white";
+    popup.classList.remove("glow-text", "static-glow");
 
-        if (typeof glow === "string") {
-          popup.style.setProperty("--glow-color", glow);
-          popup.classList.add("static-glow");
-        } else if (glow === true) {
-          popup.style.setProperty("--glow-color", color);
-          popup.classList.add("glow-text");
-        }
-
-        overlay.classList.add("visible");
-        popup.classList.add("show");
-
-        if (persistent) {
-          persistentPopupActive = true;
-        } else {
-          persistentPopupActive = false;
-          setTimeout(() => {
-            popup.classList.remove("show");
-            overlay.classList.remove("visible");
-          }, 800);
-        }
-
-        // 🎯 Anywhere click/tap when paused will unpause
-        if (message === "II Paused") {
-          overlay.style.cursor = "pointer";
-          overlay.onclick = () => {
-            if (player && player.playVideo) {
-              player.playVideo(); // resume video
-            }
-            clearPersistentPopup(); // hide popup
-            overlay.onclick = null; // remove listener
-            overlay.style.cursor = "default";
-          };
-        } else {
-          overlay.onclick = null;
-          overlay.style.cursor = "default";
-        }
-      }, delay);
+    if (typeof glow === "string") {
+      popup.style.setProperty("--glow-color", glow);
+      popup.classList.add("static-glow");
+    } else if (glow === true) {
+      popup.style.setProperty("--glow-color", color);
+      popup.classList.add("glow-text");
     }
 
-    function clearPersistentPopup() {
-      if (persistentPopupActive) {
-        const popup = document.getElementById("popupModal");
-        const overlay = document.getElementById("popupOverlay");
-        popup.classList.remove("show");
-        overlay.classList.remove("visible");
-        popup.classList.remove("glow-text"); // remove glow when clearing
-        persistentPopupActive = false;
-      }
-    }
+    // --- Animate fade in ---
+    overlay.classList.remove("slow-fade"); // normal fade-in
+    popup.classList.remove("slow-fade");
+    overlay.classList.add("visible");
+    popup.classList.remove("hide");
+    popup.classList.add("show");
 
-    // Tap anywhere to clear persistent popup and resume video if paused
-    document.body.addEventListener("click", () => {
-      if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
-        player.playVideo();
-      }
-      clearPersistentPopup();
-    });
-
-    // Popup Overlay Close
-    document.getElementById("popupOverlay").onclick = () => {
-      const popup = document.getElementById("popupModal");
-      popup.classList.remove("show");
-      document.getElementById("popupOverlay").classList.remove("visible");
+    // --- Persistent or Auto-close ---
+    if (persistent) {
+      persistentPopupActive = true;
+      clearTimeout(autoCloseTimeout);
+    } else {
       persistentPopupActive = false;
-    };
+      clearTimeout(autoCloseTimeout);
+      autoCloseTimeout = setTimeout(() => {
+        closePopupAnimated(true); // slow fade
+      }, autoCloseTime);
+    }
+
+    // --- Special case: resume video if paused ---
+    if (message === "II Paused") {
+      overlay.style.cursor = "pointer";
+      overlay.onclick = () => {
+        if (player && player.playVideo) player.playVideo();
+        clearPersistentPopup();
+        overlay.onclick = null;
+        overlay.style.cursor = "default";
+      };
+    } else {
+      overlay.onclick = null;
+      overlay.style.cursor = "default";
+    }
+  }, delay);
+}
+
+// 🔹 Close Popup with Fade (slow = true for auto-close)
+function closePopupAnimated(slow = false) {
+  const popup = document.getElementById("popupModal");
+  const overlay = document.getElementById("popupOverlay");
+
+  if (slow) {
+    popup.classList.add("slow-fade");   // apply slow fade
+    overlay.classList.add("slow-fade");
+  }
+
+  popup.classList.remove("show");       // fade out
+  popup.classList.add("hide");
+  overlay.classList.remove("visible");
+
+  setTimeout(() => {
+    popup.classList.remove("hide");
+    if (slow) {
+      popup.classList.remove("slow-fade");   // reset
+      overlay.classList.remove("slow-fade");
+    }
+  }, slow ? 1000 : 300); // match CSS transition duration
+}
+
+// 🔹 Clear Persistent Popup
+function clearPersistentPopup() {
+  if (persistentPopupActive) {
+    closePopupAnimated();
+    persistentPopupActive = false;
+  }
+  clearTimeout(autoCloseTimeout);
+}
+
+// 🔹 Tap anywhere to clear popup when paused
+document.body.addEventListener("click", () => {
+  if (player && player.getPlayerState() === YT.PlayerState.PAUSED && persistentPopupActive) {
+    player.playVideo();
+  }
+  clearPersistentPopup();
+});
+
+// =====================
+// Overlay Click Closers
+// =====================
+document.getElementById("popupOverlay").onclick = () => {
+  closePopupAnimated();
+  persistentPopupActive = false;
+  clearTimeout(autoCloseTimeout);
+};
+
+document.getElementById("drawerOverlay").onclick = () => {
+  closeDrawer();
+  document.getElementById("drawerOverlay").classList.remove("visible");
+};
+
+document.getElementById("bottomDrawerOverlay").onclick = () => {
+  closeBottomDrawer();
+  document.getElementById("bottomDrawerOverlay").classList.remove("visible");
+};
 
 
     // =====================
