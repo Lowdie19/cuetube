@@ -2337,7 +2337,6 @@ JavaScript Logic
           }
         });
       });
-
   
   
     //  ==============================
@@ -4095,8 +4094,7 @@ function openSongOptions(target, onClose) {
                 await db.collection("transfers").add({
                   to: recipientId,
                   from: currentUser.id,
-                  song: { id: songId, title: songTitle },
-                  timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                  song: { id: songId, title: songTitle }
                 });
 
                 playSuccessSound();
