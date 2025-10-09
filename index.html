@@ -4055,43 +4055,116 @@ function openSongOptions(target, onClose) {
           onClose?.();
         }
       },
-      {
-      label: "Send",
-      style: "font-size: 0.9em", // smaller font
-      onClick: async () => {
-        playClickSound();
-        const recipientId = prompt("Send to which user? (User ID)");
-        if (!recipientId) return;
+{
+  label: "Send",
+  style: "font-size: 0.9em", // smaller font
+  onClick: () => {
+    playClickSound();
 
-        try {
-          // Check if recipient exists
-          const userDoc = await db.collection("users").doc(recipientId).get();
-          if (!userDoc.exists) {
-            playErrorSound();
-            showAlert("⚠️ Invalid User ID!", "error"); // <-- use your toast
-            return;
+    __modal_onClose = () => {
+      showModal({
+        glowColor: "cyan",
+        title: "SEND",
+        titleColor: "cyan",
+        messages: [
+          { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif; font-size: 1.1em" }
+        ],
+        buttons: [
+          {
+            label: "Send",
+            onClick: async () => {
+              try {
+                // 🔹 Grab the input value
+                const recipientInput = document.getElementById("recipientIdInput");
+                const recipientId = recipientInput ? recipientInput.value.trim() : "";
+                if (!recipientId) {
+                  playErrorSound();
+                  showAlert("⚠️ Enter a User ID!", "error");
+                  return;
+                }
+
+                // Check if recipient exists
+                const userDoc = await db.collection("users").doc(recipientId).get();
+                if (!userDoc.exists) {
+                  playErrorSound();
+                  showAlert("⚠️ Invalid User ID!", "error");
+                  return;
+                }
+
+                // Send the song
+                await db.collection("transfers").add({
+                  to: recipientId,
+                  from: currentUser.id,
+                  song: { id: songId, title: songTitle },
+                  timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                playSuccessSound();
+                showPopup("Sent!", "cyan", false, true);
+                onClose?.();
+
+              } catch (err) {
+                playErrorSound();
+                console.error("Send failed:", err);
+                showPopup("⚠️ Failed to send", "red", true, true);
+              }
+            }
+          },
+          {
+            label: "Cancel",
+            onClick: () => playClickSound()
           }
+        ],
+        showCloseButton: true
+      });
 
-          // Send the song
-          await db.collection("transfers").add({
-            to: recipientId,
-            from: currentUser.id,
-            song: { id: songId, title: songTitle },
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
+// ✅ Add the input dynamically (styled like .url-input)
+setTimeout(() => {
+  const content = document.getElementById("genericContent");
+  if (content) {
+    const input = document.createElement("input");
+    input.id = "recipientIdInput";
+    input.type = "text";
+    input.placeholder = "Enter receiver's User ID";
+    input.style.cssText = `
+      flex: 1;
+      width: 100%;
+      min-width: 210px;
+      max-width: 50vw;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background-color: #1a1a1a;
+      text-align: center;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 1s, box-shadow 0.3s;
+      outline: none;
+      margin-top: 12px;
+    `;
 
-          playSuccessSound();
-          showPopup("Sent!", "cyan", false, true);
-
-        } catch (err) {
-          playErrorSound();
-          console.error("Send failed:", err);
-          showPopup("⚠️ Failed to send", "red", true, true);
-        }
-
-        onClose?.();
-      }
-    }
+    // ✅ Add glow + white outline on hover/focus
+    input.addEventListener("mouseenter", () => {
+      input.style.boxShadow = "0 0 10px 2px magenta, 0 0 0 1px white";
+    });
+    input.addEventListener("mouseleave", () => {
+      input.style.boxShadow = "none";
+    });
+    input.addEventListener("focus", () => {
+      input.style.boxShadow = "0 0 12px 3px magenta, 0 0 0 1px white";
+    });
+    input.addEventListener("blur", () => {
+      input.style.boxShadow = "none";
+    });
+    // ✅ Insert before the buttons and focus
+    content.insertBefore(input, content.lastElementChild);
+    input.focus();
+  }
+      }, 150);
+    };
+  }
+}
       // ❌ Cancel button removed here as well
     ],
     showCloseButton: true // ✅ Enable top-right X button
