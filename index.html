@@ -2,6 +2,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <script src="https://www.youtube.com/iframe_api"></script>
     
@@ -1746,6 +1747,29 @@ function showAlert(message, type = "info") {
       color: #989898;
       cursor: pointer;
     }
+  
+    .passwordGroup {
+      position: relative;
+    }
+
+    .passwordGroup input {
+      padding-right: 35px; /* make space for the icon */
+    }
+
+    .toggle-eye {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      cursor: pointer;
+      font-size: .8em;
+      transition: color 0.2s;
+    }
+
+    .toggle-eye:hover {
+      color: #333;
+    }
 
     /* Portrait & Landscape adjustments */
     @media (max-width: 768px) {
@@ -1844,9 +1868,10 @@ Authentication Overlay
       <label for="loginUser">User ID</label>
     </div>
 
-    <div class="inputGroup">
+    <div class="inputGroup passwordGroup">
       <input type="password" id="loginPass" placeholder=" " required>
       <label for="loginPass">Password</label>
+      <i class="fa fa-eye toggle-eye" onclick="togglePassword('loginPass', this)"></i>
     </div>
 
     <button onclick="loginUser()">Login</button>
@@ -1856,7 +1881,7 @@ Authentication Overlay
   <!-- Register Card -->
   <div class="authCard" id="registerCard">
     <h2>Register</h2>
-    <div class="authcard-note"><b>Note:</b> User ID is used for receiving songs. </div>
+    <div class="authcard-note"><b>Note:</b> User ID is used for receiving songs.</div>
 
     <div class="inputGroup">
       <input type="text" id="regUser" placeholder=" " maxlength="5" required>
@@ -1868,9 +1893,10 @@ Authentication Overlay
       <label for="regNick">Nickname &nbsp;&nbsp;(3-10 characters)</label>
     </div>
 
-    <div class="inputGroup">
+    <div class="inputGroup passwordGroup">
       <input type="password" id="regPass" placeholder=" " required>
       <label for="regPass">Password &nbsp;&nbsp;(min. 5 characters)</label>
+      <i class="fa fa-eye toggle-eye" onclick="togglePassword('regPass', this)"></i>
     </div>
 
     <button onclick="registerUser()">Register</button>
@@ -2009,6 +2035,19 @@ Main CueTube UI
 JavaScript Logic
 ============================== -->
 <script>
+  
+    function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
     //  ==============================
     //  Drawer & Overlay Setup
     //  ==============================
