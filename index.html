@@ -697,7 +697,7 @@ function showAlert(message, type = "info") {
     }
   
 /*  ==========================
-    Next-box
+    Next-box (Modern Hidden Scrollbar)
     ========================== */
     .next-box {
       position: relative;
@@ -706,25 +706,66 @@ function showAlert(message, type = "info") {
       flex-direction: column;
       padding: 10px;
       margin-top: 10px;
-      
+
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
-      scrollbar-width: none;
+
+      /* Firefox support */
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+
+      /* Create smooth fade animation container */
+      transition: scrollbar-color 0.5s ease;
     }
+
     /* Inner wrapper for stretch */
     .next-box-inner {
       will-change: transform;
       transition: transform 0.3s ease;
     }
-  
-    /* Hide Scrollbar for WebKit Browsers */
+
+    /* ===== Scrollbar Styling (WebKit Browsers) ===== */
     .next-box::-webkit-scrollbar {
-      display: none;
+      width: 8px;
     }
+
+    /* Track — invisible */
     .next-box::-webkit-scrollbar-track {
       background: transparent;
+      border-radius: 10px;
     }
+
+    /* Thumb — starts hidden */
+    .next-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0);
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.6s ease, background 0.3s ease;
+    }
+
+    /* Fade in on hover */
+    .next-box:hover::-webkit-scrollbar-thumb {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Slightly brighter on hover-over thumb */
+    .next-box:hover::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Firefox equivalent */
+    .next-box:hover {
+      scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+    }
+
+    /* Smooth fade-out animation using pseudo element */
+    .next-box:not(:hover)::-webkit-scrollbar-thumb {
+      transition: opacity 0.8s ease, background 0.3s ease;
+      opacity: 0;
+    }
+
   
     .next-box.hidden {
       display: none !important;
@@ -1427,9 +1468,9 @@ function showAlert(message, type = "info") {
       display: flex;
       flex-direction: column;
       border-radius: 20px;
-      padding: 10px; /* top/right/bott/left */
+      padding: 10px;
       overflow: hidden;
-      
+
       background: none;
       border: 1px solid var(--btn-glow, white);
       box-shadow:
@@ -1440,7 +1481,7 @@ function showAlert(message, type = "info") {
         max-height 0.5s ease;
       z-index: 999;
     }
-  
+
     /* Handle bar (Songbook Button) */
     .songbook-handle {
       font-family: "Orbitron", sans-serif;
@@ -1453,21 +1494,21 @@ function showAlert(message, type = "info") {
       user-select: none;
       transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
     }
-  
+
     /* Hover effect (PC) */
     .songbook-handle:hover {
       color: #dcd1ff;
       text-shadow:
-          0 0 8px #9377ea,
-          0 0 12px #9377ea,
-          0 0 24px #9377ea;
+        0 0 8px #9377ea,
+        0 0 12px #9377ea,
+        0 0 24px #9377ea;
     }
-  
-    /* Click effect (JS toggled) */
+
+    /* Click effect */
     .songbook-handle.clicked {
       transform: scale(0.85);
     }
-  
+
     /* Songbook list container */
     .songbook-list {
       max-height: 0;
@@ -1475,16 +1516,17 @@ function showAlert(message, type = "info") {
       transition: max-height 0.5s ease;
       padding: 0 10px;
     }
-  
+
     /* Expanded state */
     .songbook.open .songbook-list {
-      max-height: 65vh; /* adjust as needed */
+      max-height: 65vh;
     }
-  
+
+    /* Scrollable box */
     .songbook-box {
       position: relative;
-      overflow: hidden; /* ensures text never leaves */
-      height: 100%;     /* or fixed height */
+      overflow: hidden;
+      height: 100%;
     }
 
     .songbook-box-inner {
@@ -1492,12 +1534,57 @@ function showAlert(message, type = "info") {
       max-height: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+
+      /* Firefox scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+      transition: scrollbar-color 0.5s ease;
     }
 
-    /* keep your scrollbar hiding */
-    .songbook-box-inner::-webkit-scrollbar { display: none; }
-    .songbook-box-inner { -ms-overflow-style: none; scrollbar-width: none; }
-  
+    /* ===== Scrollbar Styling (WebKit) ===== */
+    .songbook-box-inner::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    /* Track — invisible */
+    .songbook-box-inner::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+
+    /* Thumb — hidden until hover */
+    .songbook-box-inner::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0);
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.6s ease, background 0.3s ease;
+    }
+
+    /* Fade in on hover */
+    .songbook-box-inner:hover::-webkit-scrollbar-thumb {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Thumb hover effect */
+    .songbook-box-inner:hover::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Firefox hover color */
+    .songbook-box-inner:hover {
+      scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+    }
+
+    /* Smooth fade-out when not hovered */
+    .songbook-box-inner:not(:hover)::-webkit-scrollbar-thumb {
+      transition: opacity 0.8s ease, background 0.3s ease;
+      opacity: 0;
+    }
+
     /* Song Titles */
     .songbook .songtitle {
       font-family: "Segoe UI", sans-serif;
@@ -1541,7 +1628,7 @@ function showAlert(message, type = "info") {
   
     /* Hide Scrollbar for WebKit Browsers */
     .next-box::-webkit-scrollbar {
-      display: none;
+      display: block;
     }
   
     /* Hover effect */
