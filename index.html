@@ -2805,13 +2805,13 @@ function openQueueSongOptions(song, target, index) {
     buttons: [
       // ---------- (1) DELETE ----------
     {
-      label: "Delete",
+      label: "Remove",
       onClick: () => {
         playClickSound();
         __modal_onClose = () => {
           showModal({
             glowColor: "red",
-            title: "DELETE ?",
+            title: "REMOVE ?",
             titleColor: "red",
             messages: [{ text: `"${song.title}"`, color: "white" }],
             buttons: [
@@ -2828,7 +2828,7 @@ function openQueueSongOptions(song, target, index) {
                   setTimeout(() => {
                     queue.splice(index, 1); // remove song from queue
                     updateQueueDisplay();
-                    showPopup("Deleted!", "red", false, true);
+                    showPopup("Removed!", "red", false, true);
                   }, 600); // match CSS transition time
                 }
               },
@@ -3772,7 +3772,7 @@ function _colorToRGBA(colorStr, alpha) {
 
       showModal({
         glowColor: "red",
-        title: "DELETE ?",
+        title: "REMOVE ?",
         titleColor: "red",
         messages: [
           {
@@ -4120,7 +4120,12 @@ function openSongOptions(target, onClose) {
               title: "DELETE ?",
               titleColor: "red",
               messages: [
-                { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif" }
+                { text: `"${songTitle}"`, color: "white", style: "font-family: 'Segoe UI', sans-serif"},
+                {
+                  text: "⚠️ Irreversible action: Permanently deleted from the songbook.",
+                  color: "gray",
+                  style: "font-family: 'Segoe UI', sans-serif;"
+                }
               ],
               buttons: [
                 {
@@ -4129,9 +4134,24 @@ function openSongOptions(target, onClose) {
                     try {
                       target.classList.add("removing");
 
-                      // 🔥 Delete from Firestore
-                      await db.collection("songs").doc(songId).delete();
+                      const songUrl = target.dataset.url;
+                      const songTitle = target.textContent;
 
+                      // 🔹 Remove from user’s songbook array
+                      const userRef = db.collection("users").doc(currentUser.id);
+                      const userDoc = await userRef.get();
+                      if (userDoc.exists) {
+                        const currentBook = userDoc.data().songbook || [];
+                        const updatedBook = currentBook.filter(s => s.url !== songUrl);
+                        await userRef.update({ songbook: updatedBook });
+                      }
+
+                      // 🔹 Optional: remove from "songs" collection if needed
+                      if (target.dataset.id) {
+                        await db.collection("songs").doc(target.dataset.id).delete().catch(() => {});
+                      }
+
+                      // 🔹 Remove from UI
                       setTimeout(() => {
                         playTrashSound();
                         target.remove();
